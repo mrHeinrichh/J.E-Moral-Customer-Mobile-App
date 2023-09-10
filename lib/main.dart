@@ -1,4 +1,5 @@
 import 'package:customer_app/routes/app_routes.dart';
+import 'package:customer_app/view/dashboard.page.dart';
 import 'package:customer_app/view/login.page.dart';
 import 'package:customer_app/view/onboarding.page.dart';
 import 'package:customer_app/view/signup.page.dart';
@@ -19,6 +20,7 @@ class MyApp extends StatelessWidget {
             OnBoardingPage(), // Use the imported route
         signupRoute: (context) => SignupPage(), // Use the imported route
         loginRoute: (context) => LoginPage(), // Use the imported route
+        dashboardRoute: (context) => DashboardPage(), // Use the imported route
       },
     );
   }
