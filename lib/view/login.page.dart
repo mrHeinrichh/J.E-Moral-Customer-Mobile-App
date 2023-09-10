@@ -38,7 +38,9 @@ class LoginPage extends StatelessWidget {
                 Column(
                   children: [
                     LoginButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushNamed(context, dashboardRoute);
+                      },
                     ),
                     const SizedBox(height: 16),
                     CustomWhiteButton(
