@@ -10,7 +10,7 @@ class LoginButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        primary: Color(0xFF232937), // Background color
+        backgroundColor: const Color(0xFF232937), // Background color
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30),
         ),
@@ -19,7 +19,7 @@ class LoginButton extends StatelessWidget {
         width: double.infinity,
         alignment: Alignment.center,
         padding: const EdgeInsets.symmetric(vertical: 16),
-        child: Text(
+        child: const Text(
           "Login",
           style: TextStyle(
             color: Colors.white,
