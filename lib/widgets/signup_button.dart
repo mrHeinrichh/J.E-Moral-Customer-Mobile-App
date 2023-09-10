@@ -8,11 +8,11 @@ class SignupButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 8.0),
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          primary: Colors.white, // Background color
+          backgroundColor: Colors.white, // Background color
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30),
           ),
@@ -21,7 +21,7 @@ class SignupButton extends StatelessWidget {
           width: double.infinity,
           alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(vertical: 16),
-          child: Text(
+          child: const Text(
             "Signup",
             style: TextStyle(
               color: Colors.black,
