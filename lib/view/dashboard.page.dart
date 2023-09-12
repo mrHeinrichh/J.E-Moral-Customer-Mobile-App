@@ -1,3 +1,4 @@
+import 'package:customer_app/view/home.page.dart';
 import 'package:customer_app/widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -8,7 +9,7 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  int _currentIndex = 0;
+  int _currentIndex = 2;
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +19,11 @@ class _DashboardPageState extends State<DashboardPage> {
           children: [
             buildTopBar(),
             Expanded(
-              child: getPage(_currentIndex),
+              child: _currentIndex == 2
+                  ? HomePage() // Navigate to HomePage when index is 0
+                  : Center(
+                      child: Text('Welcome to Page $_currentIndex'),
+                    ),
             ),
             BottomNavBar(
               currentIndex: _currentIndex,
@@ -95,9 +100,5 @@ class _DashboardPageState extends State<DashboardPage> {
         ),
       ),
     );
-  }
-
-  Widget getPage(int index) {
-    return Container();
   }
 }
