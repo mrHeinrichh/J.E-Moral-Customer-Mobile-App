@@ -1,5 +1,6 @@
 import 'package:customer_app/routes/app_routes.dart';
 import 'package:customer_app/view/appointment.page.dart';
+import 'package:customer_app/view/cart.page.dart';
 import 'package:customer_app/view/dashboard.page.dart';
 import 'package:customer_app/view/login.page.dart';
 import 'package:customer_app/view/onboarding.page.dart';
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
         dashboardRoute: (context) => DashboardPage(), // Use the imported route
         appointmentRoute: (context) =>
             AppointmentPage(), // Use the imported route
+        cartRoute: (context) => CartPage(), // Use the imported route
       },
     );
   }
