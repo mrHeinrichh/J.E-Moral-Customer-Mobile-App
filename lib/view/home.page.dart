@@ -1,6 +1,7 @@
 import 'package:customer_app/routes/app_routes.dart';
 import 'package:customer_app/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class HomePage extends StatelessWidget {
   List<Map<String, dynamic>> sampleData = [
@@ -65,104 +66,161 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        children: [
-          Text(
-            '"Fueling Your Life\nwith Clean Energy"', // Add your desired text here
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 30,
-              color: Color(0xFF232937), // Set the text color here
-            ),
-          ),
-          Text("Applying for a Rider?"),
-          CustomizedButton(
-            onPressed: () {
-              Navigator.pushNamed(context, appointmentRoute);
-            },
-            text: 'Book an Appointment',
-            height: 40,
-            width: 330,
-            fontz: 15,
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: sampleData.length,
-              itemBuilder: (context, categoryIndex) {
-                final category = sampleData[categoryIndex]['category'];
-                final products = sampleData[categoryIndex]['products'];
-
-                return Container(
-                  child: Column(
-                    children: [
-                      ListTile(
-                        title: Text(
-                          category, // Add your desired text here
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                            color: Color(0xFF232937), // Set the text color here
+    return Column(
+      children: [
+        SizedBox(
+          height: 100,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 35.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Material(
+                    elevation: 5,
+                    borderRadius: BorderRadius.circular(10.0),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10.0),
+                      child: Container(
+                        height: 45,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                        ),
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.search,
+                                color: Color(0xFF232937),
+                              ),
+                              Expanded(
+                                child: TextField(
+                                  decoration: InputDecoration(
+                                    hintText: 'Search',
+                                    border: InputBorder.none,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                      SizedBox(
-                        height: 180, // Adjust the height as needed
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: products.length,
-                          itemBuilder: (context, productIndex) {
-                            final product = products[productIndex];
-                            return SizedBox(
-                              width: 130,
-                              child: Column(
-                                children: [
-                                  Card(
-                                    child: Column(
-                                      children: [
-                                        Image.network(
-                                          product[
-                                              'imageUrl'], // URL of the image
-                                          width: 100,
-                                          height: 100,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  ListTile(
-                                    title: Text(
-                                      product['name'],
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        color: Color(
-                                            0xFF232937), // Set the text color here
-                                      ),
-                                    ),
-                                    subtitle: Text(
-                                      '\₱${product['price']}',
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        color: Color(
-                                            0xFFE98500), // Set the text color here
-                                      ),
-                                    ),
-                                    // Add more product information as needed
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                );
-              },
+                ),
+                const SizedBox(width: 10),
+                Material(
+                  elevation: 5,
+                  borderRadius: BorderRadius.circular(10.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10.0),
+                    child: IconButton(
+                      icon: const Icon(
+                        FontAwesomeIcons.cartShopping,
+                        color: Color(0xFF232937),
+                        size: 30,
+                      ),
+                      onPressed: () {
+                        Navigator.pushNamed(context, cartRoute);
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+        const Text(
+          '"Fueling Your Life\nwith Clean Energy"', // Add your desired text here
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 30,
+            color: Color(0xFF232937), // Set the text color here
+          ),
+        ),
+        const Text("Applying for a Rider?"),
+        CustomizedButton(
+          onPressed: () {
+            Navigator.pushNamed(context, appointmentRoute);
+          },
+          text: 'Book an Appointment',
+          height: 40,
+          width: 330,
+          fontz: 15,
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: sampleData.length,
+            itemBuilder: (context, categoryIndex) {
+              final category = sampleData[categoryIndex]['category'];
+              final products = sampleData[categoryIndex]['products'];
+
+              return Column(
+                children: [
+                  ListTile(
+                    title: Text(
+                      category, // Add your desired text here
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: Color(0xFF232937), // Set the text color here
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 180, // Adjust the height as needed
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: products.length,
+                      itemBuilder: (context, productIndex) {
+                        final product = products[productIndex];
+                        return SizedBox(
+                          width: 130,
+                          child: Column(
+                            children: [
+                              Card(
+                                child: Column(
+                                  children: [
+                                    Image.network(
+                                      product['imageUrl'], // URL of the image
+                                      width: 100,
+                                      height: 100,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              ListTile(
+                                title: Text(
+                                  product['name'],
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Color(
+                                        0xFF232937), // Set the text color here
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  '\₱${product['price']}',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Color(
+                                        0xFFE98500), // Set the text color here
+                                  ),
+                                ),
+                                // Add more product information as needed
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
