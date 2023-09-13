@@ -61,85 +61,124 @@ class _CartPageState extends State<CartPage> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: cartItems.length,
-              itemBuilder: (context, index) {
-                final cartItem = cartItems[index];
-                return ListTile(
-                  leading: Checkbox(
-                    value: cartItem.isSelected,
-                    onChanged: (value) {
-                      setState(() {
-                        cartItem.isSelected = value ?? false;
-                      });
-                    },
-                  ),
-                  trailing: Image.network(
-                    cartItem.imageUrl,
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return const Icon(Icons
-                          .error); // Display an error icon if the image fails to load
-                    },
-                  ),
-                  title: Text(cartItem.name),
+              child: ListView.separated(
+            itemCount: cartItems.length,
+            separatorBuilder: (context, index) =>
+                Divider(), // Add a divider between items
+            itemBuilder: (context, index) {
+              final cartItem = cartItems[index];
+              return SizedBox(
+                width: double.infinity,
+                child: ListTile(
+                  contentPadding: EdgeInsets.all(20),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
-                          IconButton(
-                            icon: const Icon(Icons.remove),
-                            onPressed: () {
+                          Checkbox(
+                            value: cartItem.isSelected,
+                            onChanged: (value) {
                               setState(() {
-                                if (cartItem.quantity > 0) {
-                                  cartItem.quantity--;
+                                cartItem.isSelected = value ?? false;
+                              });
+                            },
+                          ),
+                          Image.network(
+                            cartItem.imageUrl,
+                            width: 90,
+                            height: 90,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Icon(Icons.error);
+                            },
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                cartItem.name,
+                                style: TextStyle(fontSize: 18),
+                              ),
+                              Text(
+                                '₱${cartItem.price * cartItem.quantity}',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 18),
+                              ),
+                              Row(
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.remove),
+                                    onPressed: () {
+                                      setState(() {
+                                        if (cartItem.quantity > 0) {
+                                          cartItem.quantity--;
 
-                                  // Remove the item from the cart if quantity is 0
-                                  if (cartItem.quantity == 0) {
-                                    cartItems.removeAt(index);
-                                  }
-                                }
-                              });
-                            },
-                          ),
-                          Text('${cartItem.quantity}'),
-                          IconButton(
-                            icon: const Icon(Icons.add),
-                            onPressed: () {
-                              setState(() {
-                                cartItem.quantity++;
-                              });
-                            },
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () {
-                              setState(() {
-                                cartItems.removeAt(index);
-                              });
-                            },
+                                          // Remove the item from the list if quantity is 0
+                                          if (cartItem.quantity == 0) {
+                                            final updatedCartItems =
+                                                List.of(cartItems);
+                                            updatedCartItems.removeAt(index);
+                                            setState(() {
+                                              cartItems = updatedCartItems;
+                                            });
+                                          }
+                                        }
+                                      });
+                                    },
+                                  ),
+                                  Text('${cartItem.quantity}'),
+                                  IconButton(
+                                    icon: const Icon(Icons.add),
+                                    onPressed: () {
+                                      setState(() {
+                                        cartItem.quantity++;
+                                      });
+                                    },
+                                  ),
+                                  SizedBox(
+                                    width: 70,
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(
+                                      Icons.delete,
+                                      color: Colors.red,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        final updatedCartItems =
+                                            List.of(cartItems);
+                                        updatedCartItems.removeAt(index);
+                                        setState(() {
+                                          cartItems = updatedCartItems;
+                                        });
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                      Text(
-                          'Price: ₱${cartItem.price * cartItem.quantity}'), // Display price
                     ],
                   ),
-                );
-              },
-            ),
-          ),
+                ),
+              );
+            },
+          )),
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
             child: Row(
               children: [
                 Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const Text("Price:"),
                     Text(
-                        "Price:\n₱${_calculateTotalPrice()}"), // Display total price
+                      "₱${_calculateTotalPrice()}",
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ) // Display total price
                   ],
                 ),
                 const SizedBox(width: 35),
