@@ -3,6 +3,8 @@ import 'package:customer_app/view/appointment.page.dart';
 import 'package:customer_app/view/cart.page.dart';
 import 'package:customer_app/view/dashboard.page.dart';
 import 'package:customer_app/view/faq.page.dart';
+import 'package:customer_app/view/history.page.dart';
+import 'package:customer_app/view/history_details.page.dart';
 import 'package:customer_app/view/login.page.dart';
 import 'package:customer_app/view/onboarding.page.dart';
 import 'package:customer_app/view/signup.page.dart';
@@ -28,6 +30,8 @@ class MyApp extends StatelessWidget {
             AppointmentPage(), // Use the imported route
         cartRoute: (context) => CartPage(), // Use the imported route
         faqRoute: (context) => FaqPage(),
+        historyRoute: (context) => HistoryPage(),
+        historyDetails: (context) => HistoryDetails(),
       },
     );
   }
