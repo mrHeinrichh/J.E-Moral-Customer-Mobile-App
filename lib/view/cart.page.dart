@@ -1,3 +1,4 @@
+import 'package:customer_app/routes/app_routes.dart';
 import 'package:customer_app/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
 
@@ -184,7 +185,7 @@ class _CartPageState extends State<CartPage> {
                 const SizedBox(width: 35),
                 CustomizedButton(
                   onPressed: () {
-                    // Handle checkout logic
+                    Navigator.pushNamed(context, setDeliveryPage);
                   },
                   text: 'Place Order',
                   height: 60,
