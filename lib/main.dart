@@ -7,6 +7,7 @@ import 'package:customer_app/view/history.page.dart';
 import 'package:customer_app/view/history_details.page.dart';
 import 'package:customer_app/view/login.page.dart';
 import 'package:customer_app/view/onboarding.page.dart';
+import 'package:customer_app/view/set_delivery.page.dart';
 import 'package:customer_app/view/signup.page.dart';
 import 'package:flutter/material.dart';
 
@@ -32,6 +33,7 @@ class MyApp extends StatelessWidget {
         faqRoute: (context) => FaqPage(),
         historyRoute: (context) => HistoryPage(),
         historyDetails: (context) => HistoryDetails(),
+        setDeliveryPage: (context) => SetDeliveryPage(),
       },
     );
   }
