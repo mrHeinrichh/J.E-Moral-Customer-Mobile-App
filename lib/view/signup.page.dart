@@ -77,6 +77,7 @@ class SignupPage extends StatelessWidget {
                       onPressed: () {},
                     ),
                     CustomButton(
+                      backgroundColor: Color(0xFF232937),
                       onPressed: () {
                         Navigator.pushNamed(context, onboardingRoute);
                       },
