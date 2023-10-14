@@ -42,6 +42,7 @@ class HistoryCard extends StatelessWidget {
                 ),
                 Text("Status: $status"),
                 CustomButton(
+                  backgroundColor: Color(0xFF232937),
                   onPressed: () {
                     Navigator.pushNamed(context, historyDetails);
                   },
