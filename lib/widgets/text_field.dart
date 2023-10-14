@@ -32,13 +32,15 @@ class CustomTextField extends StatelessWidget {
 class CustomTextField1 extends StatelessWidget {
   final String labelText;
   final String hintText;
-  final double borderRadius; // Add a new parameter for border radius
+  final double borderRadius;
+  final TextEditingController? controller; // Add controller parameter
 
   const CustomTextField1({
     Key? key,
     required this.labelText,
     required this.hintText,
-    this.borderRadius = 10.0, // Default border radius is 40.0
+    this.borderRadius = 10.0,
+    this.controller, // Provide a default value of null for the controller
   }) : super(key: key);
 
   @override
@@ -46,6 +48,7 @@ class CustomTextField1 extends StatelessWidget {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 4.0),
       child: TextField(
+        controller: controller, // Use the provided controller
         decoration: InputDecoration(
           labelText: labelText,
           labelStyle: const TextStyle(fontSize: 15.0),
