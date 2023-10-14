@@ -8,3 +8,4 @@ const String faqRoute = '/faq';
 const String historyRoute = '/history';
 const String historyDetails = '/historyDetails';
 const String setDeliveryPage = '/setDeliveryPage';
+const String myOrdersPage = '/myOrdersPage';
