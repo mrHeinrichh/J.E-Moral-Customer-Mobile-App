@@ -1,15 +1,18 @@
-import 'package:customer_app/widgets/location_button.dart';
-import 'package:customer_app/widgets/location_search.dart';
-import 'package:customer_app/widgets/custom_button.dart';
-import 'package:customer_app/widgets/text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:customer_app/widgets/custom_button.dart';
+import 'package:customer_app/widgets/custom_timepicker.dart';
+import 'package:customer_app/widgets/location_button.dart';
+import 'package:customer_app/widgets/location_search.dart';
+import 'package:customer_app/widgets/text_field.dart';
 
 class SetDeliveryPage extends StatefulWidget {
   @override
   _SetDeliveryPageState createState() => _SetDeliveryPageState();
 }
+
+DateTime? selectedDateTime;
 
 enum PaymentMethod { cashOnDelivery, gcashPayment }
 
@@ -21,6 +24,9 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
   AssemblyOption? selectedAssemblyOption;
   List<String> searchResults = [];
   TextEditingController locationController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
+  TextEditingController contactNumberController = TextEditingController();
+  TextEditingController houseNumberController = TextEditingController();
 
   Future<void> fetchLocationData(String query) async {
     if (query.isEmpty) {
@@ -57,6 +63,48 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
     } catch (e) {
       print('Error: $e');
     }
+  }
+
+  // Function to show a modal dialog with inputted data
+  Future<void> showConfirmationDialog() async {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Confirmation'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Delivery Location: ${locationController.text}'),
+              Text('Name: ${nameController.text}'),
+              Text('Contact Number: ${contactNumberController.text}'),
+              Text('House#/Lot/Blk: ${houseNumberController.text}'),
+              Text('Scheduled Date and Time: ${selectedDateTime.toString()}'),
+              Text('Payment Method: ${selectedPaymentMethod.toString()}'),
+              Text(
+                  'Needs to be assembled: ${selectedAssemblyOption.toString()}'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                // Perform the confirmation action here
+                // You can send the data to your server or perform any other action.
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text('Confirm'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -119,21 +167,72 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                     locationController.text = address;
                   },
                 ),
-                const CustomTextField1(
+                CustomTextField1(
                   labelText: 'Name',
                   hintText: 'Enter your Name',
+                  controller: nameController,
                 ),
-                const CustomTextField1(
+                CustomTextField1(
                   labelText: 'Contact Number',
                   hintText: 'Enter your contact number',
+                  controller: contactNumberController,
                 ),
-                const CustomTextField1(
+                CustomTextField1(
                   labelText: 'House#/Lot/Blk',
                   hintText: 'Enter your house number',
+                  controller: houseNumberController,
                 ),
                 const SizedBox(height: 20),
                 const Text("Choose Payment Method"),
-                // Radio buttons and other UI elements
+                ListTile(
+                  title: const Text('Cash On Delivery'),
+                  leading: Radio<PaymentMethod>(
+                    value: PaymentMethod.cashOnDelivery,
+                    groupValue: selectedPaymentMethod,
+                    onChanged: (PaymentMethod? value) {
+                      setState(() {
+                        selectedPaymentMethod = value;
+                      });
+                    },
+                  ),
+                ),
+                ListTile(
+                  title: const Text('Gcash Payment'),
+                  leading: Radio<PaymentMethod>(
+                    value: PaymentMethod.gcashPayment,
+                    groupValue: selectedPaymentMethod,
+                    onChanged: (PaymentMethod? value) {
+                      setState(() {
+                        selectedPaymentMethod = value;
+                      });
+                    },
+                  ),
+                ),
+                Text("Needs to be assembled?"),
+                ListTile(
+                  title: const Text('Yes'),
+                  leading: Radio<AssemblyOption>(
+                    value: AssemblyOption.yes,
+                    groupValue: selectedAssemblyOption,
+                    onChanged: (AssemblyOption? value) {
+                      setState(() {
+                        selectedAssemblyOption = value;
+                      });
+                    },
+                  ),
+                ),
+                ListTile(
+                  title: const Text('No'),
+                  leading: Radio<AssemblyOption>(
+                    value: AssemblyOption.no,
+                    groupValue: selectedAssemblyOption,
+                    onChanged: (AssemblyOption? value) {
+                      setState(() {
+                        selectedAssemblyOption = value;
+                      });
+                    },
+                  ),
+                ),
               ],
             ),
           ),
@@ -141,14 +240,25 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CustomizedButton(
-                onPressed: () {},
+                onPressed: () async {
+                  final selectedDate = await showDateTimePicker(context);
+                  if (selectedDate != null) {
+                    setState(() {
+                      selectedDateTime = selectedDate;
+                      // Show the confirmation dialog when a date is selected
+                      showConfirmationDialog();
+                    });
+                  }
+                },
                 text: 'Scheduled',
                 height: 50,
                 width: 180,
                 fontz: 20,
               ),
               CustomizedButton(
-                onPressed: () {},
+                onPressed: () {
+                  showConfirmationDialog();
+                },
                 text: 'Deliver Now',
                 height: 50,
                 width: 180,
