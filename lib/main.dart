@@ -6,6 +6,7 @@ import 'package:customer_app/view/faq.page.dart';
 import 'package:customer_app/view/history.page.dart';
 import 'package:customer_app/view/history_details.page.dart';
 import 'package:customer_app/view/login.page.dart';
+import 'package:customer_app/view/my_orders.page.dart';
 import 'package:customer_app/view/onboarding.page.dart';
 import 'package:customer_app/view/set_delivery.page.dart';
 import 'package:customer_app/view/signup.page.dart';
@@ -34,6 +35,7 @@ class MyApp extends StatelessWidget {
         historyRoute: (context) => HistoryPage(),
         historyDetails: (context) => HistoryDetails(),
         setDeliveryPage: (context) => SetDeliveryPage(),
+        myOrdersPage: (context) => MyOrderPage(),
       },
     );
   }
