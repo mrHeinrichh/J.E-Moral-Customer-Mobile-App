@@ -1,3 +1,4 @@
+import 'package:customer_app/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -95,9 +96,8 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
             ),
             TextButton(
               onPressed: () {
-                // Perform the confirmation action here
-                // You can send the data to your server or perform any other action.
                 Navigator.of(context).pop(); // Close the dialog
+                Navigator.pushNamed(context, myOrdersPage);
               },
               child: Text('Confirm'),
             ),
