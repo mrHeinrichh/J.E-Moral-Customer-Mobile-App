@@ -1,4 +1,5 @@
 import 'package:customer_app/routes/app_routes.dart';
+import 'package:customer_app/view/product_details.page.dart';
 import 'package:customer_app/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -10,19 +11,19 @@ class HomePage extends StatelessWidget {
       'products': [
         {
           'name': 'Ball Valve',
-          'price': '---.--',
+          'price': '500.86',
           'imageUrl':
               'https://raw.githubusercontent.com/mrHeinrichh/J.E-Moral-cdn/main/assets/png/accessories/gas-cylinder-home-propane-tank-w7GLlP4-600%201.png'
         },
         {
           'name': 'Lpg Hose',
-          'price': '---.--',
+          'price': '600.86',
           'imageUrl':
               'https://raw.githubusercontent.com/mrHeinrichh/J.E-Moral-cdn/main/assets/png/accessories/gas-cylinder-blue-Zelrn95-600%201.png'
         },
         {
           'name': 'Regulator',
-          'price': '---.--',
+          'price': '435.25',
           'imageUrl':
               'https://raw.githubusercontent.com/mrHeinrichh/J.E-Moral-cdn/main/assets/png/accessories/9764832_546062cf-143f-4750-a49b-344311c46413_700_700%201%20(1).png'
         },
@@ -33,13 +34,13 @@ class HomePage extends StatelessWidget {
       'products': [
         {
           'name': 'Island Gas',
-          'price': '---.--',
+          'price': '999.99',
           'imageUrl':
               'https://raw.githubusercontent.com/mrHeinrichh/J.E-Moral-cdn/main/assets/png/brandnewtanks/Beverage-Elements-20-lb-propane-tank-steel-new%201%20(1).png'
         },
         {
           'name': 'Regasco',
-          'price': '---.--',
+          'price': '999.99',
           'imageUrl':
               'https://raw.githubusercontent.com/mrHeinrichh/J.E-Moral-cdn/main/assets/png/brandnewtanks/Beverage-Elements-20-lb-propane-tank-steel-new%201.png'
         },
@@ -50,13 +51,13 @@ class HomePage extends StatelessWidget {
       'products': [
         {
           'name': 'Solane',
-          'price': '---.--',
+          'price': '999.99',
           'imageUrl':
               'https://raw.githubusercontent.com/mrHeinrichh/J.E-Moral-cdn/main/assets/png/refilltanks/Bg.png'
         },
         {
           'name': 'Phoenix',
-          'price': '---.--',
+          'price': '999.99',
           'imageUrl':
               'https://raw.githubusercontent.com/mrHeinrichh/J.E-Moral-cdn/main/assets/png/refilltanks/Beverage-Elements-20-lb-propane-tank-steel-new%201%20(2).png'
         },
@@ -174,47 +175,65 @@ class HomePage extends StatelessWidget {
                       itemCount: products.length,
                       itemBuilder: (context, productIndex) {
                         final product = products[productIndex];
-                        return SizedBox(
-                          width: 130,
-                          child: Column(
-                            children: [
-                              Card(
-                                child: Column(
-                                  children: [
-                                    Image.network(
-                                      product['imageUrl'], // URL of the image
-                                      width: 100,
-                                      height: 100,
-                                      fit: BoxFit.cover,
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ProductDetailsPage(
+                                  productName: "${product['name']}",
+                                  productPrice: product['price'],
+                                  productImageUrl: product['imageUrl'],
+                                  categoryName:
+                                      category, // Pass the category name
+                                ),
+                              ),
+                            );
+                          },
+                          // ... rest of your product widget
+
+                          child: SizedBox(
+                            width: 130,
+                            child: Column(
+                              children: [
+                                Card(
+                                  child: Column(
+                                    children: [
+                                      Image.network(
+                                        product['imageUrl'],
+                                        width: 100,
+                                        height: 100,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                ListTile(
+                                  title: Text(
+                                    product['name'],
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Color(
+                                          0xFF232937), // Set the text color here
                                     ),
-                                  ],
-                                ),
-                              ),
-                              ListTile(
-                                title: Text(
-                                  product['name'],
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Color(
-                                        0xFF232937), // Set the text color here
                                   ),
-                                ),
-                                subtitle: Text(
-                                  '\₱${product['price']}',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Color(
-                                        0xFFE98500), // Set the text color here
+                                  subtitle: Text(
+                                    '\₱${product['price']}',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Color(
+                                          0xFFE98500), // Set the text color here
+                                    ),
                                   ),
+                                  // Add more product information as needed
                                 ),
-                                // Add more product information as needed
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         );
                       },
                     ),
-                  ),
+                  )
                 ],
               );
             },
