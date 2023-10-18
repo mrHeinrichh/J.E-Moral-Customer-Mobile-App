@@ -9,3 +9,6 @@ const String historyRoute = '/history';
 const String historyDetails = '/historyDetails';
 const String setDeliveryPage = '/setDeliveryPage';
 const String myOrdersPage = '/myOrdersPage';
+const String trackingPage = '/trackingPage';
+const String orderDetailsPage = '/orderDetailsPage';
+const String productDetailsPage = '/productDetailsPage';
