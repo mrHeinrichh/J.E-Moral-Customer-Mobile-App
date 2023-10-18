@@ -8,11 +8,14 @@ import 'package:customer_app/view/history_details.page.dart';
 import 'package:customer_app/view/login.page.dart';
 import 'package:customer_app/view/my_orders.page.dart';
 import 'package:customer_app/view/onboarding.page.dart';
+import 'package:customer_app/view/orders_details.page.dart';
+import 'package:customer_app/view/product_details.page.dart';
 import 'package:customer_app/view/set_delivery.page.dart';
 import 'package:customer_app/view/signup.page.dart';
+import 'package:customer_app/view/tracking.page.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+void main() async {
   runApp(MyApp());
 }
 
@@ -36,6 +39,22 @@ class MyApp extends StatelessWidget {
         historyDetails: (context) => HistoryDetails(),
         setDeliveryPage: (context) => SetDeliveryPage(),
         myOrdersPage: (context) => MyOrderPage(),
+        trackingPage: (context) => TrackingPage(),
+        orderDetailsPage: (context) => OrderDetails(),
+        productDetailsPage: (context) {
+          // You should provide the actual product details when this route is accessed.
+          // For now, you can provide placeholder values, and these will be overridden when a product is tapped.
+          const productName = "Placeholder Name";
+          const productPrice = "Placeholder Price";
+          const productImageUrl = "Placeholder Image URL";
+
+          return ProductDetailsPage(
+            productName: productName,
+            productPrice: productPrice,
+            productImageUrl: productImageUrl,
+            categoryName: "Placeholder Category Name",
+          );
+        },
       },
     );
   }
