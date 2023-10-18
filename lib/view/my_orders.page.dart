@@ -1,3 +1,4 @@
+import 'package:customer_app/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:customer_app/widgets/orders_card.dart';
 
@@ -57,9 +58,15 @@ class _MyOrderPageState extends State<MyOrderPage> {
         child: Column(
           children: [
             for (var order in visibleOrders)
-              OrdersCard(
-                order: order,
-                onCancelOrder: () => cancelOrder(order),
+              GestureDetector(
+                onTap: () {
+                  // Navigate to the order details page
+                  Navigator.pushNamed(context, orderDetailsPage);
+                },
+                child: OrdersCard(
+                  order: order,
+                  onCancelOrder: () => cancelOrder(order),
+                ),
               ),
           ],
         ),
