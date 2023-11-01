@@ -1,6 +1,8 @@
 import 'package:customer_app/routes/app_routes.dart';
 import 'package:customer_app/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'cart_provider.dart';
 
 class ProductDetailsPage extends StatefulWidget {
   final String productName;
@@ -24,6 +26,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+
     final titleText = "${widget.productName} - ${widget.categoryName}";
 
     return Scaffold(
@@ -32,7 +36,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         backgroundColor: Colors.white,
         title: Text(
           titleText,
-          style: const TextStyle(color: Color(0xFF232937), fontSize: 24),
+          style: TextStyle(color: Color(0xFF232937), fontSize: 24),
         ),
       ),
       body: SingleChildScrollView(
@@ -139,6 +143,14 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     ),
                     CustomizedButton(
                       onPressed: () {
+                        cartProvider.addToCart(
+                          CartItem(
+                            name: widget.productName,
+                            price: double.parse(widget.productPrice),
+                            quantity: quantity,
+                            imageUrl: widget.productImageUrl,
+                          ),
+                        );
                         Navigator.pushNamed(context, cartRoute);
                       },
                       text: 'Add to cart',

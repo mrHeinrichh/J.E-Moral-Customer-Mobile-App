@@ -1,6 +1,7 @@
 import 'package:customer_app/routes/app_routes.dart';
 import 'package:customer_app/view/appointment.page.dart';
 import 'package:customer_app/view/cart.page.dart';
+import 'package:customer_app/view/cart_provider.dart';
 import 'package:customer_app/view/dashboard.page.dart';
 import 'package:customer_app/view/faq.page.dart';
 import 'package:customer_app/view/history.page.dart';
@@ -14,9 +15,17 @@ import 'package:customer_app/view/set_delivery.page.dart';
 import 'package:customer_app/view/signup.page.dart';
 import 'package:customer_app/view/tracking.page.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-void main() async {
-  runApp(MyApp());
+void main() {
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) {
+        return CartProvider();
+      },
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
