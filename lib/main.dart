@@ -51,17 +51,22 @@ class MyApp extends StatelessWidget {
         trackingPage: (context) => TrackingPage(),
         orderDetailsPage: (context) => OrderDetails(),
         productDetailsPage: (context) {
-          // You should provide the actual product details when this route is accessed.
-          // For now, you can provide placeholder values, and these will be overridden when a product is tapped.
+          // Placeholder values for product details
           const productName = "Placeholder Name";
           const productPrice = "Placeholder Price";
           const productImageUrl = "Placeholder Image URL";
+          const description = "Placeholder Description";
+          const weight = "Placeholder Weight";
+          const quantity = "Placeholder Quantity";
 
           return ProductDetailsPage(
             productName: productName,
             productPrice: productPrice,
             productImageUrl: productImageUrl,
-            categoryName: "Placeholder Category Name",
+            category: "Placeholder Category Name",
+            description: description,
+            weight: weight,
+            quantity: quantity,
           );
         },
       },

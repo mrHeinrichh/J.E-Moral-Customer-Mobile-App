@@ -1,69 +1,62 @@
 import 'package:customer_app/routes/app_routes.dart';
 import 'package:customer_app/view/product_details.page.dart';
-import 'package:customer_app/widgets/custom_button.dart';
-import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:flutter/material.dart';
 
-class HomePage extends StatelessWidget {
-  List<Map<String, dynamic>> sampleData = [
-    {
-      'category': 'Accessories',
-      'products': [
-        {
-          'name': 'Ball Valve',
-          'price': '500.86',
-          'imageUrl':
-              'https://raw.githubusercontent.com/mrHeinrichh/J.E-Moral-cdn/main/assets/png/accessories/gas-cylinder-home-propane-tank-w7GLlP4-600%201.png'
-        },
-        {
-          'name': 'Lpg Hose',
-          'price': '600.86',
-          'imageUrl':
-              'https://raw.githubusercontent.com/mrHeinrichh/J.E-Moral-cdn/main/assets/png/accessories/gas-cylinder-blue-Zelrn95-600%201.png'
-        },
-        {
-          'name': 'Regulator',
-          'price': '435.25',
-          'imageUrl':
-              'https://raw.githubusercontent.com/mrHeinrichh/J.E-Moral-cdn/main/assets/png/accessories/9764832_546062cf-143f-4750-a49b-344311c46413_700_700%201%20(1).png'
-        },
-      ],
-    },
-    {
-      'category': 'Brandnew Tanks',
-      'products': [
-        {
-          'name': 'Island Gas',
-          'price': '999.99',
-          'imageUrl':
-              'https://raw.githubusercontent.com/mrHeinrichh/J.E-Moral-cdn/main/assets/png/brandnewtanks/Beverage-Elements-20-lb-propane-tank-steel-new%201%20(1).png'
-        },
-        {
-          'name': 'Regasco',
-          'price': '999.99',
-          'imageUrl':
-              'https://raw.githubusercontent.com/mrHeinrichh/J.E-Moral-cdn/main/assets/png/brandnewtanks/Beverage-Elements-20-lb-propane-tank-steel-new%201.png'
-        },
-      ],
-    },
-    {
-      'category': 'Refill Tanks',
-      'products': [
-        {
-          'name': 'Solane',
-          'price': '999.99',
-          'imageUrl':
-              'https://raw.githubusercontent.com/mrHeinrichh/J.E-Moral-cdn/main/assets/png/refilltanks/Bg.png'
-        },
-        {
-          'name': 'Phoenix',
-          'price': '999.99',
-          'imageUrl':
-              'https://raw.githubusercontent.com/mrHeinrichh/J.E-Moral-cdn/main/assets/png/refilltanks/Beverage-Elements-20-lb-propane-tank-steel-new%201%20(2).png'
-        },
-      ],
-    },
-  ];
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  List<Map<String, dynamic>> sampleData = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchDataFromAPI();
+  }
+
+  Future<void> fetchDataFromAPI() async {
+    final url = Uri.parse('https://lpg-api-06n8.onrender.com/api/v1/items');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final parsedData = json.decode(response.body);
+      final data = parsedData['data'];
+
+      setState(() {
+        final Map<String, List<Map<String, dynamic>>> groupedData = {};
+
+        data.forEach((item) {
+          final category = item['category'];
+          final product = {
+            'name': item['name'] ?? 'Name Not Available',
+            'price': (item['customerPrice'] ?? 0.0).toString(),
+            'imageUrl': item['image'] ?? 'Image URL Not Available',
+            'description': item['description'] ?? 'Description Not Available',
+            'weight': (item['weight'] ?? 0).toString(),
+            'quantity': (item['quantity'] ?? 0).toString(),
+          };
+
+          if (groupedData.containsKey(category)) {
+            groupedData[category]!.add(product);
+          } else {
+            groupedData[category] = [product];
+          }
+        });
+
+        sampleData = groupedData.entries
+            .map((entry) => {
+                  'category': entry.key,
+                  'products': entry.value,
+                })
+            .toList();
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -132,23 +125,16 @@ class HomePage extends StatelessWidget {
           ),
         ),
         const Text(
-          '"Fueling Your Life\nwith Clean Energy"', // Add your desired text here
+          'Fueling Your Life\nwith Clean Energy',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 30,
-            color: Color(0xFF232937), // Set the text color here
+            color: Color(0xFF232937),
           ),
         ),
-        const Text("Applying for a Rider?"),
-        CustomizedButton(
-          onPressed: () {
-            Navigator.pushNamed(context, appointmentRoute);
-          },
-          text: 'Book an Appointment',
-          height: 40,
-          width: 330,
-          fontz: 15,
-        ),
+        const Text('Applying for a Rider?'),
+        // Implement your 'Book an Appointment' button
+
         Expanded(
           child: ListView.builder(
             itemCount: sampleData.length,
@@ -160,16 +146,16 @@ class HomePage extends StatelessWidget {
                 children: [
                   ListTile(
                     title: Text(
-                      category, // Add your desired text here
+                      category,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
-                        color: Color(0xFF232937), // Set the text color here
+                        color: Color(0xFF232937),
                       ),
                     ),
                   ),
                   SizedBox(
-                    height: 180, // Adjust the height as needed
+                    height: 180,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: products.length,
@@ -181,17 +167,24 @@ class HomePage extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => ProductDetailsPage(
-                                  productName: "${product['name']}",
-                                  productPrice: product['price'],
-                                  productImageUrl: product['imageUrl'],
-                                  categoryName:
-                                      category, // Pass the category name
+                                  productName:
+                                      product['name'] ?? 'Name Not Available',
+                                  productPrice:
+                                      product['price'] ?? 'Price Not Available',
+                                  productImageUrl: product['imageUrl'] ??
+                                      'Image URL Not Available',
+                                  category:
+                                      category ?? 'Category Not Available',
+                                  description: product['description'] ??
+                                      'Description Not Available',
+                                  weight: product['weight'] ??
+                                      'Weight Not Available',
+                                  quantity: product['quantity'] ??
+                                      'Quantity Not Available',
                                 ),
                               ),
                             );
                           },
-                          // ... rest of your product widget
-
                           child: SizedBox(
                             width: 130,
                             child: Column(
@@ -213,19 +206,16 @@ class HomePage extends StatelessWidget {
                                     product['name'],
                                     style: TextStyle(
                                       fontSize: 13,
-                                      color: Color(
-                                          0xFF232937), // Set the text color here
+                                      color: Color(0xFF232937),
                                     ),
                                   ),
                                   subtitle: Text(
                                     '\₱${product['price']}',
                                     style: TextStyle(
                                       fontSize: 13,
-                                      color: Color(
-                                          0xFFE98500), // Set the text color here
+                                      color: Color(0xFFE98500),
                                     ),
                                   ),
-                                  // Add more product information as needed
                                 ),
                               ],
                             ),
@@ -233,7 +223,7 @@ class HomePage extends StatelessWidget {
                         );
                       },
                     ),
-                  )
+                  ),
                 ],
               );
             },

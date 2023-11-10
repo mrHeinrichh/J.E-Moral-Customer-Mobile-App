@@ -1,6 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:customer_app/routes/app_routes.dart';
 import 'package:customer_app/widgets/custom_button.dart';
-import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'cart_provider.dart';
 
@@ -8,13 +8,19 @@ class ProductDetailsPage extends StatefulWidget {
   final String productName;
   final String productPrice;
   final String productImageUrl;
-  final String categoryName;
+  final String category;
+  final String description;
+  final String weight;
+  final String quantity;
 
   ProductDetailsPage({
     required this.productName,
     required this.productPrice,
     required this.productImageUrl,
-    required this.categoryName,
+    required this.category,
+    required this.description, // Added description
+    required this.weight, // Added weight
+    required this.quantity, // Added quantity
   });
 
   @override
@@ -28,7 +34,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   Widget build(BuildContext context) {
     final cartProvider = Provider.of<CartProvider>(context, listen: false);
 
-    final titleText = "${widget.productName} - ${widget.categoryName}";
+    final titleText = "${widget.productName} - ${widget.category}";
 
     return Scaffold(
       appBar: AppBar(
@@ -40,26 +46,28 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         ),
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Image.network(
-                widget.productImageUrl,
-                width: 400,
-                height: 400,
-                fit: BoxFit.cover,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                children: [
+                  Image.network(
+                    widget.productImageUrl,
+                    width: 400,
+                    height: 400,
+                    fit: BoxFit.cover,
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                      "Description: ${widget.description}"), // Display description
+                  Text("Weight: ${widget.weight}"), // Display weight
+                  Text("Quantity: ${widget.quantity}"), // Display quantity
+                ],
               ),
-              const SizedBox(height: 20),
-              const Text(
-                "Product Description",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const Text("11 Kilograms"),
-              const Text("Hand wheel valve"),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
       bottomNavigationBar: BottomAppBar(
@@ -71,8 +79,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text("Stock Available: 10"),
-                    const SizedBox(
+                    Text("Stock Available: 10"),
+                    SizedBox(
                       width: 150,
                     ),
                     Container(
@@ -86,7 +94,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         ),
                       ),
                       child: IconButton(
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.remove,
                           size: 15,
                         ),
@@ -101,7 +109,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     ),
                     Text(
                       "$quantity",
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         color: Color(0xFF232937),
                       ),
@@ -117,7 +125,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         ),
                       ),
                       child: IconButton(
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.add,
                           size: 15,
                         ),
@@ -134,7 +142,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Price: \n₱${quantity * double.parse(widget.productPrice)}",
+                      "Price: \n₱${(double.tryParse(widget.productPrice) ?? 0) * quantity}",
                       style: const TextStyle(
                         fontSize: 18,
                         color: Color(0xFF232937),
@@ -153,7 +161,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         );
                         Navigator.pushNamed(context, cartRoute);
                       },
-                      text: 'Add to cart',
+                      text: 'Add to Cart',
                       height: 60,
                       width: 220,
                       fontz: 20,

@@ -11,8 +11,10 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  String email = "";
-  String password = "";
+  TextEditingController emailController =
+      TextEditingController(text: 'customer@gmail.com');
+  TextEditingController passwordController =
+      TextEditingController(text: 'customer');
 
   Future<Map<String, dynamic>> login(String email, String password) async {
     final response = await http.post(
@@ -57,18 +59,15 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 50.0),
                 TextField(
-                  onChanged: (value) {
-                    email = value;
-                  },
+                  controller: emailController,
                   decoration: InputDecoration(
                     labelText: "Email Address",
                     hintText: "Enter your Email Address",
                   ),
                 ),
                 TextField(
-                  onChanged: (value) {
-                    password = value;
-                  },
+                  controller: passwordController,
+                  obscureText: true,
                   decoration: InputDecoration(
                     labelText: "Password",
                     hintText: "Enter your Password",
@@ -83,7 +82,8 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     LoginButton(
                       onPressed: () async {
-                        final loginResult = await login(email, password);
+                        final loginResult = await login(
+                            emailController.text, passwordController.text);
 
                         if (loginResult.containsKey('error')) {
                           showDialog(
