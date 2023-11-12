@@ -14,15 +14,19 @@ import 'package:customer_app/view/product_details.page.dart';
 import 'package:customer_app/view/set_delivery.page.dart';
 import 'package:customer_app/view/signup.page.dart';
 import 'package:customer_app/view/tracking.page.dart';
+import 'package:customer_app/view/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (context) {
-        return CartProviderView.CartProvider();
-      },
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+            create: (context) => CartProviderView.CartProvider()),
+        ChangeNotifierProvider(
+            create: (context) => UserProvider()), // Add UserProvider
+      ],
       child: MyApp(),
     ),
   );

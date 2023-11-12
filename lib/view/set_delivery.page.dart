@@ -1,4 +1,5 @@
 import 'package:customer_app/view/cart_provider.dart';
+import 'package:customer_app/view/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -90,6 +91,15 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
         convertCartItems(cartProvider.cartItems);
     double totalPrice = cartProvider.calculateTotalPrice();
 
+    final UserProvider userProvider =
+        Provider.of<UserProvider>(context, listen: false);
+    final String userId = userProvider.userId ?? '';
+
+    if (userId == null || userId.isEmpty) {
+      print('Error: User ID is null or empty.');
+      // You might want to display an error message to the user.
+      return;
+    }
     final Map<String, dynamic> requestData = {
       "deliveryLocation": locationController.text,
       "name": nameController.text,
@@ -100,7 +110,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
       "deliveryTime": selectedDateTime.toString(),
       "total": totalPrice.toString(),
       "items": itemsList,
-      "customer": "",
+      "customer": userId,
       "rider": "",
       "hasFeedback": "false",
       "feedback": "",

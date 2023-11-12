@@ -1,9 +1,11 @@
+import 'package:customer_app/view/user_provider.dart';
 import 'package:customer_app/widgets/login_button.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:customer_app/routes/app_routes.dart';
 import 'package:customer_app/widgets/custom_button.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -32,6 +34,11 @@ class _LoginPageState extends State<LoginPage> {
       final Map<String, dynamic> data = jsonDecode(response.body);
 
       if (data['status'] == 'success') {
+        final String userId = data['data'][0]['_id'];
+
+        // Get the UserProvider and set the user ID
+        Provider.of<UserProvider>(context, listen: false).setUserId(userId);
+
         return data;
       } else {
         return {'error': 'Login failed'};
