@@ -1,3 +1,4 @@
+import 'package:customer_app/routes/app_routes.dart';
 import 'package:customer_app/view/cart_provider.dart';
 import 'package:customer_app/view/user_provider.dart';
 import 'package:flutter/material.dart';
@@ -135,12 +136,17 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
       if (response.statusCode == 200) {
         print('Transaction successful');
         print('Response: ${response.body}');
+        // If the transaction is successful, you can proceed with navigation.
+        Navigator.pushNamed(context, myOrdersPage);
       } else {
         print('Transaction failed with status code: ${response.statusCode}');
         print('Response: ${response.body}');
+        // You might want to display an error message to the user.
       }
     } catch (e) {
       print('Error: $e');
+      // Handle other types of errors, if any.
+      // You might want to display an error message to the user.
     }
   }
 
@@ -172,9 +178,10 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
               child: Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.of(context).pop();
-                sendTransactionData();
+                await sendTransactionData(); // Wait for the transaction to complete.
+                // The navigation is now done inside sendTransactionData.
               },
               child: Text('Confirm'),
             ),

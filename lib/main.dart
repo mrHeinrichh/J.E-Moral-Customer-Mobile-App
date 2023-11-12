@@ -51,7 +51,31 @@ class MyApp extends StatelessWidget {
         setDeliveryPage: (context) => SetDeliveryPage(),
         myOrdersPage: (context) => MyOrderPage(),
         trackingPage: (context) => TrackingPage(),
-        orderDetailsPage: (context) => OrderDetails(),
+        orderDetailsPage: (context) {
+          // Sample Transaction object
+          Transaction sampleTransaction = Transaction(
+            name: 'Sample Name',
+            contactNumber: 'Sample Contact Number',
+            houseLotBlk: 'Sample House/Lot/Block',
+            paymentMethod: 'Sample Payment Method',
+            assembly: 'Sample Assembly',
+            deliveryTime: 'Sample Delivery Time',
+            total: 0.0,
+            createdAt: 'Sample Created At',
+            items: [
+              {
+                'productId': 'Sample Product ID',
+                'quantity': 0,
+              },
+            ],
+            deliveryLocation: 'Sample Location',
+            price: 'Sample Price',
+            isApproved: 'Sample Status',
+            id: 'Sample ID',
+          );
+
+          return OrderDetails(transaction: sampleTransaction);
+        },
         productDetailsPage: (context) {
           const productName = "Placeholder Name";
           const productPrice = "Placeholder Price";
