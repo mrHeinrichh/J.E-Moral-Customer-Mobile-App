@@ -1,7 +1,7 @@
 import 'package:customer_app/routes/app_routes.dart';
 import 'package:customer_app/view/appointment.page.dart';
-import 'package:customer_app/view/cart.page.dart';
-import 'package:customer_app/view/cart_provider.dart';
+import 'package:customer_app/view/cart.page.dart' as CartView;
+import 'package:customer_app/view/cart_provider.dart' as CartProviderView;
 import 'package:customer_app/view/dashboard.page.dart';
 import 'package:customer_app/view/faq.page.dart';
 import 'package:customer_app/view/history.page.dart';
@@ -21,7 +21,7 @@ void main() {
   runApp(
     ChangeNotifierProvider(
       create: (context) {
-        return CartProvider();
+        return CartProviderView.CartProvider();
       },
       child: MyApp(),
     ),
@@ -33,16 +33,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Your App',
-      initialRoute: onboardingRoute, // Set the initial route
+      initialRoute: onboardingRoute,
       routes: {
-        onboardingRoute: (context) =>
-            OnBoardingPage(), // Use the imported route
-        signupRoute: (context) => SignupPage(), // Use the imported route
-        loginRoute: (context) => LoginPage(), // Use the imported route
-        dashboardRoute: (context) => DashboardPage(), // Use the imported route
-        appointmentRoute: (context) =>
-            AppointmentPage(), // Use the imported route
-        cartRoute: (context) => CartPage(), // Use the imported route
+        onboardingRoute: (context) => OnBoardingPage(),
+        signupRoute: (context) => SignupPage(),
+        loginRoute: (context) => LoginPage(),
+        dashboardRoute: (context) => DashboardPage(),
+        appointmentRoute: (context) => AppointmentPage(),
+        cartRoute: (context) => CartView.CartPage(),
         faqRoute: (context) => FaqPage(),
         historyRoute: (context) => HistoryPage(),
         historyDetails: (context) => HistoryDetails(),
@@ -51,7 +49,6 @@ class MyApp extends StatelessWidget {
         trackingPage: (context) => TrackingPage(),
         orderDetailsPage: (context) => OrderDetails(),
         productDetailsPage: (context) {
-          // Placeholder values for product details
           const productName = "Placeholder Name";
           const productPrice = "Placeholder Price";
           const productImageUrl = "Placeholder Image URL";

@@ -1,31 +1,63 @@
 import 'package:flutter/material.dart';
 
+class CartProvider extends ChangeNotifier {
+  List<CartItem> _cartItems = [];
+
+  List<CartItem> get cartItems => _cartItems;
+
+  void addToCart(CartItem newItem) {
+    _cartItems.add(newItem);
+    notifyListeners();
+  }
+
+  void removeFromCart(CartItem itemToRemove) {
+    _cartItems.remove(itemToRemove);
+    notifyListeners();
+  }
+
+  void toggleSelection(CartItem item) {
+    item.isSelected = !item.isSelected;
+    notifyListeners();
+  }
+
+  void incrementQuantity(CartItem item) {
+    item.quantity++;
+    notifyListeners();
+  }
+
+  void decrementQuantity(CartItem item) {
+    if (item.quantity > 0) {
+      item.quantity--;
+      if (item.quantity == 0) {
+        removeFromCart(item);
+      }
+    }
+    notifyListeners();
+  }
+
+  double calculateTotalPrice() {
+    double totalPrice = 0.0;
+    for (var cartItem in _cartItems) {
+      if (cartItem.isSelected) {
+        totalPrice += cartItem.price * cartItem.quantity;
+      }
+    }
+    return totalPrice;
+  }
+}
+
 class CartItem {
-  final String name;
-  final double price;
+  String name;
+  double price;
+  String imageUrl;
+  bool isSelected;
   int quantity;
-  final String imageUrl;
-  bool isSelected; // Define isSelected property
 
   CartItem({
     required this.name,
     required this.price,
-    required this.quantity,
     required this.imageUrl,
-    this.isSelected = false, // Initialize isSelected property
+    this.isSelected = false,
+    this.quantity = 1,
   });
-}
-
-class CartProvider extends ChangeNotifier {
-  List<CartItem> cartItems = [];
-
-  void addToCart(CartItem item) {
-    cartItems.add(item);
-    notifyListeners();
-  }
-
-  void removeFromCart(CartItem item) {
-    cartItems.remove(item);
-    notifyListeners();
-  }
 }

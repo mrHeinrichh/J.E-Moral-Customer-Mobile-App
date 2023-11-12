@@ -1,4 +1,4 @@
-import 'package:customer_app/routes/app_routes.dart';
+import 'package:customer_app/view/cart_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -7,6 +7,7 @@ import 'package:customer_app/widgets/custom_timepicker.dart';
 import 'package:customer_app/widgets/location_button.dart';
 import 'package:customer_app/widgets/location_search.dart';
 import 'package:customer_app/widgets/text_field.dart';
+import 'package:provider/provider.dart';
 
 class SetDeliveryPage extends StatefulWidget {
   @override
@@ -28,6 +29,20 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
   TextEditingController nameController = TextEditingController();
   TextEditingController contactNumberController = TextEditingController();
   TextEditingController houseNumberController = TextEditingController();
+
+  List<Map<String, dynamic>> convertCartItems(List<CartItem> cartItems) {
+    List<Map<String, dynamic>> itemsList = [];
+    for (var cartItem in cartItems) {
+      if (cartItem.isSelected) {
+        itemsList.add({
+          "productId":
+              cartItem.name, // Use the name as a placeholder for the product ID
+          "quantity": cartItem.quantity,
+        });
+      }
+    }
+    return itemsList;
+  }
 
   Future<void> fetchLocationData(String query) async {
     if (query.isEmpty) {
@@ -66,9 +81,61 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
     }
   }
 
-  // Function to show a modal dialog with inputted data
+  Future<void> sendTransactionData() async {
+    final apiUrl = 'https://lpg-api-06n8.onrender.com/api/v1/transactions';
+
+    final CartProvider cartProvider =
+        Provider.of<CartProvider>(context, listen: false);
+    final List<Map<String, dynamic>> itemsList =
+        convertCartItems(cartProvider.cartItems);
+    double totalPrice = cartProvider.calculateTotalPrice();
+
+    final Map<String, dynamic> requestData = {
+      "deliveryLocation": locationController.text,
+      "name": nameController.text,
+      "contactNumber": contactNumberController.text,
+      "houseLotBlk": houseNumberController.text,
+      "paymentMethod": selectedPaymentMethod.toString(),
+      "assembly": selectedAssemblyOption.toString(),
+      "deliveryTime": selectedDateTime.toString(),
+      "total": totalPrice.toString(),
+      "items": itemsList,
+      "customer": "",
+      "rider": "",
+      "hasFeedback": "false",
+      "feedback": "",
+      "rating": "0",
+      "pickupImages": [],
+      "completionImages": [],
+      "cancellationImages": [],
+      "cancelReason": "",
+      "pickedUp": "false",
+      "cancelled": "false",
+      "completed": "false",
+      "type": "{Online}",
+    };
+
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        body: json.encode(requestData),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        print('Transaction successful');
+        print('Response: ${response.body}');
+      } else {
+        print('Transaction failed with status code: ${response.statusCode}');
+        print('Response: ${response.body}');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
   Future<void> showConfirmationDialog() async {
-    return showDialog(
+    showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
@@ -90,14 +157,14 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
               },
               child: Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-                Navigator.pushNamed(context, myOrdersPage);
+                Navigator.of(context).pop();
+                sendTransactionData();
               },
               child: Text('Confirm'),
             ),
@@ -114,7 +181,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
         elevation: 0,
         backgroundColor: Colors.white,
         title: const Text(
-          'History',
+          'Set Delivery',
           style: TextStyle(color: Color(0xFF232937), fontSize: 24),
         ),
       ),
@@ -245,7 +312,6 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                   if (selectedDate != null) {
                     setState(() {
                       selectedDateTime = selectedDate;
-                      // Show the confirmation dialog when a date is selected
                       showConfirmationDialog();
                     });
                   }
