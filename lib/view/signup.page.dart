@@ -96,12 +96,32 @@ class _SignupPageState extends State<SignupPage> {
       var fileStream = http.ByteStream(Stream.castFrom(imageFile.openRead()));
       var length = await imageFile.length();
 
+      // Get the file extension
+      String fileExtension = imageFile.path.split('.').last.toLowerCase();
+
+      // Default content type
+      var contentType = MediaType('image', 'png');
+
+      // Map commonly used image file extensions to their content types
+      Map<String, String> imageExtensions = {
+        'png': 'png',
+        'jpg': 'jpeg',
+        'jpeg': 'jpeg',
+        'gif': 'gif',
+        // Add more if needed
+      };
+
+      // Set content type based on file extension
+      if (imageExtensions.containsKey(fileExtension)) {
+        contentType = MediaType('image', imageExtensions[fileExtension]!);
+      }
+
       var multipartFile = http.MultipartFile(
         'image',
         fileStream,
         length,
-        filename: 'image.png',
-        contentType: MediaType('image', 'png'),
+        filename: 'image.$fileExtension',
+        contentType: contentType,
       );
 
       request.files.add(multipartFile);
