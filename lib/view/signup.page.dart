@@ -16,12 +16,15 @@ class SignupPage extends StatefulWidget {
 
 class _SignupPageState extends State<SignupPage> {
   File? _image;
+  File? _image2;
+  bool isPWDClicked = false;
+
   final nameController = TextEditingController();
   final contactNumberController = TextEditingController();
   final addressController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  final formKey = GlobalKey<FormState>(); // Form key
+  final formKey = GlobalKey<FormState>();
   bool isCheckboxChecked = false;
   String? checkboxError;
 
@@ -36,53 +39,68 @@ class _SignupPageState extends State<SignupPage> {
     }
   }
 
+  Future<void> _pickImage2() async {
+    final pickedFile2 =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+
+    if (pickedFile2 != null) {
+      setState(() {
+        _image2 = File(pickedFile2.path);
+      });
+    }
+  }
+
   Future<void> signup() async {
     if (isCheckboxChecked) {
       if (formKey.currentState!.validate()) {
-        // Your existing code to handle signup
+        final userData = {
+          "name": nameController.text,
+          "contactNumber": contactNumberController.text,
+          "address": addressController.text,
+          "email": emailController.text,
+          "password": passwordController.text,
+          "hasAppointment": "false",
+          "verified": "false",
+          "discounted": "false",
+          "type": "Customer",
+          "discountIdImage": "",
+          "dateInterview": "",
+          "timeInterview": "",
+          "image": "",
+        };
+
+        final responseImage1 = await uploadImageToServer(_image!);
+
+        if (responseImage1 != null) {
+          final imageUrl1 = responseImage1["data"][0]["path"];
+          userData["image"] = imageUrl1;
+        }
+
+        final responseImage2 = await uploadImageToServer(_image2!);
+
+        if (responseImage2 != null) {
+          final imageUrl2 = responseImage2["data"][0]["path"];
+          userData["discountIdImage"] = imageUrl2;
+        }
+
+        final userResponse = await http.post(
+          Uri.parse('https://lpg-api-06n8.onrender.com/api/v1/users'),
+          headers: <String, String>{
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode(userData),
+        );
+
+        if (userResponse.statusCode == 201) {
+          print("User created successfully.");
+        } else {
+          print("Response: ${userResponse.body}");
+        }
       }
     } else {
       setState(() {
         checkboxError = 'Please accept the Terms of Use & Privacy Policy';
       });
-    }
-    if (formKey.currentState!.validate() && isCheckboxChecked) {
-      final userData = {
-        "name": nameController.text,
-        "contactNumber": contactNumberController.text,
-        "address": addressController.text,
-        "email": emailController.text,
-        "password": passwordController.text,
-        "hasAppointment": "false",
-        "verified": "false",
-        "discounted": "false",
-        "type": "Customer",
-        "discountIdImage": "",
-        "dateInterview": "",
-        "timeInterview": "",
-        "image": "",
-      };
-
-      final response = await uploadImageToServer(_image!);
-
-      if (response != null) {
-        final imageUrl = response["data"][0]["path"];
-        userData["image"] = imageUrl;
-      }
-
-      final userResponse = await http.post(
-        Uri.parse('https://lpg-api-06n8.onrender.com/api/v1/users'),
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode(userData),
-      );
-
-      if (userResponse.statusCode == 201) {
-        print("User created successfully.");
-      } else {
-        print("Response: ${userResponse.body}");
-      }
     }
   }
 
@@ -96,22 +114,16 @@ class _SignupPageState extends State<SignupPage> {
       var fileStream = http.ByteStream(Stream.castFrom(imageFile.openRead()));
       var length = await imageFile.length();
 
-      // Get the file extension
       String fileExtension = imageFile.path.split('.').last.toLowerCase();
-
-      // Default content type
       var contentType = MediaType('image', 'png');
 
-      // Map commonly used image file extensions to their content types
       Map<String, String> imageExtensions = {
         'png': 'png',
         'jpg': 'jpeg',
         'jpeg': 'jpeg',
         'gif': 'gif',
-        // Add more if needed
       };
 
-      // Set content type based on file extension
       if (imageExtensions.containsKey(fileExtension)) {
         contentType = MediaType('image', imageExtensions[fileExtension]!);
       }
@@ -146,20 +158,61 @@ class _SignupPageState extends State<SignupPage> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
-          margin: const EdgeInsets.only(top: 40.0),
+          margin: const EdgeInsets.only(top: 0.0),
           child: Padding(
             padding: const EdgeInsets.all(50.0),
             child: Form(
-              key: formKey, // Form widget with form key
+              key: formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   const SizedBox(height: 50.0),
                   Column(
                     children: <Widget>[
+                      const Text(
+                        "Sign Up",
+                        style: TextStyle(
+                          fontSize: 30.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        "Create an account, It's free",
+                        style: TextStyle(
+                          fontSize: 15.0,
+                          color: Colors.grey[700],
+                        ),
+                      ),
+                      const SizedBox(height: 10.0),
+                      const Divider(),
+                      const SizedBox(height: 10.0),
+                      _image == null
+                          ? const CircleAvatar(
+                              radius: 50,
+                              backgroundColor: Colors.grey,
+                              child: Icon(
+                                Icons.person,
+                                color: Colors.white,
+                                size: 50,
+                              ),
+                            )
+                          : CircleAvatar(
+                              radius: 50,
+                              backgroundImage: FileImage(_image!),
+                            ),
+                      TextButton(
+                        onPressed: _pickImage,
+                        child: const Text(
+                          "Upload Image",
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontSize: 15.0,
+                          ),
+                        ),
+                      ),
                       TextFormField(
                         controller: nameController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: "Full Name",
                           hintText: "Enter your Full Name",
                         ),
@@ -172,7 +225,7 @@ class _SignupPageState extends State<SignupPage> {
                       ),
                       TextFormField(
                         controller: contactNumberController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: "Contact Number",
                           hintText: "Enter your Contact Number",
                         ),
@@ -185,7 +238,7 @@ class _SignupPageState extends State<SignupPage> {
                       ),
                       TextFormField(
                         controller: addressController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: "Address",
                           hintText: "Enter your Address",
                         ),
@@ -198,7 +251,7 @@ class _SignupPageState extends State<SignupPage> {
                       ),
                       TextFormField(
                         controller: emailController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: "Email Address",
                           hintText: "Enter your Email Address",
                         ),
@@ -211,7 +264,7 @@ class _SignupPageState extends State<SignupPage> {
                       ),
                       TextFormField(
                         controller: passwordController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: "Password",
                           hintText: "Enter your Password",
                         ),
@@ -222,12 +275,67 @@ class _SignupPageState extends State<SignupPage> {
                           return null;
                         },
                       ),
-                      _image == null
-                          ? ElevatedButton(
-                              onPressed: _pickImage,
-                              child: Text("Choose Image"),
-                            )
-                          : Image.file(_image!, height: 100, width: 100),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Column(
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              setState(() {
+                                isPWDClicked = true;
+                              });
+                            },
+                            child: Text(
+                              "Are you a Person with Disability (PWD)?",
+                              style: TextStyle(
+                                color:
+                                    isPWDClicked ? Colors.blue : Colors.black,
+                                fontSize: 15.0,
+                              ),
+                            ),
+                          ),
+                          isPWDClicked
+                              ? (_image2 == null
+                                  ? Container(
+                                      width: 250,
+                                      height: 100,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.rectangle,
+                                        color: Colors.grey,
+                                      ),
+                                      child: Icon(
+                                        Icons.person,
+                                        color: Colors.white,
+                                        size: 50,
+                                      ),
+                                    )
+                                  : Container(
+                                      width: 100,
+                                      height: 100,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        image: DecorationImage(
+                                          image: FileImage(_image2!),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ))
+                              : Container(),
+                          isPWDClicked
+                              ? TextButton(
+                                  onPressed: _pickImage2,
+                                  child: Text(
+                                    "Upload your PWD ID",
+                                    style: TextStyle(
+                                      color: Colors.blue,
+                                      fontSize: 15.0,
+                                    ),
+                                  ),
+                                )
+                              : Container(),
+                        ],
+                      ),
                       Row(
                         children: <Widget>[
                           Checkbox(
@@ -235,7 +343,7 @@ class _SignupPageState extends State<SignupPage> {
                             onChanged: (bool? newValue) {
                               setState(() {
                                 isCheckboxChecked = newValue ?? false;
-                                checkboxError = null; // Clear the error message
+                                checkboxError = null;
                               });
                             },
                           ),
@@ -264,7 +372,7 @@ class _SignupPageState extends State<SignupPage> {
                         onPressed: signup,
                       ),
                       CustomButton(
-                        backgroundColor: Color(0xFF232937),
+                        backgroundColor: const Color(0xFF232937),
                         onPressed: () {
                           Navigator.pushNamed(context, onboardingRoute);
                         },
@@ -273,7 +381,7 @@ class _SignupPageState extends State<SignupPage> {
                       if (checkboxError != null)
                         Text(
                           checkboxError!,
-                          style: TextStyle(color: Colors.red),
+                          style: const TextStyle(color: Colors.red),
                         ),
                     ],
                   ),
