@@ -1,5 +1,6 @@
 import 'package:customer_app/routes/app_routes.dart';
 import 'package:customer_app/view/product_details.page.dart';
+import 'package:customer_app/widgets/custom_button.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -133,8 +134,15 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         const Text('Applying for a Rider?'),
-        // Implement your 'Book an Appointment' button
-
+        CustomizedButton(
+          onPressed: () {
+            Navigator.pushNamed(context, appointmentRoute);
+          },
+          text: 'Book an Appointment',
+          height: 40,
+          width: 330,
+          fontz: 15,
+        ),
         Expanded(
           child: ListView.builder(
             itemCount: sampleData.length,
