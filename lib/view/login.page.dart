@@ -1,11 +1,11 @@
-import 'package:customer_app/view/user_provider.dart';
-import 'package:customer_app/widgets/login_button.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:customer_app/routes/app_routes.dart';
 import 'package:customer_app/widgets/custom_button.dart';
 import 'package:provider/provider.dart';
+import 'package:customer_app/view/user_provider.dart';
+import 'package:customer_app/widgets/login_button.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -18,33 +18,54 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController passwordController =
       TextEditingController(text: 'customer');
 
-  Future<Map<String, dynamic>> login(String email, String password) async {
-    final response = await http.post(
-      Uri.parse('https://lpg-api-06n8.onrender.com/api/v1/auth/login'),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
-        'email': email,
-        'password': password,
-      }),
-    );
+  Future<Map<String, dynamic>> login(String? email, String? password,
+      [BuildContext? context]) async {
+    // Check if email and password are not null
+    if (email == null || password == null) {
+      print('Email or password is null');
+      return {'error': 'Invalid email or password'};
+    }
 
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> data = jsonDecode(response.body);
+    print('Email: $email, Password: $password');
 
-      if (data['status'] == 'success') {
-        final String userId = data['data'][0]['_id'];
+    try {
+      final response = await http.post(
+        Uri.parse('https://lpg-api-06n8.onrender.com/api/v1/auth/login'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'email': email,
+          'password': password,
+        }),
+      );
 
-        // Get the UserProvider and set the user ID
-        Provider.of<UserProvider>(context, listen: false).setUserId(userId);
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
 
-        return data;
+        if (data['status'] == 'success') {
+          // Null check before using context
+          if (context != null) {
+            final List<dynamic>? userData = data['data'];
+            if (userData != null && userData.isNotEmpty) {
+              Provider.of<UserProvider>(context, listen: false)
+                  .setUserId(userData[0]['_id'] ?? '');
+            } else {
+              return {'error': 'User data is missing or empty'};
+            }
+          }
+
+          return data;
+        } else {
+          return {'error': 'Login failed'};
+        }
       } else {
         return {'error': 'Login failed'};
       }
-    } else {
-      return {'error': 'Login failed'};
+    } catch (error, stackTrace) {
+      print('Error: $error');
+      print('Stack trace: $stackTrace');
+      return {'error': 'An error occurred during login'};
     }
   }
 
@@ -90,7 +111,10 @@ class _LoginPageState extends State<LoginPage> {
                     LoginButton(
                       onPressed: () async {
                         final loginResult = await login(
-                            emailController.text, passwordController.text);
+                          emailController.text,
+                          passwordController.text,
+                          context,
+                        );
 
                         if (loginResult.containsKey('error')) {
                           showDialog(
