@@ -42,26 +42,20 @@ class _LoginPageState extends State<LoginPage> {
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
 
-        if (response.statusCode == 200) {
-          final Map<String, dynamic> data = jsonDecode(response.body);
-
-          if (data['status'] == 'success') {
-            if (context != null) {
-              final List<dynamic>? userData = data['data'];
-              if (userData != null && userData.isNotEmpty) {
-                // Accessing the correct nested value
-                String userId = userData[0]['_doc']['user'] ?? '';
-                Provider.of<UserProvider>(context, listen: false)
-                    .setUserId(userId);
-              } else {
-                return {'error': 'User data is missing or empty'};
-              }
+        if (data['status'] == 'success') {
+          if (context != null) {
+            final List<dynamic>? userData = data['data'];
+            if (userData != null && userData.isNotEmpty) {
+              // Accessing the correct nested value
+              String userId = userData[0]['_doc']['user'] ?? '';
+              Provider.of<UserProvider>(context, listen: false)
+                  .setUserId(userId);
+            } else {
+              return {'error': 'User data is missing or empty'};
             }
-
-            return data;
-          } else {
-            return {'error': 'Login failed'};
           }
+
+          return data;
         } else {
           return {'error': 'Login failed'};
         }
