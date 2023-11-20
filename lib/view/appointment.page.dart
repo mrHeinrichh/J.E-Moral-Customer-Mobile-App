@@ -1,6 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:customer_app/widgets/custom_button.dart';
 import 'package:customer_app/widgets/date_time_picker.dart';
-import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:customer_app/view/user_provider.dart';
 
 class AppointmentPage extends StatefulWidget {
   @override
@@ -43,14 +45,11 @@ class _AppointmentPageState extends State<AppointmentPage> {
   }
 
   @override
-  void dispose() {
-    dateController.dispose();
-    timeController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    String? userId = Provider.of<UserProvider>(context).userId;
+
+    print('UserId in build method: $userId');
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -68,8 +67,8 @@ class _AppointmentPageState extends State<AppointmentPage> {
       ),
       body: Column(
         children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(0, 60, 5, 5),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 60, 5, 5),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,

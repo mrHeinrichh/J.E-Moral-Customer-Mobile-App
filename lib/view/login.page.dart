@@ -20,7 +20,6 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<Map<String, dynamic>> login(String? email, String? password,
       [BuildContext? context]) async {
-    // Check if email and password are not null
     if (email == null || password == null) {
       print('Email or password is null');
       return {'error': 'Invalid email or password'};
@@ -43,19 +42,26 @@ class _LoginPageState extends State<LoginPage> {
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
 
-        if (data['status'] == 'success') {
-          // Null check before using context
-          if (context != null) {
-            final List<dynamic>? userData = data['data'];
-            if (userData != null && userData.isNotEmpty) {
-              Provider.of<UserProvider>(context, listen: false)
-                  .setUserId(userData[0]['_id'] ?? '');
-            } else {
-              return {'error': 'User data is missing or empty'};
-            }
-          }
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> data = jsonDecode(response.body);
 
-          return data;
+          if (data['status'] == 'success') {
+            if (context != null) {
+              final List<dynamic>? userData = data['data'];
+              if (userData != null && userData.isNotEmpty) {
+                // Accessing the correct nested value
+                String userId = userData[0]['_doc']['user'] ?? '';
+                Provider.of<UserProvider>(context, listen: false)
+                    .setUserId(userId);
+              } else {
+                return {'error': 'User data is missing or empty'};
+              }
+            }
+
+            return data;
+          } else {
+            return {'error': 'Login failed'};
+          }
         } else {
           return {'error': 'Login failed'};
         }
@@ -115,6 +121,8 @@ class _LoginPageState extends State<LoginPage> {
                           passwordController.text,
                           context,
                         );
+
+                        print('Login Result: $loginResult');
 
                         if (loginResult.containsKey('error')) {
                           showDialog(
