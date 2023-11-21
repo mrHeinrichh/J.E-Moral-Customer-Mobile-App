@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:customer_app/widgets/custom_button.dart';
 import 'package:customer_app/widgets/date_time_picker.dart';
 import 'package:provider/provider.dart';
@@ -41,6 +43,45 @@ class _AppointmentPageState extends State<AppointmentPage> {
         selectedTime = picked;
         timeController.text = picked.format(context);
       });
+    }
+  }
+
+  Future<void> _updateAppointment() async {
+    String? userId = Provider.of<UserProvider>(context, listen: false).userId;
+
+    if (userId != null && selectedDate != null) {
+      final apiUrl = 'https://lpg-api-06n8.onrender.com/api/v1/users/$userId';
+
+      final patchData = {
+        "dateInterview": dateController.text,
+        "timeInterview": timeController.text,
+        "hasAppointment": "true",
+        "type": "Customer"
+      };
+
+      print('Request body: ${jsonEncode(patchData)}'); // Log the request body
+
+      try {
+        final response = await http.patch(
+          Uri.parse(apiUrl),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode(patchData),
+        );
+
+        print('Response body: ${response.body}'); // Log the response body
+
+        if (response.statusCode == 200) {
+          print(response.statusCode);
+          print('Appointment updated successfully');
+        } else {
+          print(
+              'Failed to update appointment. Status code: ${response.statusCode}');
+        }
+      } catch (e) {
+        print('Error updating appointment: $e');
+      }
     }
   }
 
@@ -115,7 +156,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
               SizedBox(
                 width: double.infinity,
                 child: CustomizedButton(
-                  onPressed: () {},
+                  onPressed: _updateAppointment,
                   text: 'Book an Appointment',
                   height: 60,
                   width: 90,
