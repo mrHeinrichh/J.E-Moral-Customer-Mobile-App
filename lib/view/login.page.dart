@@ -42,14 +42,49 @@ class _LoginPageState extends State<LoginPage> {
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
 
+        print('Login Response: $data');
+
         if (data['status'] == 'success') {
           if (context != null) {
             final List<dynamic>? userData = data['data'];
             if (userData != null && userData.isNotEmpty) {
-              // Accessing the correct nested value
+              // Accessing the correct nested values
               String userId = userData[0]['_doc']['user'] ?? '';
-              Provider.of<UserProvider>(context, listen: false)
-                  .setUserId(userId);
+
+              print('User ID: $userId');
+
+              // Fetch additional user details using the user ID
+              final userDetailsResponse = await http.get(
+                Uri.parse(
+                    'https://lpg-api-06n8.onrender.com/api/v1/users/$userId'),
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+              );
+
+              print('User Details Response: ${userDetailsResponse.statusCode}');
+
+              if (userDetailsResponse.statusCode == 200) {
+                final Map<String, dynamic> userDetailsData =
+                    jsonDecode(userDetailsResponse.body);
+
+                print('User Details: $userDetailsData');
+
+                // Extract "type" field from user details
+                String userType = userDetailsData['data']['__t'] ?? '';
+
+                print('User Type: $userType');
+
+                if (userType == 'Customer') {
+                  // Set the user ID in the app state
+                  Provider.of<UserProvider>(context, listen: false)
+                      .setUserId(userId);
+                } else {
+                  return {'error': 'Invalid user type'};
+                }
+              } else {
+                return {'error': 'Failed to fetch user details'};
+              }
             } else {
               return {'error': 'User data is missing or empty'};
             }
