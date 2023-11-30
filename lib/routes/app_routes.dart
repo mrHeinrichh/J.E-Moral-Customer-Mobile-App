@@ -12,3 +12,5 @@ const String myOrdersPage = '/myOrdersPage';
 const String trackingPage = '/trackingPage';
 const String orderDetailsPage = '/orderDetailsPage';
 const String productDetailsPage = '/productDetailsPage';
+const String feedBackPage = "/feedBackPage";
+const String authenticationPage = '/authenticationPage';

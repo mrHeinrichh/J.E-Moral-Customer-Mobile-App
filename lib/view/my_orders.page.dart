@@ -1,3 +1,4 @@
+import 'package:customer_app/view/authentication.page.dart';
 import 'package:customer_app/view/orders_details.page.dart';
 import 'package:customer_app/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,8 @@ class Transaction {
   final String deliveryLocation;
   final String price;
   final dynamic isApproved;
+
+  final dynamic completed;
   final String id; // Added ID field for identifying transactions
   final String name;
   final String contactNumber;
@@ -36,6 +39,7 @@ class Transaction {
     required this.total,
     required this.createdAt,
     required this.items,
+    required this.completed,
   });
 }
 
@@ -88,6 +92,7 @@ class _MyOrderPageState extends State<MyOrderPage> {
                     price: transactionData['total'].toString(),
                     isApproved: transactionData['isApproved'] ?? '',
                     id: transactionData['_id'] ?? '',
+                    completed: transactionData['completed'] ?? '',
                   ))
               .toList();
         });
@@ -130,13 +135,14 @@ class _MyOrderPageState extends State<MyOrderPage> {
             for (int i = 0; i < visibleTransactions.length; i++)
               GestureDetector(
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          OrderDetails(transaction: visibleTransactions[i]),
-                    ),
-                  );
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) => AuthenticationPage(
+                  //       transaction: visibleTransactions[i],
+                  //     ),
+                  //   ),
+                  // );
                 },
                 child: TransactionCard(
                   transaction: visibleTransactions[i],
@@ -185,7 +191,7 @@ class _TransactionCardState extends State<TransactionCard> {
     return ClipRRect(
       borderRadius: BorderRadius.circular(30),
       child: SizedBox(
-        height: 200,
+        height: 250,
         child: Card(
           elevation: 2,
           child: Padding(
@@ -211,7 +217,12 @@ class _TransactionCardState extends State<TransactionCard> {
                 CustomButton(
                   backgroundColor: getTrackOrderButtonColor(),
                   onPressed: () {
-                    // Navigate to track order page
+                    Navigator.pushNamed(
+                      context,
+                      authenticationPage,
+                      arguments: widget
+                          .transaction, // Pass the transaction data as arguments
+                    );
                   },
                   text: 'Track Order',
                 ),

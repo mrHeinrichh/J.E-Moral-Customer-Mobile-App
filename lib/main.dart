@@ -1,9 +1,11 @@
 import 'package:customer_app/routes/app_routes.dart';
 import 'package:customer_app/view/appointment.page.dart';
+import 'package:customer_app/view/authentication.page.dart';
 import 'package:customer_app/view/cart.page.dart' as CartView;
 import 'package:customer_app/view/cart_provider.dart' as CartProviderView;
 import 'package:customer_app/view/dashboard.page.dart';
 import 'package:customer_app/view/faq.page.dart';
+import 'package:customer_app/view/feedback.page.dart';
 import 'package:customer_app/view/history.page.dart';
 import 'package:customer_app/view/history_details.page.dart';
 import 'package:customer_app/view/login.page.dart';
@@ -51,6 +53,8 @@ class MyApp extends StatelessWidget {
         setDeliveryPage: (context) => SetDeliveryPage(),
         myOrdersPage: (context) => MyOrderPage(),
         trackingPage: (context) => TrackingPage(),
+        authenticationPage: (context) => AuthenticationPage(),
+        feedBackPage: (context) => FeedbackPage(),
         orderDetailsPage: (context) {
           // Sample Transaction object
           Transaction sampleTransaction = Transaction(
@@ -61,6 +65,7 @@ class MyApp extends StatelessWidget {
             assembly: 'Sample Assembly',
             deliveryTime: 'Sample Delivery Time',
             total: 0.0,
+            completed: 'Sample Completed',
             createdAt: 'Sample Created At',
             items: [
               {

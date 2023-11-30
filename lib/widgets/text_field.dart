@@ -61,3 +61,36 @@ class CustomTextField1 extends StatelessWidget {
     );
   }
 }
+
+class FeedbackTextField extends StatelessWidget {
+  final String labelText;
+  final String hintText;
+  final double borderRadius;
+  final TextEditingController? controller; // Add controller parameter
+
+  const FeedbackTextField({
+    Key? key,
+    required this.labelText,
+    required this.hintText,
+    this.borderRadius = 10.0,
+    this.controller, // Provide a default value of null for the controller
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 40,
+      child: TextField(
+        controller: controller, // Use the provided controller
+        decoration: InputDecoration(
+          labelText: labelText,
+          labelStyle: const TextStyle(fontSize: 13.0),
+          hintText: hintText,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(borderRadius),
+          ),
+        ),
+      ),
+    );
+  }
+}

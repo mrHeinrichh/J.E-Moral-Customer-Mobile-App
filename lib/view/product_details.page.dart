@@ -45,35 +45,34 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           style: TextStyle(color: Color(0xFF232937), fontSize: 24),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                children: [
-                  Image.network(
-                    widget.productImageUrl,
-                    width: 400,
-                    height: 400,
-                    fit: BoxFit.cover,
-                  ),
-                  SizedBox(height: 20),
-                  Text(
-                      "Description: ${widget.description}"), // Display description
-                  Text("Weight: ${widget.weight}"), // Display weight
-                  Text("Quantity: ${widget.quantity}"), // Display quantity
-                ],
-              ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              children: [
+                Image.network(
+                  widget.productImageUrl,
+                  width: 400,
+                  height: 400,
+                  fit: BoxFit.cover,
+                ),
+                SizedBox(height: 20),
+                Text(
+                    "Description: ${widget.description}"), // Display description
+                Text("Weight: ${widget.weight}"), // Display weight
+                Text("Quantity: ${widget.quantity}"), // Display quantity
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-      bottomNavigationBar: BottomAppBar(
-        child: SingleChildScrollView(
+      bottomNavigationBar: Container(
+        height: 170,
+        child: BottomAppBar(
           child: Padding(
-            padding: const EdgeInsets.all(25.0),
+            padding: const EdgeInsets.all(5.0),
             child: Column(
               children: [
                 Row(
