@@ -191,6 +191,49 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
     );
   }
 
+  Future<void> confirmDialog() async {
+    selectedDateTime = DateTime.now();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Confirmation'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Delivery Location: ${locationController.text}'),
+              Text('Name: ${nameController.text}'),
+              Text('Contact Number: ${contactNumberController.text}'),
+              Text('House#/Lot/Blk: ${houseNumberController.text}'),
+              Text('Scheduled Date and Time: ${selectedDateTime.toString()}'),
+              Text('Payment Method: ${selectedPaymentMethod.toString()}'),
+              Text(
+                  'Needs to be assembled: ${selectedAssemblyOption.toString()}'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await sendTransactionData(); // Wait for the transaction to complete.
+                // The navigation is now done inside sendTransactionData.
+              },
+              child: Text('Confirm'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -340,7 +383,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
               ),
               CustomizedButton(
                 onPressed: () {
-                  showConfirmationDialog();
+                  confirmDialog();
                 },
                 text: 'Deliver Now',
                 height: 50,
