@@ -46,6 +46,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
     print(transaction.id);
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         elevation: 0,
         backgroundColor: Colors.white,
         title: const Padding(
