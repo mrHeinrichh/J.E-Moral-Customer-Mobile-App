@@ -63,7 +63,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         title: const Padding(
           padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
