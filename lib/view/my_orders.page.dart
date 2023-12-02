@@ -77,6 +77,8 @@ class _MyOrderPageState extends State<MyOrderPage> {
 
         setState(() {
           visibleTransactions = transactionsData
+              .where(
+                  (transactionData) => transactionData['hasFeedback'] == false)
               .map((transactionData) => Transaction(
                     name: transactionData['name'] ?? '',
                     contactNumber: transactionData['contactNumber'] ?? '',

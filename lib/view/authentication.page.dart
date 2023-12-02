@@ -105,7 +105,11 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                   ),
                   CustomizedButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, feedBackPage);
+                      Navigator.pushNamed(
+                        context,
+                        feedBackPage,
+                        arguments: transaction,
+                      );
                     },
                     text: 'Feedback',
                     height: 50,

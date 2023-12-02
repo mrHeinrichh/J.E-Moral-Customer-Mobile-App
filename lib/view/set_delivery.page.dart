@@ -114,7 +114,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
       "customer": userId,
       "rider": "",
       "hasFeedback": "false",
-      "feedback": "",
+      "feedback": [],
       "rating": "0",
       "pickupImages": "",
       "completionImages": "",

@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:customer_app/routes/app_routes.dart';
+import 'package:customer_app/view/my_orders.page.dart';
 import 'package:customer_app/widgets/text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:customer_app/widgets/custom_button.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -34,8 +38,12 @@ class _FeedbackPageState extends State<FeedbackPage> {
   final recommendationToOthersController = TextEditingController();
 
   final suggestionsForImprovementController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
+    final Transaction transaction =
+        ModalRoute.of(context)!.settings.arguments as Transaction;
+    print(transaction.id);
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -382,7 +390,8 @@ class _FeedbackPageState extends State<FeedbackPage> {
             ),
             CustomizedButton(
               onPressed: () {
-                Navigator.pushNamed(context, dashboardRoute);
+                submitFeedback(transaction);
+                // Navigator.pushNamed(context, dashboardRoute);
                 print('Submitted Rating: $rating');
               },
               text: 'Submit',
@@ -394,5 +403,61 @@ class _FeedbackPageState extends State<FeedbackPage> {
         ),
       ),
     );
+  }
+
+  List<String> getFeedbackValues() {
+    return [
+      rating.toString(),
+      rating1.toString(),
+      rating2.toString(),
+      rating3.toString(),
+      rating4.toString(),
+      rating5.toString(),
+      rating6.toString(),
+      userInterfaceController.text,
+      easeofNavigationController.text,
+      orderTimeController.text,
+      riderandDeliveryserviceController.text,
+      announcementsController.text,
+      qualityofServiceController.text,
+      recommendationToOthersController.text,
+      suggestionsForImprovementController.text,
+    ];
+  }
+
+  Future<void> submitFeedback(Transaction transaction) async {
+    List<String> feedbackValues = getFeedbackValues();
+
+    Map<String, dynamic> feedbackData = {
+      "hasFeedback": 'true',
+      "feedback": feedbackValues,
+      "_id": transaction.id,
+    };
+
+    String jsonData = jsonEncode(feedbackData);
+
+    String apiUrl =
+        "https://lpg-api-06n8.onrender.com/api/v1/transactions/${transaction.id}";
+
+    try {
+      http.Response response = await http.patch(
+        Uri.parse(apiUrl),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: jsonData,
+      );
+
+      if (response.statusCode == 200) {
+        print("Feedback submitted successfully");
+        print(response.body);
+        print(response.statusCode);
+        Navigator.pushNamed(context, dashboardRoute);
+      } else {
+        print("Failed to submit feedback. Status code: ${response.statusCode}");
+      }
+    } catch (error) {
+      print("Error: $error");
+    }
   }
 }
