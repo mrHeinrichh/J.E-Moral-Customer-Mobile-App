@@ -109,12 +109,13 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
       "paymentMethod": selectedPaymentMethod.toString(),
       "assembly": selectedAssemblyOption.toString(),
       "deliveryTime": selectedDateTime.toString(),
+      "barangay": selectedBarangay,
       "total": totalPrice.toString(),
       "items": itemsList,
       "customer": userId,
       "rider": "",
       "hasFeedback": "false",
-      "feedback": [],
+      "feedback": "",
       "rating": "0",
       "pickupImages": "",
       "completionImages": "",
@@ -164,6 +165,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
               Text('Name: ${nameController.text}'),
               Text('Contact Number: ${contactNumberController.text}'),
               Text('House#/Lot/Blk: ${houseNumberController.text}'),
+              Text('Barangay $selectedBarangay'),
               Text('Scheduled Date and Time: ${selectedDateTime.toString()}'),
               Text('Payment Method: ${selectedPaymentMethod.toString()}'),
               Text(
@@ -207,6 +209,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
               Text('Name: ${nameController.text}'),
               Text('Contact Number: ${contactNumberController.text}'),
               Text('House#/Lot/Blk: ${houseNumberController.text}'),
+              Text('Barangay $selectedBarangay'),
               Text('Scheduled Date and Time: ${selectedDateTime.toString()}'),
               Text('Payment Method: ${selectedPaymentMethod.toString()}'),
               Text(
@@ -233,6 +236,49 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
       },
     );
   }
+
+  String? selectedBarangay;
+  final List<String> barangays = [
+    'Bagumbayan'
+        'Bambang'
+        'Calzada Tipas'
+        'Cembo'
+        'Central Bicutan'
+        'Central Signal Village'
+        'Cembo'
+        'Comembo'
+        'East Rembo'
+        'Fort Bonifacio'
+        'Hagonoy'
+        'Ibayo Tipas'
+        'Katuparan'
+        'Ligid Tipas'
+        'Lower Bicutan'
+        'Maharlika Village'
+        'Napindan'
+        'New Lower Bicutan'
+        'North Daang Hari'
+        'North Signal Village'
+        'Palingon Tipas'
+        'Pembo'
+        'Pinagsama'
+        'Pitogo'
+        'Post Proper Northside'
+        'Post Proper Southside'
+        'Rizal'
+        'San Miguel'
+        'Santa Ana'
+        'South Cembo'
+        'South Daang Hari'
+        'South Signal Village'
+        'Tanyag'
+        'Tuktukan'
+        'Ususan'
+        'Upper Bicutan'
+        'Wawa'
+        'West Rembo'
+        'Western Bicutan'
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -308,6 +354,26 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                   labelText: 'House#/Lot/Blk',
                   hintText: 'Enter your house number',
                   controller: houseNumberController,
+                ),
+                const SizedBox(height: 20),
+                const Text("Choose Barangay"),
+                DropdownButtonFormField<String>(
+                  value: selectedBarangay,
+                  items: barangays.map((barangay) {
+                    return DropdownMenuItem<String>(
+                      value: barangay,
+                      child: Text(barangay),
+                    );
+                  }).toList(),
+                  onChanged: (String? value) {
+                    setState(() {
+                      selectedBarangay = value;
+                    });
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Barangay',
+                    border: OutlineInputBorder(),
+                  ),
                 ),
                 const SizedBox(height: 20),
                 const Text("Choose Payment Method"),
