@@ -9,7 +9,7 @@ class _FaqPageState extends State<FaqPage> {
   List<String> questions = [
     'How Can We help?',
     'How Can We Access Your Application?',
-    'My Orders',
+    'How to Order?',
     'Support Request',
     'My Account',
     'Orders and Payment',
@@ -26,7 +26,7 @@ class _FaqPageState extends State<FaqPage> {
   List<String> answers = [
     'We, the J.E. Moral LPG Store is committed to help our growing clients by giving them a platform to access our products anytime and anywhere to ease their purchasing time and efforts.',
     'To access the full potential of the application according to your role, just simply register or create an account, supply the necessary requirements, and wait for the confirmation of your account.',
-    'Answer 2',
+    'For you to order in the application, just search or click to your desired products, add it to your cart, review, and proceed to checkout by supplying the necessary delivery information provided.',
     'Answer 3',
     'Answer 4',
     'Answer 5',
