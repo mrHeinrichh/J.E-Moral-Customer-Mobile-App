@@ -25,6 +25,7 @@ class _FaqPageState extends State<FaqPage> {
 
   List<String> answers = [
     'We, the J.E. Moral LPG Store is committed to help our growing clients by giving them a platform to access our products anytime and anywhere to ease their purchasing time and efforts.',
+    'To access the full potential of the application according to your role, just simply register or create an account, supply the necessary requirements, and wait for the confirmation of your account.',
     'Answer 2',
     'Answer 3',
     'Answer 4',
