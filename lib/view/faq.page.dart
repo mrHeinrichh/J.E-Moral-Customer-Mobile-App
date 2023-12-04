@@ -13,8 +13,8 @@ class _FaqPageState extends State<FaqPage> {
     'How to Order?',
     'Mode of Payment',
     'Can I track my order?',
-    'Do you offer warranty on products?',
-
+    'Do you Offer Warranty on Products?',
+    'How can I Contact Customer Support?',
     // 'Support Request',
     // 'My Account',
     // 'Orders and Payment',
@@ -35,7 +35,7 @@ class _FaqPageState extends State<FaqPage> {
     'The application offers you a Cash on Delivery and contactless payment such as GCash.',
     'Yes, you can track your order once it is shipped. Just go to History -> View Orders -> Track Order.',
     'Yes, we do offer warranty on our products especially the LPG parts and accessories items. Warranty covers replacement of items nor refund if there is no more stocks available, but warranty complaints are always subject for thorough investigations. ',
-
+    'You can reach out to us through the "Contact Us" page on the website or by using the live chat option in the application for real-time support.',
     // 'Answer 6',
     // 'Answer 7',
     // 'Answer 8',
