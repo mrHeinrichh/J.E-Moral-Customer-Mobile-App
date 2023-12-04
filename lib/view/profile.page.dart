@@ -39,6 +39,7 @@ class _ProfilePageState extends State<ProfilePage> {
         body: jsonEncode({
           'name': name,
           'contactNumber': contactNumber,
+          'type': "Customer",
           'address': address,
         }),
       );

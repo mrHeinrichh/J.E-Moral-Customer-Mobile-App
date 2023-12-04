@@ -239,45 +239,45 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
 
   String? selectedBarangay;
   final List<String> barangays = [
-    'Bagumbayan'
-        'Bambang'
-        'Calzada Tipas'
-        'Cembo'
-        'Central Bicutan'
-        'Central Signal Village'
-        'Cembo'
-        'Comembo'
-        'East Rembo'
-        'Fort Bonifacio'
-        'Hagonoy'
-        'Ibayo Tipas'
-        'Katuparan'
-        'Ligid Tipas'
-        'Lower Bicutan'
-        'Maharlika Village'
-        'Napindan'
-        'New Lower Bicutan'
-        'North Daang Hari'
-        'North Signal Village'
-        'Palingon Tipas'
-        'Pembo'
-        'Pinagsama'
-        'Pitogo'
-        'Post Proper Northside'
-        'Post Proper Southside'
-        'Rizal'
-        'San Miguel'
-        'Santa Ana'
-        'South Cembo'
-        'South Daang Hari'
-        'South Signal Village'
-        'Tanyag'
-        'Tuktukan'
-        'Ususan'
-        'Upper Bicutan'
-        'Wawa'
-        'West Rembo'
-        'Western Bicutan'
+    'Bagumbayan',
+    'Bambang',
+    'Calzada Tipas',
+    'Cembo',
+    'Central Bicutan',
+    'Central Signal Village',
+    'Cembo',
+    'Comembo',
+    'East Rembo',
+    'Fort Bonifacio',
+    'Hagonoy',
+    'Ibayo Tipas',
+    'Katuparan',
+    'Ligid Tipas',
+    'Lower Bicutan',
+    'Maharlika Village',
+    'Napindan',
+    'New Lower Bicutan',
+    'North Daang Hari',
+    'North Signal Village',
+    'Palingon Tipas',
+    'Pembo',
+    'Pinagsama',
+    'Pitogo',
+    'Post Proper Northside',
+    'Post Proper Southside',
+    'Rizal',
+    'San Miguel',
+    'Santa Ana',
+    'South Cembo',
+    'South Daang Hari',
+    'South Signal Village',
+    'Tanyag',
+    'Tuktukan',
+    'Ususan',
+    'Upper Bicutan',
+    'Wawa',
+    'West Rembo',
+    'Western Bicutan'
   ];
 
   @override
@@ -357,22 +357,26 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                 ),
                 const SizedBox(height: 20),
                 const Text("Choose Barangay"),
-                DropdownButtonFormField<String>(
-                  value: selectedBarangay,
-                  items: barangays.map((barangay) {
-                    return DropdownMenuItem<String>(
-                      value: barangay,
-                      child: Text(barangay),
-                    );
-                  }).toList(),
-                  onChanged: (String? value) {
-                    setState(() {
-                      selectedBarangay = value;
-                    });
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'Barangay',
-                    border: OutlineInputBorder(),
+                SingleChildScrollView(
+                  child: DropdownButtonFormField<String>(
+                    value: selectedBarangay,
+                    items: barangays.map((barangay) {
+                      return DropdownMenuItem<String>(
+                        value: barangay,
+                        child: Text(barangay),
+                      );
+                    }).toList(),
+                    onChanged: (String? value) {
+                      setState(() {
+                        selectedBarangay = value;
+                      });
+                    },
+                    decoration: InputDecoration(
+                      labelText: 'Select your Barangay',
+                      border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.symmetric(
+                          vertical: 20.0, horizontal: 16.0), // Adjust padding
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),

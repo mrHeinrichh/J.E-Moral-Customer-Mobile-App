@@ -80,30 +80,31 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   children: [
                     Text("Stock Available: 10"),
                     SizedBox(
-                      width: 150,
+                      width: 100,
                     ),
-                    Container(
-                      width: 30,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.grey,
-                          width: 0.50,
+                    Expanded(
+                      child: Container(
+                        height: 30,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.grey,
+                            width: 0.50,
+                          ),
                         ),
-                      ),
-                      child: IconButton(
-                        icon: Icon(
-                          Icons.remove,
-                          size: 15,
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.remove,
+                            size: 15,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              if (quantity > 1) {
+                                quantity--;
+                              }
+                            });
+                          },
                         ),
-                        onPressed: () {
-                          setState(() {
-                            if (quantity > 1) {
-                              quantity--;
-                            }
-                          });
-                        },
                       ),
                     ),
                     Text(
@@ -114,7 +115,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       ),
                     ),
                     Container(
-                      width: 30,
                       height: 30,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,

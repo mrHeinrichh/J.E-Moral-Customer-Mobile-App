@@ -65,6 +65,7 @@ class _CartPageState extends State<CartPage> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,7 +77,6 @@ class _CartPageState extends State<CartPage> {
                         ),
                       ],
                     ),
-                    const SizedBox(width: 35),
                     CustomizedButton(
                       onPressed: () {
                         Navigator.pushNamed(context, setDeliveryPage);
@@ -161,7 +161,7 @@ class CartItemWidget extends StatelessWidget {
                           },
                         ),
                         SizedBox(
-                          width: 70,
+                          width: 50,
                         ),
                         IconButton(
                           icon: const Icon(
