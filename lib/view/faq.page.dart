@@ -13,6 +13,7 @@ class _FaqPageState extends State<FaqPage> {
     'How to Order?',
     'Mode of Payment',
     'Can I track my order?',
+    'Do you offer warranty on products?',
 
     // 'Support Request',
     // 'My Account',
@@ -32,7 +33,9 @@ class _FaqPageState extends State<FaqPage> {
     'To apply as a Rider of our shop, just click "Book an Appointment" below "Apply as a Rider?" question in the landing page, supply the appointment information needed, and wait for the approval from the administrator confirming your schedule.',
     'For you to order in the application, just search or click to your desired products, add it to your cart, review, and proceed to checkout by supplying the necessary delivery information provided.',
     'The application offers you a Cash on Delivery and contactless payment such as GCash.',
-    'Yes, you can track your order once it is shipped. Just go to History -> View Orders -> Track Order.'
+    'Yes, you can track your order once it is shipped. Just go to History -> View Orders -> Track Order.',
+    'Yes, we do offer warranty on our products especially the LPG parts and accessories items. Warranty covers replacement of items nor refund if there is no more stocks available, but warranty complaints are always subject for thorough investigations. ',
+
     // 'Answer 6',
     // 'Answer 7',
     // 'Answer 8',
