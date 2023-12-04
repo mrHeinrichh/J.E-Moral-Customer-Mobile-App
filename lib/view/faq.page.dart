@@ -7,19 +7,20 @@ class FaqPage extends StatefulWidget {
 
 class _FaqPageState extends State<FaqPage> {
   List<String> questions = [
-    'How can we help?',
+    'How Can We help?',
+    'How Can We Access Your Application?',
     'My Orders',
-    'Support request',
+    'Support Request',
     'My Account',
     'Orders and Payment',
-    'Get help with my pay',
+    'Get Help With My Pay',
     'Safety Concerns',
-    'How to become a Rider',
-    'How to become a Retailer',
+    'How to Become a Rider',
+    'How to Become a Retailer',
     'Selling and Billing',
     'Refilling',
-    'How to order',
-    'Get customer support',
+    'How to Order',
+    'Get Customer Support',
   ];
 
   List<String> answers = [
