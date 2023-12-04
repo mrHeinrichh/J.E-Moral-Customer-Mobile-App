@@ -6,6 +6,38 @@ class FaqPage extends StatefulWidget {
 }
 
 class _FaqPageState extends State<FaqPage> {
+  List<String> questions = [
+    'How can we help?',
+    'My Orders',
+    'Support request',
+    'My Account',
+    'Orders and Payment',
+    'Get help with my pay',
+    'Safety Concerns',
+    'How to become a Rider',
+    'How to become a Retailer',
+    'Selling and Billing',
+    'Refilling',
+    'How to order',
+    'Get customer support',
+  ];
+
+  List<String> answers = [
+    'We, the J.E. Moral LPG Store is committed to help our growing clients by giving them a platform to access our products anytime and anywhere to ease their purchasing time and efforts.',
+    'Answer 2',
+    'Answer 3',
+    'Answer 4',
+    'Answer 5',
+    'Answer 6',
+    'Answer 7',
+    'Answer 8',
+    'Answer 9',
+    'Answer 10',
+    'Answer 11',
+    'Answer 12',
+    'Answer 13',
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,159 +57,32 @@ class _FaqPageState extends State<FaqPage> {
         padding: const EdgeInsets.all(20.0),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
-          child: const Card(
+          child: Card(
             elevation: 0,
-            child: Padding(
-              padding: EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        'How can we help? ',
-                        style: TextStyle(
-                          fontSize: 16,
-                        ),
-                      ),
-                      Spacer(),
-                      Icon(Icons.arrow_forward_ios, color: Color(0xFF5E738A)),
-                    ],
+            child: ListView.builder(
+              itemCount: questions.length,
+              itemBuilder: (context, index) {
+                return ExpansionTile(
+                  title: Text(
+                    questions[index],
+                    style: TextStyle(fontSize: 16),
                   ),
-                  Divider(color: Colors.black),
-                  Row(
-                    children: [
-                      Text(
-                        'My Orders',
-                        style: TextStyle(fontSize: 16),
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            answers[index],
+                            style: TextStyle(fontSize: 14),
+                          ),
+                        ],
                       ),
-                      Spacer(),
-                      Icon(Icons.arrow_forward_ios, color: Color(0xFF5E738A)),
-                    ],
-                  ),
-                  Divider(color: Colors.black),
-                  Row(
-                    children: [
-                      Text(
-                        'Support request',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      Spacer(),
-                      Icon(Icons.arrow_forward_ios, color: Color(0xFF5E738A)),
-                    ],
-                  ),
-                  Divider(color: Colors.black),
-                  Row(
-                    children: [
-                      Text(
-                        'My Account ',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      Spacer(),
-                      Icon(Icons.arrow_forward_ios, color: Color(0xFF5E738A)),
-                    ],
-                  ),
-                  Divider(color: Colors.black),
-                  Row(
-                    children: [
-                      Text(
-                        'Orders and Payment ',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      Spacer(),
-                      Icon(Icons.arrow_forward_ios, color: Color(0xFF5E738A)),
-                    ],
-                  ),
-                  Divider(color: Colors.black),
-                  Row(
-                    children: [
-                      Text(
-                        'Get help with my pay ',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      Spacer(),
-                      Icon(Icons.arrow_forward_ios, color: Color(0xFF5E738A)),
-                    ],
-                  ),
-                  Divider(color: Colors.black),
-                  Row(
-                    children: [
-                      Text(
-                        'Safety Concerns ',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      Spacer(),
-                      Icon(Icons.arrow_forward_ios, color: Color(0xFF5E738A)),
-                    ],
-                  ),
-                  Divider(color: Colors.black),
-                  Row(
-                    children: [
-                      Text(
-                        'How to become a Rider ',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      Spacer(),
-                      Icon(Icons.arrow_forward_ios, color: Color(0xFF5E738A)),
-                    ],
-                  ),
-                  Divider(color: Colors.black),
-                  Row(
-                    children: [
-                      Text(
-                        'How to become a Retailer ',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      Spacer(),
-                      Icon(Icons.arrow_forward_ios, color: Color(0xFF5E738A)),
-                    ],
-                  ),
-                  Divider(color: Colors.black),
-                  Row(
-                    children: [
-                      Text(
-                        'Selling and Billing ',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      Spacer(),
-                      Icon(Icons.arrow_forward_ios, color: Color(0xFF5E738A)),
-                    ],
-                  ),
-                  Divider(color: Colors.black),
-                  Row(
-                    children: [
-                      Text(
-                        'Refilling ',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      Spacer(),
-                      Icon(Icons.arrow_forward_ios, color: Color(0xFF5E738A)),
-                    ],
-                  ),
-                  Divider(color: Colors.black),
-                  Row(
-                    children: [
-                      Text(
-                        'How to order ',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      Spacer(),
-                      Icon(Icons.arrow_forward_ios, color: Color(0xFF5E738A)),
-                    ],
-                  ),
-                  Divider(color: Colors.black),
-                  Row(
-                    children: [
-                      Text(
-                        'Get customer support ',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      Spacer(),
-                      Icon(Icons.arrow_forward_ios, color: Color(0xFF5E738A)),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         ),
