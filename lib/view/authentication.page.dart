@@ -1,5 +1,7 @@
 import 'package:customer_app/routes/app_routes.dart';
+import 'package:customer_app/view/user_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:customer_app/view/my_orders.page.dart';
 import 'package:customer_app/widgets/custom_button.dart';
@@ -10,6 +12,8 @@ class AuthenticationPage extends StatefulWidget {
 }
 
 class _AuthenticationPageState extends State<AuthenticationPage> {
+  final GlobalKey<_AuthenticationPageState> _key = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     // Retrieve the passed data from arguments
@@ -24,13 +28,18 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
-        title: const Padding(
-          padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
-          child: Text(
-            'Authentication',
-            style: TextStyle(color: Color(0xFF232937), fontSize: 24),
-          ),
+        title: Text(
+          'Authentication',
+          style: TextStyle(color: Color(0xFF232937), fontSize: 24),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: () {
+              _key.currentState?.forceRebuild();
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -123,5 +132,9 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
         ),
       ),
     );
+  }
+
+  void forceRebuild() {
+    setState(() {});
   }
 }

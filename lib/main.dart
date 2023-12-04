@@ -66,6 +66,7 @@ class MyApp extends StatelessWidget {
             deliveryTime: 'Sample Delivery Time',
             total: 0.0,
             completed: 'Sample Completed',
+            hasFeedback: false,
             createdAt: 'Sample Created At',
             items: [
               {

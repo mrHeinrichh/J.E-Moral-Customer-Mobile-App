@@ -1,5 +1,3 @@
-import 'package:customer_app/view/authentication.page.dart';
-import 'package:customer_app/view/orders_details.page.dart';
 import 'package:customer_app/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -12,9 +10,9 @@ class Transaction {
   final String deliveryLocation;
   final String price;
   final dynamic isApproved;
-
+  final bool hasFeedback;
   final dynamic completed;
-  final String id; // Added ID field for identifying transactions
+  final String id;
   final String name;
   final String contactNumber;
   final String houseLotBlk;
@@ -40,6 +38,7 @@ class Transaction {
     required this.createdAt,
     required this.items,
     required this.completed,
+    required this.hasFeedback,
   });
 }
 
@@ -91,6 +90,7 @@ class _MyOrderPageState extends State<MyOrderPage> {
                     items: List<Map<String, dynamic>>.from(
                         transactionData['items'] ?? []),
                     deliveryLocation: transactionData['deliveryLocation'] ?? '',
+                    hasFeedback: transactionData['hasFeedback'] ?? false,
                     price: transactionData['total'].toString(),
                     isApproved: transactionData['isApproved'] ?? '',
                     id: transactionData['_id'] ?? '',
@@ -129,6 +129,21 @@ class _MyOrderPageState extends State<MyOrderPage> {
           'My Orders',
           style: TextStyle(color: Color(0xFF232937), fontSize: 24),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: () {
+              // Add logic to refresh the page here
+              final userProvider =
+                  Provider.of<UserProvider>(context, listen: false);
+              final userId = userProvider.userId;
+
+              if (userId != null) {
+                fetchTransactions(userId);
+              }
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -188,6 +203,10 @@ class _TransactionCardState extends State<TransactionCard> {
         : Color(0xFF232937);
   }
 
+  String getTrackOrderButtonText() {
+    return widget.transaction.completed == true ? 'Feedback' : 'Track Order';
+  }
+
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
@@ -226,7 +245,7 @@ class _TransactionCardState extends State<TransactionCard> {
                           .transaction, // Pass the transaction data as arguments
                     );
                   },
-                  text: 'Track Order',
+                  text: getTrackOrderButtonText(), // Use the updated method
                 ),
                 CustomButton(
                   backgroundColor: getCancelOrderButtonColor(),

@@ -431,7 +431,8 @@ class _FeedbackPageState extends State<FeedbackPage> {
 
     Map<String, dynamic> feedbackData = {
       "hasFeedback": 'true',
-      "feedback": feedbackValues,
+      "feedback":
+          getFeedbackValues().join(', '), // Join the array into a string
       "_id": transaction.id,
     };
 
