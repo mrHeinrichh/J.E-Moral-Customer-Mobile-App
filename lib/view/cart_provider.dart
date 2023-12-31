@@ -57,7 +57,7 @@ class CartItem {
     required this.name,
     required this.price,
     required this.imageUrl,
-    this.isSelected = false,
+    this.isSelected = true,
     this.quantity = 1,
   });
 }
