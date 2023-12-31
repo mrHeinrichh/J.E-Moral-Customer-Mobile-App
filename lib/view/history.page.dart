@@ -108,8 +108,6 @@ class _HistoryPageState extends State<HistoryPage> {
                         Text(
                             'Payment Method: ${completedTransactions[i]['paymentMethod']}'),
                         Text(
-                            'Assembly: ${completedTransactions[i]['assembly']}'),
-                        Text(
                             'Delivery Time: ${completedTransactions[i]['deliveryTime']}'),
                         Text('Total: ${completedTransactions[i]['total']}'),
                         Text(
@@ -117,21 +115,10 @@ class _HistoryPageState extends State<HistoryPage> {
                         Text('Price: ${completedTransactions[i]['price']}'),
                         Text(
                             'Is Approved: ${completedTransactions[i]['isApproved']}'),
-                        Text('Id: ${completedTransactions[i]['id']}'),
                         Text(
                             'Barangay: ${completedTransactions[i]['barangay']}'),
                         Text(
-                            'Feedback: ${completedTransactions[i]['feedback']}'),
-                        Text('Rating: ${completedTransactions[i]['rating']}'),
-                        Text(
-                            'Has Feedback: ${completedTransactions[i]['hasFeedback']}'),
-                        Text(
                             'Picked Up: ${completedTransactions[i]['pickedUp']}'),
-                        Text(
-                            'Cancelled: ${completedTransactions[i]['cancelled']}'),
-                        Text(
-                            'Completed: ${completedTransactions[i]['completed']}'),
-                        Text('Type: ${completedTransactions[i]['type']}'),
                       ],
                     ),
                   ),
