@@ -246,7 +246,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
               ),
             ),
             const Text(
-              'How satisfied are you with the information dissemination through announcements?  (e.g. pricelists)',
+              'How satisfied are you with the information dissemination through announcements? (e.g. pricelists)',
               style: TextStyle(
                 color: Color(0xFF232937),
                 fontSize: 15,

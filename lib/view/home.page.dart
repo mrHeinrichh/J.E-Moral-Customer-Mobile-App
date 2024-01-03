@@ -10,14 +10,60 @@ class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
+// ... Import statements remain unchanged
 
 class _HomePageState extends State<HomePage> {
   List<Map<String, dynamic>> sampleData = [];
+  TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     fetchDataFromAPI();
+  }
+
+  void searchItems() async {
+    final searchTerm = _searchController.text;
+    final url = Uri.parse(
+        'https://lpg-api-06n8.onrender.com/api/v1/items/?search=$searchTerm');
+    final response = await http.get(url);
+    if (!mounted) {
+      return; // Check if the widget is still in the tree
+    }
+
+    if (response.statusCode == 200) {
+      final parsedData = json.decode(response.body);
+      final data = parsedData['data'];
+
+      setState(() {
+        final Map<String, List<Map<String, dynamic>>> groupedData = {};
+
+        data.forEach((item) {
+          final category = item['category'];
+          final product = {
+            'name': item['name'] ?? 'Name Not Available',
+            'price': (item['customerPrice'] ?? 0.0).toString(),
+            'imageUrl': item['image'] ?? 'Image URL Not Available',
+            'description': item['description'] ?? 'Description Not Available',
+            'weight': (item['weight'] ?? 0).toString(),
+            'quantity': (item['quantity'] ?? 0).toString(),
+          };
+
+          if (groupedData.containsKey(category)) {
+            groupedData[category]!.add(product);
+          } else {
+            groupedData[category] = [product];
+          }
+        });
+
+        sampleData = groupedData.entries
+            .map((entry) => {
+                  'category': entry.key,
+                  'products': entry.value,
+                })
+            .toList();
+      });
+    }
   }
 
   Future<void> fetchDataFromAPI() async {
@@ -80,10 +126,10 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(10.0),
                       child: Container(
                         height: 45,
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                           color: Colors.white,
                         ),
-                        child: const Padding(
+                        child: Padding(
                           padding: EdgeInsets.symmetric(horizontal: 8.0),
                           child: Row(
                             children: [
@@ -93,6 +139,10 @@ class _HomePageState extends State<HomePage> {
                               ),
                               Expanded(
                                 child: TextField(
+                                  controller: _searchController,
+                                  onChanged: (text) {
+                                    searchItems();
+                                  },
                                   decoration: InputDecoration(
                                     hintText: 'Search',
                                     border: InputBorder.none,

@@ -5,13 +5,13 @@ import 'package:provider/provider.dart';
 import 'cart_provider.dart';
 
 class ProductDetailsPage extends StatefulWidget {
-  final String productName;
-  final String productPrice;
-  final String productImageUrl;
-  final String category;
-  final String description;
-  final String weight;
-  final String quantity;
+  String productName;
+  String productPrice;
+  String productImageUrl;
+  String category;
+  String description;
+  String weight;
+  String quantity;
 
   ProductDetailsPage({
     required this.productName,
@@ -47,6 +47,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Padding(
             padding: const EdgeInsets.all(20.0),
