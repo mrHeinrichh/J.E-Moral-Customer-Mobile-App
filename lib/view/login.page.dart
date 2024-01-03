@@ -76,13 +76,28 @@ class _LoginPageState extends State<LoginPage> {
                 print('User Type: $userType');
 
                 if (userType == 'Customer') {
-                  // Set the user ID in the app state
-                  Provider.of<UserProvider>(context, listen: false)
-                      .setUserId(userId);
+                  // Check if the user is verified
+                  bool isVerified =
+                      userDetailsData['data']['verified'] ?? false;
+
+                  if (isVerified != null) {
+                    if (isVerified) {
+                      // Set the user ID in the app state
+                      Provider.of<UserProvider>(context, listen: false)
+                          .setUserId(userId);
+                      return data;
+                    } else {
+                      return {'error': 'User is not verified'};
+                    }
+                  } else {
+                    return {'error': 'Verification status not available'};
+                  }
                 } else {
                   return {'error': 'Invalid user type'};
                 }
               } else {
+                print(
+                    'Failed to fetch user details. Response code: ${userDetailsResponse.statusCode}');
                 return {'error': 'Failed to fetch user details'};
               }
             } else {
@@ -95,6 +110,7 @@ class _LoginPageState extends State<LoginPage> {
           return {'error': 'Login failed'};
         }
       } else {
+        print('Login failed. Response code: ${response.statusCode}');
         return {'error': 'Login failed'};
       }
     } catch (error, stackTrace) {

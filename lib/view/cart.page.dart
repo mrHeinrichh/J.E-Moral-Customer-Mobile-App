@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
+import 'package:customer_app/view/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:customer_app/routes/app_routes.dart';
 import 'package:customer_app/widgets/custom_button.dart';
@@ -10,7 +14,59 @@ class CartPage extends StatefulWidget {
 }
 
 class _CartPageState extends State<CartPage> {
+  late Future<Map<String, dynamic>> userData;
+  bool isDiscounted = false;
+
   @override
+  void initState() {
+    super.initState();
+    // Accessing userId from UserProvider
+    final String? userId =
+        Provider.of<UserProvider>(context, listen: false).userId;
+    userData = fetchUserData(userId);
+  }
+
+  Future<Map<String, dynamic>> fetchUserData(String? userId) async {
+    try {
+      final response = await http.get(
+          Uri.parse('https://lpg-api-06n8.onrender.com/api/v1/users/$userId'));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> userData = json.decode(response.body);
+        print('User ID: $userId');
+        print('Response Body: $userData');
+
+        // Set isDiscounted based on the value of "discounted" in the user data
+        isDiscounted = userData['data']['discounted'] ?? false;
+
+        return userData;
+      } else {
+        print('Failed to load user data. Status code: ${response.statusCode}');
+        throw Exception('Failed to load user data');
+      }
+    } catch (error) {
+      print('Error: $error');
+      throw error;
+    }
+  }
+
+  double _calculateTotalPrice(List<CartItem> cartItems) {
+    double totalPrice = 0.0;
+    for (var cartItem in cartItems) {
+      if (cartItem.isSelected) {
+        totalPrice += cartItem.price * cartItem.quantity;
+      }
+    }
+
+    // Apply a 20% discount if isDiscounted is true
+    if (isDiscounted) {
+      double discountAmount = totalPrice * 0.2; // 20% discount
+      totalPrice -= discountAmount;
+    }
+
+    return totalPrice;
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -27,19 +83,15 @@ class _CartPageState extends State<CartPage> {
           ),
         ),
       ),
-      body: Consumer<CartProvider>(
-        builder: (context, cartProvider, child) {
-          List<CartItem> cartItems = cartProvider.cartItems;
+      body: Consumer2<CartProvider, UserProvider>(
+        builder: (context, cartProvider, userProvider, child) {
+          // Accessing userId from UserProvider
+          String? userId = userProvider.userId;
 
-          double _calculateTotalPrice() {
-            double totalPrice = 0.0;
-            for (var cartItem in cartItems) {
-              if (cartItem.isSelected) {
-                totalPrice += cartItem.price * cartItem.quantity;
-              }
-            }
-            return totalPrice;
-          }
+          // Print userId here to ensure it is not null
+          print('User ID: $userId');
+
+          List<CartItem> cartItems = cartProvider.cartItems;
 
           return Column(
             children: [
@@ -72,7 +124,7 @@ class _CartPageState extends State<CartPage> {
                       children: [
                         const Text("Price:"),
                         Text(
-                          "₱${cartProvider.calculateTotalPrice()}",
+                          "₱${_calculateTotalPrice(cartItems)}",
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ],

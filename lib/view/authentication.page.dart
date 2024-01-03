@@ -3,6 +3,7 @@ import 'package:customer_app/view/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+
 import 'package:customer_app/view/my_orders.page.dart';
 import 'package:customer_app/widgets/custom_button.dart';
 
