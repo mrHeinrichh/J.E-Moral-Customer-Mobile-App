@@ -14,7 +14,8 @@ class _ProfilePageState extends State<ProfilePage> {
   TextEditingController _nameController = TextEditingController();
   TextEditingController _contactNumberController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
-
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
   @override
   void initState() {
     super.initState();
@@ -29,6 +30,8 @@ class _ProfilePageState extends State<ProfilePage> {
     String name,
     String contactNumber,
     String address,
+    String email,
+    String password,
   ) async {
     try {
       final response = await http.patch(
@@ -41,11 +44,18 @@ class _ProfilePageState extends State<ProfilePage> {
           'contactNumber': contactNumber,
           'type': "Customer",
           'address': address,
+          'authData': {
+            'email': email,
+            'password': password,
+          },
         }),
       );
 
       print(name);
       print(contactNumber);
+      print(address);
+      print(email);
+      print(password);
       print('User ID: $userId');
 
       if (response.statusCode == 200) {
@@ -92,8 +102,8 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget buildProfileWidget(Map<String, dynamic> userDetails, String? userId) {
-    final userData = userDetails['data'];
-
+    final userData = userDetails['data']['user'];
+    final authData = userDetails['data']['authData'];
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -150,14 +160,37 @@ class _ProfilePageState extends State<ProfilePage> {
                     color: Colors.white,
                   ),
                 ),
+                Text(
+                  'Email: ${authData != null ? authData['email'] ?? 'N/A' : 'N/A'}',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
+                ),
+                Text(
+                  'Password: ******',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
+                ),
                 ElevatedButton(
                   onPressed: () async {
                     // Show dialog on button click
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
+                        _nameController.text = userData['name'] ?? '';
+                        _contactNumberController.text =
+                            userData['contactNumber'] ?? '';
+                        _addressController.text = userData['address'] ?? '';
+                        _emailController.text =
+                            authData != null ? authData['email'] ?? '' : '';
+                        _passwordController.text =
+                            ''; // You may set the password if available
+
                         return AlertDialog(
-                          title: Text('Enter Name and Contact Number'),
+                          title: Text('Edit your profile Data'),
                           content: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -175,6 +208,15 @@ class _ProfilePageState extends State<ProfilePage> {
                                 decoration:
                                     InputDecoration(labelText: 'Address'),
                               ),
+                              TextField(
+                                controller: _emailController,
+                                decoration: InputDecoration(labelText: 'Email'),
+                              ),
+                              TextField(
+                                controller: _passwordController,
+                                decoration:
+                                    InputDecoration(labelText: 'Password'),
+                              ),
                             ],
                           ),
                           actions: [
@@ -185,13 +227,15 @@ class _ProfilePageState extends State<ProfilePage> {
                                 String contactNumber =
                                     _contactNumberController.text;
                                 String address = _addressController.text;
+                                String email = _emailController.text;
+                                String password = _passwordController.text;
 
                                 // Close the dialog
                                 Navigator.of(context).pop();
 
                                 // Update user profile
-                                await updateUserProfile(
-                                    userId!, name, contactNumber, address);
+                                await updateUserProfile(userId!, name,
+                                    contactNumber, address, email, password);
                               },
                               child: Text('Save'),
                             ),

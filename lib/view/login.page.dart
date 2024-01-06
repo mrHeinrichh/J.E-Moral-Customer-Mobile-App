@@ -14,9 +14,9 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   TextEditingController emailController =
-      TextEditingController(text: 'heinrichsorbaf02@gmail.com');
+      TextEditingController(text: 'customer@gmail.com');
   TextEditingController passwordController =
-      TextEditingController(text: 'heinrich');
+      TextEditingController(text: 'customer');
 
   Future<Map<String, dynamic>> login(String? email, String? password,
       [BuildContext? context]) async {
@@ -71,14 +71,15 @@ class _LoginPageState extends State<LoginPage> {
                 print('User Details: $userDetailsData');
 
                 // Extract "type" field from user details
-                String userType = userDetailsData['data']['__t'] ?? '';
+                String userType = userDetailsData['data']['user']['__t'] ?? '';
+                print('User Type: $userType');
 
                 print('User Type: $userType');
 
                 if (userType == 'Customer') {
                   // Check if the user is verified
                   bool isVerified =
-                      userDetailsData['data']['verified'] ?? false;
+                      userDetailsData['data']['user']['verified'] ?? false;
 
                   if (isVerified != null) {
                     if (isVerified) {
