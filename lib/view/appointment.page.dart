@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:customer_app/routes/app_routes.dart';
+import 'package:customer_app/view/dashboard.page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:customer_app/widgets/custom_button.dart';
@@ -75,6 +77,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
         if (response.statusCode == 200) {
           print(response.statusCode);
           print('Appointment updated successfully');
+          Navigator.pushNamed(context, dashboardRoute);
         } else {
           print(
               'Failed to update appointment. Status code: ${response.statusCode}');
