@@ -1,4 +1,5 @@
 import 'package:customer_app/routes/app_routes.dart';
+import 'package:customer_app/view/login.page.dart';
 import 'package:customer_app/widgets/custom_button.dart';
 import 'package:customer_app/widgets/privacy_policy_dialog.dart';
 import 'package:customer_app/widgets/signup_button.dart';
@@ -75,12 +76,13 @@ class _SignupPageState extends State<SignupPage> {
           final imageUrl1 = responseImage1["data"][0]["path"];
           userData["image"] = imageUrl1;
         }
+        if (_image2 != null) {
+          final responseImage2 = await uploadImageToServer(_image2!);
 
-        final responseImage2 = await uploadImageToServer(_image2!);
-
-        if (responseImage2 != null) {
-          final imageUrl2 = responseImage2["data"][0]["path"];
-          userData["discountIdImage"] = imageUrl2;
+          if (responseImage2 != null) {
+            final imageUrl2 = responseImage2["data"][0]["path"];
+            userData["discountIdImage"] = imageUrl2;
+          }
         }
 
         final userResponse = await http.post(
@@ -91,8 +93,14 @@ class _SignupPageState extends State<SignupPage> {
           body: jsonEncode(userData),
         );
 
-        if (userResponse.statusCode == 201) {
+        if (userResponse.statusCode == 200) {
           print("User created successfully.");
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    LoginPage()), // replace with your login screen
+          );
         } else {
           print("Response: ${userResponse.body}");
         }
