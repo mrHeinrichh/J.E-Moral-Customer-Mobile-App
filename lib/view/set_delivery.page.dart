@@ -152,6 +152,8 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
   }
 
   Future<void> showConfirmationDialog() async {
+    BuildContext currentContext = context;
+
     showDialog(
       context: context,
       builder: (context) {
@@ -183,7 +185,9 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
               onPressed: () async {
                 Navigator.of(context).pop();
                 await sendTransactionData(); // Wait for the transaction to complete.
-                // The navigation is now done inside sendTransactionData.
+                Provider.of<CartProvider>(currentContext, listen: false)
+                    .clearCart();
+                Navigator.pushNamed(currentContext, myOrdersPage);
               },
               child: Text('Confirm'),
             ),
@@ -195,6 +199,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
 
   Future<void> confirmDialog() async {
     selectedDateTime = DateTime.now();
+    BuildContext currentContext = context;
 
     showDialog(
       context: context,
@@ -227,7 +232,9 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
               onPressed: () async {
                 Navigator.of(context).pop();
                 await sendTransactionData(); // Wait for the transaction to complete.
-                // The navigation is now done inside sendTransactionData.
+                Provider.of<CartProvider>(currentContext, listen: false)
+                    .clearCart();
+                Navigator.pushNamed(currentContext, myOrdersPage);
               },
               child: Text('Confirm'),
             ),
@@ -289,6 +296,12 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
         title: const Text(
           'Set Delivery',
           style: TextStyle(color: Color(0xFF232937), fontSize: 24),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushReplacementNamed(context, dashboardRoute);
+          },
         ),
       ),
       body: ListView(

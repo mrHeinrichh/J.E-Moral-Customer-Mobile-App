@@ -25,6 +25,13 @@ class CartProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void clearCart() {
+    // Clear the cart items
+    cartItems.clear();
+    // Notify listeners to update the UI
+    notifyListeners();
+  }
+
   void decrementQuantity(CartItem item) {
     if (item.quantity > 0) {
       item.quantity--;

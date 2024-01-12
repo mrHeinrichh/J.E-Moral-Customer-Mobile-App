@@ -144,6 +144,12 @@ class _MyOrderPageState extends State<MyOrderPage> {
             },
           ),
         ],
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushReplacementNamed(context, dashboardRoute);
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
