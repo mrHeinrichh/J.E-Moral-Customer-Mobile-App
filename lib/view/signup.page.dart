@@ -19,7 +19,7 @@ class _SignupPageState extends State<SignupPage> {
   File? _image;
   File? _image2;
   bool isPWDClicked = false;
-
+  bool isLoading = false;
   final nameController = TextEditingController();
   final contactNumberController = TextEditingController();
   final addressController = TextEditingController();
@@ -52,6 +52,10 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   Future<void> signup() async {
+    setState(() {
+      isLoading = true;
+    });
+
     if (isCheckboxChecked) {
       if (formKey.currentState!.validate()) {
         final userData = {
@@ -70,44 +74,53 @@ class _SignupPageState extends State<SignupPage> {
           "image": "",
         };
 
-        final responseImage1 = await uploadImageToServer(_image!);
+        try {
+          final responseImage1 = await uploadImageToServer(_image!);
 
-        if (responseImage1 != null) {
-          final imageUrl1 = responseImage1["data"][0]["path"];
-          userData["image"] = imageUrl1;
-        }
-        if (_image2 != null) {
-          final responseImage2 = await uploadImageToServer(_image2!);
-
-          if (responseImage2 != null) {
-            final imageUrl2 = responseImage2["data"][0]["path"];
-            userData["discountIdImage"] = imageUrl2;
+          if (responseImage1 != null) {
+            final imageUrl1 = responseImage1["data"][0]["path"];
+            userData["image"] = imageUrl1;
           }
-        }
+          if (_image2 != null) {
+            final responseImage2 = await uploadImageToServer(_image2!);
 
-        final userResponse = await http.post(
-          Uri.parse('https://lpg-api-06n8.onrender.com/api/v1/users'),
-          headers: <String, String>{
-            'Content-Type': 'application/json',
-          },
-          body: jsonEncode(userData),
-        );
+            if (responseImage2 != null) {
+              final imageUrl2 = responseImage2["data"][0]["path"];
+              userData["discountIdImage"] = imageUrl2;
+            }
+          }
 
-        if (userResponse.statusCode == 200) {
-          print("User created successfully.");
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    LoginPage()), // replace with your login screen
+          final userResponse = await http.post(
+            Uri.parse('https://lpg-api-06n8.onrender.com/api/v1/users'),
+            headers: <String, String>{
+              'Content-Type': 'application/json',
+            },
+            body: jsonEncode(userData),
           );
-        } else {
-          print("Response: ${userResponse.body}");
+
+          if (userResponse.statusCode == 200) {
+            print("User created successfully.");
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => LoginPage(),
+              ),
+            );
+          } else {
+            print("Response: ${userResponse.body}");
+          }
+        } catch (error) {
+          print("Error during sign-up: $error");
+        } finally {
+          setState(() {
+            isLoading = false;
+          });
         }
       }
     } else {
       setState(() {
         checkboxError = 'Please accept the Terms of Use & Privacy Policy';
+        isLoading = false;
       });
     }
   }
@@ -164,240 +177,252 @@ class _SignupPageState extends State<SignupPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Container(
-          margin: const EdgeInsets.only(top: 0.0),
-          child: Padding(
-            padding: const EdgeInsets.all(50.0),
-            child: Form(
-              key: formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  const SizedBox(height: 50.0),
-                  Column(
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Container(
+              margin: const EdgeInsets.only(top: 0.0),
+              child: Padding(
+                padding: const EdgeInsets.all(50.0),
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      const Text(
-                        "Sign Up",
-                        style: TextStyle(
-                          fontSize: 30.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        "Create an account, It's free",
-                        style: TextStyle(
-                          fontSize: 15.0,
-                          color: Colors.grey[700],
-                        ),
-                      ),
-                      const SizedBox(height: 10.0),
-                      const Divider(),
-                      const SizedBox(height: 10.0),
-                      _image == null
-                          ? const CircleAvatar(
-                              radius: 50,
-                              backgroundColor: Colors.grey,
-                              child: Icon(
-                                Icons.person,
-                                color: Colors.white,
-                                size: 50,
-                              ),
-                            )
-                          : CircleAvatar(
-                              radius: 50,
-                              backgroundImage: FileImage(_image!),
-                            ),
-                      TextButton(
-                        onPressed: _pickImage,
-                        child: const Text(
-                          "Upload Image",
-                          style: TextStyle(
-                            color: Colors.blue,
-                            fontSize: 15.0,
-                          ),
-                        ),
-                      ),
-                      TextFormField(
-                        controller: nameController,
-                        decoration: const InputDecoration(
-                          labelText: "Full Name",
-                          hintText: "Enter your Full Name",
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Full Name is required';
-                          }
-                          return null;
-                        },
-                      ),
-                      TextFormField(
-                        controller: contactNumberController,
-                        decoration: const InputDecoration(
-                          labelText: "Contact Number",
-                          hintText: "Enter your Contact Number",
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Contact Number is required';
-                          }
-                          return null;
-                        },
-                      ),
-                      TextFormField(
-                        controller: addressController,
-                        decoration: const InputDecoration(
-                          labelText: "Address",
-                          hintText: "Enter your Address",
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Address is required';
-                          }
-                          return null;
-                        },
-                      ),
-                      TextFormField(
-                        controller: emailController,
-                        decoration: const InputDecoration(
-                          labelText: "Email Address",
-                          hintText: "Enter your Email Address",
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Email Address is required';
-                          }
-                          return null;
-                        },
-                      ),
-                      TextFormField(
-                        controller: passwordController,
-                        decoration: const InputDecoration(
-                          labelText: "Password",
-                          hintText: "Enter your Password",
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Password is required';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
+                      const SizedBox(height: 50.0),
                       Column(
-                        children: [
+                        children: <Widget>[
+                          const Text(
+                            "Sign Up",
+                            style: TextStyle(
+                              fontSize: 30.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            "Create an account, It's free",
+                            style: TextStyle(
+                              fontSize: 15.0,
+                              color: Colors.grey[700],
+                            ),
+                          ),
+                          const SizedBox(height: 10.0),
+                          const Divider(),
+                          const SizedBox(height: 10.0),
+                          _image == null
+                              ? const CircleAvatar(
+                                  radius: 50,
+                                  backgroundColor: Colors.grey,
+                                  child: Icon(
+                                    Icons.person,
+                                    color: Colors.white,
+                                    size: 50,
+                                  ),
+                                )
+                              : CircleAvatar(
+                                  radius: 50,
+                                  backgroundImage: FileImage(_image!),
+                                ),
                           TextButton(
-                            onPressed: () {
-                              setState(() {
-                                isPWDClicked = true;
-                              });
-                            },
-                            child: Text(
-                              "Are you a Person with Disability (PWD)?",
+                            onPressed: _pickImage,
+                            child: const Text(
+                              "Upload Image",
                               style: TextStyle(
-                                color:
-                                    isPWDClicked ? Colors.blue : Colors.black,
+                                color: Colors.blue,
                                 fontSize: 15.0,
                               ),
                             ),
                           ),
-                          isPWDClicked
-                              ? (_image2 == null
-                                  ? Container(
-                                      width: 250,
-                                      height: 100,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.rectangle,
-                                        color: Colors.grey,
-                                      ),
-                                      child: Icon(
-                                        Icons.person,
-                                        color: Colors.white,
-                                        size: 50,
-                                      ),
-                                    )
-                                  : Container(
-                                      width: 100,
-                                      height: 100,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        image: DecorationImage(
-                                          image: FileImage(_image2!),
-                                          fit: BoxFit.cover,
+                          TextFormField(
+                            controller: nameController,
+                            decoration: const InputDecoration(
+                              labelText: "Full Name",
+                              hintText: "Enter your Full Name",
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Full Name is required';
+                              }
+                              return null;
+                            },
+                          ),
+                          TextFormField(
+                            controller: contactNumberController,
+                            decoration: const InputDecoration(
+                              labelText: "Contact Number",
+                              hintText: "Enter your Contact Number",
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Contact Number is required';
+                              }
+                              return null;
+                            },
+                          ),
+                          TextFormField(
+                            controller: addressController,
+                            decoration: const InputDecoration(
+                              labelText: "Address",
+                              hintText: "Enter your Address",
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Address is required';
+                              }
+                              return null;
+                            },
+                          ),
+                          TextFormField(
+                            controller: emailController,
+                            decoration: const InputDecoration(
+                              labelText: "Email Address",
+                              hintText: "Enter your Email Address",
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Email Address is required';
+                              }
+                              return null;
+                            },
+                          ),
+                          TextFormField(
+                            controller: passwordController,
+                            decoration: const InputDecoration(
+                              labelText: "Password",
+                              hintText: "Enter your Password",
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Password is required';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Column(
+                            children: [
+                              TextButton(
+                                onPressed: () {
+                                  setState(() {
+                                    isPWDClicked = true;
+                                  });
+                                },
+                                child: Text(
+                                  "Are you a Person with Disability (PWD)?",
+                                  style: TextStyle(
+                                    color: isPWDClicked
+                                        ? Colors.blue
+                                        : Colors.black,
+                                    fontSize: 15.0,
+                                  ),
+                                ),
+                              ),
+                              isPWDClicked
+                                  ? (_image2 == null
+                                      ? Container(
+                                          width: 250,
+                                          height: 100,
+                                          decoration: const BoxDecoration(
+                                            shape: BoxShape.rectangle,
+                                            color: Colors.grey,
+                                          ),
+                                          child: const Icon(
+                                            Icons.person,
+                                            color: Colors.white,
+                                            size: 50,
+                                          ),
+                                        )
+                                      : Container(
+                                          width: 100,
+                                          height: 100,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            image: DecorationImage(
+                                              image: FileImage(_image2!),
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                        ))
+                                  : Container(),
+                              isPWDClicked
+                                  ? TextButton(
+                                      onPressed: _pickImage2,
+                                      child: Text(
+                                        "Upload your PWD ID",
+                                        style: TextStyle(
+                                          color: Colors.blue,
+                                          fontSize: 15.0,
                                         ),
                                       ),
-                                    ))
-                              : Container(),
-                          isPWDClicked
-                              ? TextButton(
-                                  onPressed: _pickImage2,
-                                  child: Text(
-                                    "Upload your PWD ID",
-                                    style: TextStyle(
-                                      color: Colors.blue,
-                                      fontSize: 15.0,
-                                    ),
-                                  ),
-                                )
-                              : Container(),
-                        ],
-                      ),
-                      Row(
-                        children: <Widget>[
-                          Checkbox(
-                            value: isCheckboxChecked,
-                            onChanged: (bool? newValue) {
-                              setState(() {
-                                isCheckboxChecked = newValue ?? false;
-                                checkboxError = null;
-                              });
-                            },
+                                    )
+                                  : Container(),
+                            ],
                           ),
-                          GestureDetector(
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return PrivacyPolicyDialog();
+                          Row(
+                            children: <Widget>[
+                              Checkbox(
+                                value: isCheckboxChecked,
+                                onChanged: (bool? newValue) {
+                                  setState(() {
+                                    isCheckboxChecked = newValue ?? false;
+                                    checkboxError = null;
+                                  });
                                 },
-                              );
-                            },
-                            child: const Text(
-                              "I accept the Terms of Use & Privacy Policy",
-                              style: TextStyle(
-                                fontSize: 13.0,
-                                color: Colors.blue,
-                                decoration: TextDecoration.underline,
                               ),
-                            ),
+                              GestureDetector(
+                                onTap: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return PrivacyPolicyDialog();
+                                    },
+                                  );
+                                },
+                                child: const Text(
+                                  "I accept the Terms of Use & Privacy Policy",
+                                  style: TextStyle(
+                                    fontSize: 13.0,
+                                    color: Colors.blue,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
+                          const SizedBox(height: 16),
+                          SignupButton(
+                            onPressed: signup,
+                          ),
+                          CustomButton(
+                            backgroundColor: const Color(0xFF232937),
+                            onPressed: () {
+                              Navigator.pushNamed(context, onboardingRoute);
+                            },
+                            text: "Back",
+                          ),
+                          if (checkboxError != null)
+                            Text(
+                              checkboxError!,
+                              style: const TextStyle(color: Colors.red),
+                            ),
                         ],
                       ),
-                      const SizedBox(height: 16),
-                      SignupButton(
-                        onPressed: signup,
-                      ),
-                      CustomButton(
-                        backgroundColor: const Color(0xFF232937),
-                        onPressed: () {
-                          Navigator.pushNamed(context, onboardingRoute);
-                        },
-                        text: "Back",
-                      ),
-                      if (checkboxError != null)
-                        Text(
-                          checkboxError!,
-                          style: const TextStyle(color: Colors.red),
-                        ),
                     ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
-        ),
+          if (isLoading)
+            Container(
+              color: Colors.black.withOpacity(0.5),
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+        ],
       ),
     );
   }
