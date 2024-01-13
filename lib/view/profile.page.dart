@@ -192,13 +192,34 @@ class _ProfilePageState extends State<ProfilePage> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
-        title: const Padding(
+        title: Padding(
           padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
           child: Text(
             'Profile',
             style: TextStyle(color: Color(0xFF232937), fontSize: 24),
           ),
         ),
+        actions: [
+          // Add a popup menu button with three dots
+          PopupMenuButton<String>(
+            icon: Icon(Icons.more_vert, color: Color(0xFF232937)),
+            onSelected: (String result) {
+              // Handle the selected option here
+              if (result == 'logout') {
+                Navigator.pushNamed(context,
+                    '/login'); // Replace '/login' with your actual login route
+              }
+            },
+            itemBuilder: (BuildContext context) {
+              return [
+                PopupMenuItem<String>(
+                  child: Text('Log out'),
+                  value: 'logout',
+                ),
+              ];
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
