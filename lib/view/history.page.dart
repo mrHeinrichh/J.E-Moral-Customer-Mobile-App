@@ -20,6 +20,7 @@ class _HistoryPageState extends State<HistoryPage> {
     fetchTransactions();
   }
 
+//Search transaction id is used in customer history page to search the transaction made by the userid
   Future<void> fetchTransactions() async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final userId = userProvider.userId;

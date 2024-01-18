@@ -9,6 +9,7 @@ import 'package:customer_app/view/feedback.page.dart';
 import 'package:customer_app/view/history.page.dart';
 import 'package:customer_app/view/history_details.page.dart';
 import 'package:customer_app/view/login.page.dart';
+import 'package:customer_app/view/maps.page.dart';
 import 'package:customer_app/view/my_orders.page.dart';
 import 'package:customer_app/view/onboarding.page.dart';
 import 'package:customer_app/view/orders_details.page.dart';
@@ -55,6 +56,7 @@ class MyApp extends StatelessWidget {
         trackingPage: (context) => TrackingPage(),
         authenticationPage: (context) => AuthenticationPage(),
         feedBackPage: (context) => FeedbackPage(),
+        mapsPage: (context) => MapsPage(),
         orderDetailsPage: (context) {
           // Sample Transaction object
           Transaction sampleTransaction = Transaction(

@@ -249,7 +249,6 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
     'Bagumbayan',
     'Bambang',
     'Calzada Tipas',
-    'Cembo',
     'Central Bicutan',
     'Central Signal Village',
     'Cembo',

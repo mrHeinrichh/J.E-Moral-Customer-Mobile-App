@@ -83,7 +83,8 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
               visible: !transaction.completed,
               child: CustomizedButton(
                 onPressed: () {
-                  // Navigator.pushNamed(context, appointmentRoute);
+                  Navigator.pushNamed(context, mapsPage,
+                      arguments: transaction);
                 },
                 text: 'View Live Tracking',
                 height: 50,
