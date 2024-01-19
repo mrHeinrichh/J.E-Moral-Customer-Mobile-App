@@ -18,15 +18,19 @@ class _MapsPageState extends State<MapsPage> {
   bool isLoading = true;
   void parseWaypoints(Map<String, dynamic> routingData) {
     try {
-      List<dynamic> coordinates =
+      routePoints.clear(); // Clear existing points before adding new ones
+
+      List<dynamic> segments =
           routingData['features'][0]['geometry']['coordinates'];
 
-      for (var coordinateSet in coordinates) {
-        for (var coordinate in coordinateSet) {
+      for (var segment in segments) {
+        List<LatLng> segmentPoints = [];
+        for (var coordinate in segment) {
           double latitude = coordinate[1].toDouble();
           double longitude = coordinate[0].toDouble();
-          routePoints.add(LatLng(latitude, longitude));
+          segmentPoints.add(LatLng(latitude, longitude));
         }
+        routePoints.addAll(segmentPoints);
       }
     } catch (e) {
       print('Error parsing waypoints: $e');
