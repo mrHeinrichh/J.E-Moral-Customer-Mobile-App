@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -14,7 +15,7 @@ class _MapsPageState extends State<MapsPage> {
   final GlobalKey<_MapsPageState> _key = GlobalKey();
   late Transaction transaction;
   List<LatLng> routePoints = [];
-
+  bool isLoading = true;
   void parseWaypoints(Map<String, dynamic> routingData) {
     try {
       List<dynamic> coordinates =
@@ -35,6 +36,7 @@ class _MapsPageState extends State<MapsPage> {
   @override
   void initState() {
     super.initState();
+    fetchData();
   }
 
   @override
@@ -51,36 +53,80 @@ class _MapsPageState extends State<MapsPage> {
           style: TextStyle(color: Color(0xFF232937), fontSize: 24),
         ),
       ),
-      body: Container(
-        child: FlutterMap(
-          options: MapOptions(
-            center: LatLng(
-              14.549095,
-              121.027211,
-            ),
-            zoom: 12.5,
-          ),
-          children: [
-            TileLayer(
-              urlTemplate:
-                  'https://maps.geoapify.com/v1/tile/klokantech-basic/{z}/{x}/{y}.png?apiKey=3e4c0fcabf244021845380f543236e29',
-            ),
-            PolylineLayer(
-              polylines: [
-                Polyline(
-                  points: routePoints,
-                  strokeWidth: 9.0,
-                  color: Colors.red,
-                ),
-              ],
-            ),
-          ],
-        ),
+      body: FutureBuilder(
+        future: fetchData(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else {
+            return buildMap(); // Implement a separate method for building the map
+          }
+        },
       ),
     );
   }
 
+  Widget buildMap() {
+    return FlutterMap(
+      options: MapOptions(
+        center: LatLng(
+          14.549095,
+          121.027211,
+        ),
+        zoom: 12.5,
+      ),
+      children: [
+        TileLayer(
+          urlTemplate:
+              'https://maps.geoapify.com/v1/tile/klokantech-basic/{z}/{x}/{y}.png?apiKey=3e4c0fcabf244021845380f543236e29',
+        ),
+        PolylineLayer(
+          polylines: [
+            Polyline(
+              points: routePoints,
+              strokeWidth: 9.0,
+              color: Colors.red,
+            ),
+          ],
+        ),
+        MarkerLayer(
+          markers: [
+            Marker(
+              width: 80.0,
+              height: 60.0,
+              point: routePoints.isNotEmpty ? routePoints.first : LatLng(0, 0),
+              builder: (ctx) => CustomMarker(
+                iconUrl:
+                    'https://raw.githubusercontent.com/mrHeinrichh/J.E-Moral-cdn/main/assets/png/motorcycle-pin.png',
+              ),
+              anchorPos: AnchorPos.align(AnchorAlign.top),
+            ),
+            Marker(
+              width: 70.0,
+              height: 40.0,
+              point: routePoints.isNotEmpty ? routePoints.last : LatLng(0, 0),
+              builder: (ctx) => Container(
+                child: Icon(
+                  Icons.person_pin_circle,
+                  color: Colors.green,
+                  size: 40.0,
+                ),
+              ),
+              anchorPos: AnchorPos.align(AnchorAlign.top),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   Future<void> fetchData() async {
+    if (!isLoading) {
+      return;
+    }
+
     try {
       final response = await http.get(
         Uri.parse(
@@ -102,6 +148,10 @@ class _MapsPageState extends State<MapsPage> {
         // Call the method to convert the address to coordinates
         await getAddressCoordinates(
             deliveryLocation, startLatitude, startLongitude);
+
+        setState(() {
+          isLoading = false;
+        });
       } else {
         print('Failed to load additional data: ${response.statusCode}');
       }
@@ -162,5 +212,18 @@ class _MapsPageState extends State<MapsPage> {
     } catch (e) {
       print('Error getting routing information: $e');
     }
+  }
+}
+
+class CustomMarker extends StatelessWidget {
+  final String iconUrl;
+
+  CustomMarker({required this.iconUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Image.network(iconUrl, width: 40.0, height: 40.0),
+    );
   }
 }
