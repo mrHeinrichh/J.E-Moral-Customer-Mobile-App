@@ -21,9 +21,10 @@ class _MapsPageState extends State<MapsPage> {
   @override
   void initState() {
     super.initState();
+    fetchData();
 
     // Start a timer to call fetchData every 3 seconds
-    timer = Timer.periodic(Duration(seconds: 1), (Timer t) => fetchData());
+    timer = Timer.periodic(Duration(seconds: 3), (Timer t) => fetchData());
   }
 
   @override
@@ -116,9 +117,9 @@ class _MapsPageState extends State<MapsPage> {
   }
 
   Future<void> fetchData() async {
-    // if (!isLoading) {
-    //   return;
-    // }
+    if (!isLoading) {
+      return;
+    }
 
     try {
       final response = await http.get(
@@ -142,9 +143,9 @@ class _MapsPageState extends State<MapsPage> {
         await getAddressCoordinates(
             deliveryLocation, startLatitude, startLongitude);
 
-        // setState(() {
-        //   isLoading = false;
-        // });
+        setState(() {
+          isLoading = false;
+        });
       } else {
         print('Failed to load additional data: ${response.statusCode}');
       }
