@@ -6,6 +6,8 @@ import 'package:latlong2/latlong.dart';
 import 'package:customer_app/view/my_orders.page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:math' as math;
+import 'package:url_launcher/url_launcher.dart';
+import 'dart:io' show Platform;
 
 class MapsPage extends StatefulWidget {
   @override
@@ -18,6 +20,7 @@ class _MapsPageState extends State<MapsPage> {
   List<LatLng> routePoints = [];
   bool isLoading = true;
   late Timer timer; // Declare a Timer variable
+  Map<String, dynamic>? riderData; // Add this line to store rider data
 
   @override
   void initState() {
@@ -45,16 +48,23 @@ class _MapsPageState extends State<MapsPage> {
         elevation: 0,
         backgroundColor: Colors.white,
         title: Text(
-          'Maps',
+          'In Transit',
           style: TextStyle(color: Color(0xFF232937), fontSize: 24),
         ),
+        centerTitle: true,
       ),
-      body: Column(
+      body: Stack(
         children: [
-          if (isLoading)
-            Center(child: CircularProgressIndicator())
-          else
-            buildMap(),
+          Column(
+            children: [
+              if (isLoading)
+                Center(child: CircularProgressIndicator())
+              else
+                buildMap(),
+            ],
+          ),
+          RiderDetails(riderDetails: riderData),
+          LocationDestination(deliveryLocation: transaction.deliveryLocation),
         ],
       ),
     );
@@ -144,7 +154,8 @@ class _MapsPageState extends State<MapsPage> {
         final Map<String, dynamic> data = jsonDecode(response.body);
         print(response.body);
 
-        // Get deliveryLocation from the data
+        final String riderId = data['data']['rider'];
+
         final String deliveryLocation = data['data']['deliveryLocation'];
         final String startLatitude = data['data']['lat'];
         final String startLongitude = data['data']['long'];
@@ -154,6 +165,7 @@ class _MapsPageState extends State<MapsPage> {
         // Call the method to convert the address to coordinates
         await getAddressCoordinates(
             deliveryLocation, startLatitude, startLongitude);
+        await fetchRiderDetails(riderId);
 
         setState(() {
           isLoading = false;
@@ -163,6 +175,27 @@ class _MapsPageState extends State<MapsPage> {
       }
     } catch (e) {
       print('Error fetching additional data: $e');
+    }
+  }
+
+  Future<void> fetchRiderDetails(String riderId) async {
+    try {
+      final riderResponse = await http.get(
+        Uri.parse(
+          'https://lpg-api-06n8.onrender.com/api/v1/users/$riderId',
+        ),
+      );
+
+      if (riderResponse.statusCode == 200) {
+        setState(() {
+          riderData = jsonDecode(riderResponse.body);
+        });
+        print('Rider details: $riderData');
+      } else {
+        print('Failed to load rider details: ${riderResponse.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching rider details: $e');
     }
   }
 
@@ -275,3 +308,186 @@ double calculateZoom(
 }
 
 const double EarthRadius = 150;
+
+class RiderDetails extends StatelessWidget {
+  final Map<String, dynamic>? riderDetails;
+
+  RiderDetails({required this.riderDetails});
+  Future<void> _launchCaller(String contactNumber) async {
+    final url = 'tel:$contactNumber';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      // Handle the case where launching is not supported
+      print('Could not launch $url');
+      // You can show a dialog, display a toast, or take any other appropriate action.
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Check if riderDetails is not null and contains the necessary data
+    if (riderDetails != null && riderDetails!['status'] == 'success') {
+      final Map<String, dynamic> userData = riderDetails!['data']['user'];
+
+      return Positioned(
+        bottom: 20,
+        child: Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Container(
+            width: 375.0,
+            height: 250.0,
+            padding: EdgeInsets.all(20.0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 2,
+                  blurRadius: 5,
+                  offset: Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  'Rider Details',
+                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                ),
+                CircleAvatar(
+                  backgroundImage: NetworkImage('${userData['image']}'),
+                  radius: 40.0, // Adjust the radius as needed
+                ),
+                SizedBox(height: 8.0),
+                Text('Name: ${userData['name']}'),
+                Text('Contact Number: ${userData['contactNumber']}'),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        _launchCaller(userData['contactNumber']);
+                      },
+                      child: Text('Call Driver'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () async {
+                        final contactNumber = userData['contactNumber'];
+                        if (await canLaunch('sms:$contactNumber')) {
+                          await launch('sms:$contactNumber');
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Unable to launch messaging app'),
+                            ),
+                          );
+                        }
+                      },
+                      child: Text('Message'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    } else {
+      // If riderDetails is null or status is not 'success', display a placeholder or handle the error
+      return Positioned(
+        bottom: 20,
+        child: Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Container(
+            width: 350.0,
+            height: 200.0,
+            padding: EdgeInsets.all(20.0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 2,
+                  blurRadius: 5,
+                  offset: Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Rider Details',
+                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8.0),
+                Text('fetching rider details'),
+                // Handle error message or display a placeholder
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+  }
+}
+
+class LocationDestination extends StatelessWidget {
+  final String deliveryLocation;
+
+  LocationDestination({required this.deliveryLocation});
+  String truncateText(String text, int maxLength) {
+    if (text.length <= maxLength) {
+      return text;
+    } else {
+      // Add a newline character after the specified length
+      return text.substring(0, maxLength) + '\n' + text.substring(maxLength);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final truncatedLocation = truncateText(deliveryLocation, 40);
+
+    return Positioned(
+      top: 1,
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Center(
+          child: Container(
+            width: 385.0, // Adjust the width as needed
+            height: 70.0, // Adjust the height as needed
+            padding: EdgeInsets.all(20.0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 2,
+                  blurRadius: 5,
+                  offset: Offset(0, 3), // changes position of shadow
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(truncatedLocation,
+                    style:
+                        TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold)),
+                Image.network(
+                  'https://raw.githubusercontent.com/mrHeinrichh/J.E-Moral-cdn/main/assets/png/location-arrow-circle-icon.png', // Replace with your image URL
+                  width: 30.0, // Adjust the width as needed
+                  height: 30.0, // Adjust the height as needed
+                  fit: BoxFit.cover,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
