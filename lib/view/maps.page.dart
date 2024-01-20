@@ -5,6 +5,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:customer_app/view/my_orders.page.dart';
 import 'package:http/http.dart' as http;
+import 'dart:math' as math;
 
 class MapsPage extends StatefulWidget {
   @override
@@ -60,14 +61,25 @@ class _MapsPageState extends State<MapsPage> {
   }
 
   Widget buildMap() {
+    double minLat = double.infinity;
+    double maxLat = double.negativeInfinity;
+    double minLng = double.infinity;
+    double maxLng = double.negativeInfinity;
+
+    for (LatLng point in routePoints) {
+      minLat = math.min(minLat, point.latitude);
+      maxLat = math.max(maxLat, point.latitude);
+      minLng = math.min(minLng, point.longitude);
+      maxLng = math.max(maxLng, point.longitude);
+    }
+    LatLng center = LatLng((minLat + maxLat) / 2, (minLng + maxLng) / 2);
+    double zoom = calculateZoom(minLat, maxLat, minLng, maxLng);
+
     return Expanded(
       child: FlutterMap(
         options: MapOptions(
-          center: LatLng(
-            14.549095,
-            121.027211,
-          ),
-          zoom: 12.5,
+          center: center,
+          zoom: zoom,
         ),
         children: [
           TileLayer(
@@ -245,3 +257,21 @@ class CustomMarker extends StatelessWidget {
     );
   }
 }
+
+double calculateZoom(
+    double minLat, double maxLat, double minLng, double maxLng) {
+  const double paddingFactor = 1.1; // Adjust this to add padding around markers
+  double latRange = (maxLat - minLat) * paddingFactor;
+  double lngRange = (maxLng - minLng) * paddingFactor;
+
+  double diagonal = math.sqrt(latRange * latRange + lngRange * lngRange);
+
+  // 256 is the default tile size
+  double zoom =
+      (math.log(360.0 / 256.0 * (EarthRadius * math.pi) / diagonal) / math.ln2)
+          .floorToDouble();
+
+  return zoom;
+}
+
+const double EarthRadius = 150;
