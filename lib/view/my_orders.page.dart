@@ -157,16 +157,7 @@ class _MyOrderPageState extends State<MyOrderPage> {
           children: [
             for (int i = 0; i < visibleTransactions.length; i++)
               GestureDetector(
-                onTap: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => AuthenticationPage(
-                  //       transaction: visibleTransactions[i],
-                  //     ),
-                  //   ),
-                  // );
-                },
+                onTap: () {},
                 child: TransactionCard(
                   transaction: visibleTransactions[i],
                   onDeleteTransaction: () =>
@@ -243,15 +234,16 @@ class _TransactionCardState extends State<TransactionCard> {
                 Text("Status: ${widget.transaction.isApproved}"),
                 CustomButton(
                   backgroundColor: getTrackOrderButtonColor(),
-                  onPressed: () {
-                    Navigator.pushNamed(
-                      context,
-                      authenticationPage,
-                      arguments: widget
-                          .transaction, // Pass the transaction data as arguments
-                    );
-                  },
-                  text: getTrackOrderButtonText(), // Use the updated method
+                  onPressed: getTrackOrderButtonColor() == Color(0xFFAFB7C9)
+                      ? () {} // Provide an empty function for disabled state
+                      : () {
+                          Navigator.pushNamed(
+                            context,
+                            authenticationPage,
+                            arguments: widget.transaction,
+                          );
+                        },
+                  text: getTrackOrderButtonText(),
                 ),
                 CustomButton(
                   backgroundColor: getCancelOrderButtonColor(),
