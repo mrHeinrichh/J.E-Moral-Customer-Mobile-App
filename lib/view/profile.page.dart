@@ -22,6 +22,7 @@ class _ProfilePageState extends State<ProfilePage> {
   TextEditingController _addressController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
+
   File? _image;
 
   Future<void> _pickImage() async {
@@ -103,14 +104,8 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  Future<void> updateUserProfile(
-    String userId,
-    String name,
-    String contactNumber,
-    String address,
-    String email,
-    String password,
-  ) async {
+  Future<void> updateUserProfile(String userId, String name,
+      String contactNumber, String address, String email) async {
     try {
       final userData = await fetchUserDetails(userId);
 
@@ -134,10 +129,7 @@ class _ProfilePageState extends State<ProfilePage> {
           'contactNumber': contactNumber,
           'type': "Customer",
           'address': address,
-          'authData': {
-            'email': email,
-            'password': password,
-          },
+          'email': email,
         }),
       );
 
@@ -178,16 +170,38 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  Future<void> changePassword(String userId, String newPassword) async {
+    try {
+      final response = await Dio().patch(
+        'https://lpg-api-06n8.onrender.com/api/v1/users/$userId',
+        data: {
+          'password': newPassword,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print('Password changed successfully');
+        print(response.data);
+      } else {
+        print('Failed to change password: ${response.statusCode}');
+        print(response.data);
+      }
+    } catch (error) {
+      print('Error changing password: $error');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     String? userId = Provider.of<UserProvider>(context, listen: false).userId;
     _userDetailsFuture = fetchUserDetails(userId!);
+    print(userId);
   }
 
   Widget buildProfileWidget(Map<String, dynamic> userDetails, String? userId) {
-    final userData = userDetails['data']['user'];
-    final authData = userDetails['data']['authData'];
+    final userData = userDetails['data'][0];
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -239,155 +253,199 @@ class _ProfilePageState extends State<ProfilePage> {
                     color: Colors.white,
                   ),
                 ),
-                if (userData.containsKey('image') && userData['image'] != null)
-                  CircleAvatar(
-                    radius: 60,
-                    backgroundImage: NetworkImage(userData['image'] as String),
-                  ),
+                CircleAvatar(
+                  radius: 50,
+                  backgroundImage: NetworkImage(userData['image'].trim()),
+                ),
                 Text(
-                  'Full Name: ${userData['name'] ?? 'N/A'}',
+                  'Name: ${userData['name']}',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 18,
                     color: Colors.white,
                   ),
                 ),
                 Text(
-                  'Address: ${userData['address'] ?? 'N/A'}',
+                  'Contact Number: ${userData['contactNumber']}',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 18,
                     color: Colors.white,
                   ),
                 ),
                 Text(
-                  'Contact Number: ${userData['contactNumber'] ?? 'N/A'}',
+                  'Address: ${userData['address']}',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 18,
                     color: Colors.white,
                   ),
                 ),
                 Text(
-                  'Email: ${authData != null ? authData['email'] ?? 'N/A' : 'N/A'}',
+                  'Email: ${userData['email']}',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 18,
                     color: Colors.white,
                   ),
                 ),
-                Text(
-                  'Password: ******',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white,
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () async {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        _nameController.text = userData['name'] ?? '';
-                        _contactNumberController.text =
-                            userData['contactNumber'] ?? '';
-                        _addressController.text = userData['address'] ?? '';
-                        _emailController.text =
-                            authData != null ? authData['email'] ?? '' : '';
-                        _passwordController.text = '';
-
-                        return AlertDialog(
-                          title: Text('Edit your profile Data'),
-                          content: StatefulBuilder(
-                            builder:
-                                (BuildContext context, StateSetter setState) {
-                              return SingleChildScrollView(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    _image == null
-                                        ? const CircleAvatar(
-                                            radius: 50,
-                                            backgroundColor: Colors.grey,
-                                            child: Icon(
-                                              Icons.person,
-                                              color: Colors.white,
-                                              size: 50,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () async {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            _nameController.text = userData['name'] ?? '';
+                            _contactNumberController.text =
+                                userData['contactNumber'] ?? '';
+                            _addressController.text = userData['address'] ?? '';
+                            _emailController.text = userData['email'] ?? '';
+                            return AlertDialog(
+                              title: Text('Edit your profile Data'),
+                              content: StatefulBuilder(
+                                builder: (BuildContext context,
+                                    StateSetter setState) {
+                                  return SingleChildScrollView(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        _image == null
+                                            ? const CircleAvatar(
+                                                radius: 50,
+                                                backgroundColor: Colors.grey,
+                                                child: Icon(
+                                                  Icons.person,
+                                                  color: Colors.white,
+                                                  size: 50,
+                                                ),
+                                              )
+                                            : CircleAvatar(
+                                                radius: 50,
+                                                backgroundImage:
+                                                    FileImage(_image!),
+                                              ),
+                                        TextButton(
+                                          onPressed: () async {
+                                            await _pickImage();
+                                            setState(
+                                                () {}); // Rebuild the content after picking image
+                                          },
+                                          child: const Text(
+                                            "Upload Image",
+                                            style: TextStyle(
+                                              color: Colors.blue,
+                                              fontSize: 15.0,
                                             ),
-                                          )
-                                        : CircleAvatar(
-                                            radius: 50,
-                                            backgroundImage: FileImage(_image!),
                                           ),
-                                    TextButton(
-                                      onPressed: () async {
-                                        await _pickImage();
-                                        setState(
-                                            () {}); // Rebuild the content after picking image
-                                      },
-                                      child: const Text(
-                                        "Upload Image",
-                                        style: TextStyle(
-                                          color: Colors.blue,
-                                          fontSize: 15.0,
                                         ),
-                                      ),
+                                        TextField(
+                                          controller: _nameController,
+                                          decoration: InputDecoration(
+                                              labelText: 'Name'),
+                                        ),
+                                        TextField(
+                                          controller: _contactNumberController,
+                                          decoration: InputDecoration(
+                                              labelText: 'Contact Number'),
+                                        ),
+                                        TextField(
+                                          controller: _addressController,
+                                          decoration: InputDecoration(
+                                              labelText: 'Address'),
+                                        ),
+                                        TextField(
+                                          controller: _emailController,
+                                          decoration: InputDecoration(
+                                              labelText: 'Email'),
+                                        ),
+                                      ],
                                     ),
-                                    TextField(
-                                      controller: _nameController,
-                                      decoration:
-                                          InputDecoration(labelText: 'Name'),
-                                    ),
-                                    TextField(
-                                      controller: _contactNumberController,
-                                      decoration: InputDecoration(
-                                          labelText: 'Contact Number'),
-                                    ),
-                                    TextField(
-                                      controller: _addressController,
-                                      decoration:
-                                          InputDecoration(labelText: 'Address'),
-                                    ),
-                                    TextField(
-                                      controller: _emailController,
-                                      decoration:
-                                          InputDecoration(labelText: 'Email'),
-                                    ),
-                                    TextField(
-                                      controller: _passwordController,
-                                      decoration: InputDecoration(
-                                          labelText: 'Password'),
-                                    ),
-                                  ],
+                                  );
+                                },
+                              ),
+                              actions: [
+                                ElevatedButton(
+                                  onPressed: () async {
+                                    String name = _nameController.text;
+                                    String contactNumber =
+                                        _contactNumberController.text;
+                                    String address = _addressController.text;
+                                    String email = _emailController.text;
+                                    Navigator.of(context).pop();
+
+                                    await updateUserProfile(userId!, name,
+                                        contactNumber, address, email);
+                                  },
+                                  child: Text('Save'),
                                 ),
-                              );
-                            },
-                          ),
-                          actions: [
-                            ElevatedButton(
-                              onPressed: () async {
-                                String name = _nameController.text;
-                                String contactNumber =
-                                    _contactNumberController.text;
-                                String address = _addressController.text;
-                                String email = _emailController.text;
-                                String password = _passwordController.text;
-
-                                Navigator.of(context).pop();
-
-                                await updateUserProfile(userId!, name,
-                                    contactNumber, address, email, password);
-                              },
-                              child: Text('Save'),
-                            ),
-                            ElevatedButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: Text('Cancel'),
-                            ),
-                          ],
+                                ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text('Cancel'),
+                                ),
+                              ],
+                            );
+                          },
                         );
                       },
-                    );
-                  },
-                  child: Text("Edit Profile"),
+                      child: Text("Edit Profile"),
+                    ),
+                    ElevatedButton(
+                      onPressed: () async {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            _passwordController
+                                .clear(); // Clear the password field on each dialog open
+
+                            return AlertDialog(
+                              title: Text('Change Password'),
+                              content: StatefulBuilder(
+                                builder: (BuildContext context,
+                                    StateSetter setState) {
+                                  return SingleChildScrollView(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        TextField(
+                                          controller: _passwordController,
+                                          obscureText: true,
+                                          decoration: InputDecoration(
+                                            labelText: 'New Password',
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                              actions: [
+                                ElevatedButton(
+                                  onPressed: () async {
+                                    String newPassword =
+                                        _passwordController.text;
+
+                                    Navigator.of(context)
+                                        .pop(); // Close the dialog
+
+                                    await changePassword(userId!, newPassword);
+                                  },
+                                  child: Text('Change'),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.of(context)
+                                        .pop(); // Close the dialog
+                                  },
+                                  child: Text('Cancel'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      child: Text("Change Password"),
+                    )
+                  ],
                 ),
               ],
             ),
