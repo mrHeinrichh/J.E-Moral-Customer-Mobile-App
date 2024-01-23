@@ -70,14 +70,15 @@ class _MyOrderPageState extends State<MyOrderPage> {
 
     if (response.statusCode == 200) {
       final Map<String, dynamic>? data = jsonDecode(response.body);
-
+      print(response.body);
       if (data != null && data['status'] == 'success') {
         final List<dynamic> transactionsData = data['data'] ?? [];
 
         setState(() {
           visibleTransactions = transactionsData
-              .where(
-                  (transactionData) => transactionData['hasFeedback'] == false)
+              .where((transactionData) =>
+                  transactionData['hasFeedback'] == false &&
+                  transactionData['cancelled'] == false)
               .map((transactionData) => Transaction(
                     name: transactionData['name'] ?? '',
                     contactNumber: transactionData['contactNumber'] ?? '',
