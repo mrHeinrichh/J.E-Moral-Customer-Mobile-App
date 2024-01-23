@@ -15,8 +15,9 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   TextEditingController emailController = TextEditingController(text: '');
   TextEditingController passwordController = TextEditingController(text: '');
-  Future<Map<String, dynamic>> login(String? email, String? password,
-      [BuildContext? context]) async {
+
+  Future<Map<String, dynamic>> login(
+      String? email, String? password, BuildContext context) async {
     if (email == null || password == null) {
       print('Email or password is null');
       return {'error': 'Invalid email or password'};
@@ -25,13 +26,12 @@ class _LoginPageState extends State<LoginPage> {
     print('Email: $email, Password: $password');
 
     try {
-      if (context != null) {
-        // Show loading indicator
-        Provider.of<UserProvider>(context, listen: false).setLoading(true);
-      }
+      // Show loading indicator
+      Provider.of<UserProvider>(context, listen: false).setLoading(true);
 
       final response = await http.post(
-        Uri.parse('https://lpg-api-06n8.onrender.com/api/v1/auth/login'),
+        Uri.parse(
+            'https://lpg-api-06n8.onrender.com/api/v1/users/authenticate/'),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -41,10 +41,8 @@ class _LoginPageState extends State<LoginPage> {
         }),
       );
 
-      if (context != null) {
-        // Hide loading indicator
-        Provider.of<UserProvider>(context, listen: false).setLoading(false);
-      }
+      // Hide loading indicator
+      Provider.of<UserProvider>(context, listen: false).setLoading(false);
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
@@ -52,78 +50,20 @@ class _LoginPageState extends State<LoginPage> {
         print('Login Response: $data');
 
         if (data['status'] == 'success') {
-          if (context != null) {
-            final List<dynamic>? userData = data['data'];
-            if (userData != null && userData.isNotEmpty) {
-              // Accessing the correct nested values
-              String userId = userData[0]['_doc']['user'] ?? '';
+          final List<dynamic>? userData = data['data'];
+          if (userData != null && userData.isNotEmpty) {
+            // Accessing the correct nested values
+            String userId = userData[0]['_doc']['_id'] ?? '';
 
-              print('User ID: $userId');
+            print('User ID: $userId');
 
-              // Fetch additional user details using the user ID
-              if (context != null) {
-                // Show loading indicator
-                Provider.of<UserProvider>(context, listen: false)
-                    .setLoading(true);
-              }
+            // Set the user ID in the app state
+            Provider.of<UserProvider>(context, listen: false).setUserId(userId);
 
-              final userDetailsResponse = await http.get(
-                Uri.parse(
-                    'https://lpg-api-06n8.onrender.com/api/v1/users/$userId'),
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-              );
-
-              if (context != null) {
-                // Hide loading indicator
-                Provider.of<UserProvider>(context, listen: false)
-                    .setLoading(false);
-              }
-
-              print('User Details Response: ${userDetailsResponse.statusCode}');
-
-              if (userDetailsResponse.statusCode == 200) {
-                final Map<String, dynamic> userDetailsData =
-                    jsonDecode(userDetailsResponse.body);
-
-                print('User Details: $userDetailsData');
-
-                // Extract "type" field from user details
-                String userType = userDetailsData['data']['user']['__t'] ?? '';
-                print('User Type: $userType');
-
-                if (userType == 'Customer') {
-                  // Check if the user is verified
-                  bool isVerified =
-                      userDetailsData['data']['user']['verified'] ?? false;
-
-                  if (isVerified != null) {
-                    if (isVerified) {
-                      // Set the user ID in the app state
-                      Provider.of<UserProvider>(context, listen: false)
-                          .setUserId(userId);
-                      return data;
-                    } else {
-                      return {'error': 'User is not verified'};
-                    }
-                  } else {
-                    return {'error': 'Verification status not available'};
-                  }
-                } else {
-                  return {'error': 'Invalid user type'};
-                }
-              } else {
-                print(
-                    'Failed to fetch user details. Response code: ${userDetailsResponse.statusCode}');
-                return {'error': 'Failed to fetch user details'};
-              }
-            } else {
-              return {'error': 'User data is missing or empty'};
-            }
+            return data;
+          } else {
+            return {'error': 'User data is missing or empty'};
           }
-
-          return data;
         } else {
           return {'error': 'Login failed'};
         }
@@ -132,10 +72,8 @@ class _LoginPageState extends State<LoginPage> {
         return {'error': 'Login failed'};
       }
     } catch (error, stackTrace) {
-      if (context != null) {
-        // Hide loading indicator on error
-        Provider.of<UserProvider>(context, listen: false).setLoading(false);
-      }
+      // Hide loading indicator on error
+      Provider.of<UserProvider>(context, listen: false).setLoading(false);
 
       print('Error: $error');
       print('Stack trace: $stackTrace');
