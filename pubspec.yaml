@@ -50,6 +50,7 @@ dependencies:
   latlng: ^1.0.0
   latlong2: ^0.8.2
   url_launcher: ^6.0.12
+  carousel_slider: ^4.2.1
   
 dev_dependencies:
   flutter_test:

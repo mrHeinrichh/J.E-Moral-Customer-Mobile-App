@@ -1,3 +1,4 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:customer_app/routes/app_routes.dart';
 import 'package:customer_app/view/product_details.page.dart';
 import 'package:customer_app/widgets/custom_button.dart';
@@ -15,11 +16,29 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<Map<String, dynamic>> sampleData = [];
   TextEditingController _searchController = TextEditingController();
+  List<Map<String, dynamic>> announcements = [];
+  bool initialSectionShown = false;
 
   @override
   void initState() {
     super.initState();
     fetchDataFromAPI();
+    fetchAnnouncements();
+  }
+
+  Future<void> fetchAnnouncements() async {
+    final url =
+        Uri.parse('https://lpg-api-06n8.onrender.com/api/v1/announcements/');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final parsedData = json.decode(response.body);
+      final data = parsedData['data'];
+
+      setState(() {
+        announcements = List<Map<String, dynamic>>.from(data);
+      });
+    }
   }
 
   void searchItems() async {
@@ -178,24 +197,81 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
-        const Text(
-          'Fueling Your Life\nwith Clean Energy',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 30,
-            color: Color(0xFF232937),
+        SizedBox(
+          child: CarouselSlider.builder(
+            itemCount: announcements.length + 1,
+            itemBuilder: (BuildContext context, int index, int realIndex) {
+              if (index == 0) {
+                // Initial section to be shown first
+                return Container(
+                  child: Column(
+                    children: [
+                      const Text(
+                        'Fueling Your Life\nwith Clean Energy',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 30,
+                          color: Color(0xFF232937),
+                        ),
+                      ),
+                      const Text('Applying for a Rider?'),
+                      CustomizedButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, appointmentRoute);
+                        },
+                        text: 'Book an Appointment',
+                        height: 30,
+                        width: 310,
+                        fontz: 10,
+                      ),
+                    ],
+                  ),
+                );
+              } else {
+                // Display announcements in the carousel
+                final announcement = announcements[index - 1];
+
+                return Container(
+                  width: MediaQuery.of(context).size.width,
+                  margin: EdgeInsets.symmetric(horizontal: 5.0),
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: NetworkImage(announcement['image']),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      announcement['text'],
+                      style: TextStyle(fontSize: 20.0, color: Colors.black),
+                    ),
+                  ),
+                );
+              }
+            },
+            options: CarouselOptions(
+              height: 180,
+              enableInfiniteScroll: true,
+              autoPlay: true,
+              enlargeCenterPage: true,
+              onPageChanged: (index, _) {
+                // Set a flag to track whether initial section is shown
+                setState(() {
+                  initialSectionShown = true;
+                });
+              },
+            ),
           ),
         ),
-        const Text('Applying for a Rider?'),
-        CustomizedButton(
-          onPressed: () {
-            Navigator.pushNamed(context, appointmentRoute);
-          },
-          text: 'Book an Appointment',
-          height: 40,
-          width: 330,
-          fontz: 15,
-        ),
+        if (!initialSectionShown)
+          Expanded(
+            child: ListView.builder(
+              itemCount: sampleData.length,
+              itemBuilder: (context, categoryIndex) {
+                // ... Your existing category and product UI
+              },
+            ),
+          ),
         Expanded(
           child: ListView.builder(
             itemCount: sampleData.length,
