@@ -15,7 +15,6 @@ class MapsPage extends StatefulWidget {
 }
 
 class _MapsPageState extends State<MapsPage> {
-  final GlobalKey<_MapsPageState> _key = GlobalKey();
   late Transaction transaction;
   List<LatLng> routePoints = [];
   bool isLoading = true;
@@ -25,7 +24,7 @@ class _MapsPageState extends State<MapsPage> {
   @override
   void initState() {
     super.initState();
-    // fetchData();
+    fetchData();
 
     // Start a timer to call fetchData every 3 seconds
     timer = Timer.periodic(Duration(seconds: 3), (Timer t) => fetchData());
@@ -139,9 +138,9 @@ class _MapsPageState extends State<MapsPage> {
   }
 
   Future<void> fetchData() async {
-    // if (!isLoading) {
-    //   return;
-    // }
+    if (!isLoading) {
+      return;
+    }
     print("test");
 
     try {
@@ -168,9 +167,9 @@ class _MapsPageState extends State<MapsPage> {
             deliveryLocation, startLatitude, startLongitude);
         await fetchRiderDetails(riderId);
 
-        // setState(() {
-        //   isLoading = false;
-        // });
+        setState(() {
+          isLoading = false;
+        });
       } else {
         print('Failed to load additional data: ${response.statusCode}');
       }
@@ -329,7 +328,7 @@ class RiderDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     // Check if riderDetails is not null and contains the necessary data
     if (riderDetails != null && riderDetails!['status'] == 'success') {
-      final Map<String, dynamic> userData = riderDetails!['data']['user'];
+      final Map<String, dynamic> userData = riderDetails!['data'][0];
 
       return Positioned(
         bottom: 20,

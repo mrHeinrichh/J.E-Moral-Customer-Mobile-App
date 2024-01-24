@@ -255,7 +255,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 CircleAvatar(
                   radius: 50,
-                  backgroundImage: NetworkImage(userData['image'].trim()),
+                  backgroundImage: userData['image'] != null
+                      ? NetworkImage(userData['image']!)
+                      : null,
                 ),
                 Text(
                   'Name: ${userData['name']}',

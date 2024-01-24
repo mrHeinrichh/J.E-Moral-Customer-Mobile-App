@@ -21,6 +21,8 @@ class Transaction {
   final String deliveryTime;
   final double total;
   final String createdAt;
+  final String pickupImages;
+  final String completionImages;
   final List<Map<String, dynamic>> items;
 
   Transaction({
@@ -38,7 +40,9 @@ class Transaction {
     required this.createdAt,
     required this.items,
     required this.completed,
+    required this.pickupImages,
     required this.hasFeedback,
+    required this.completionImages,
   });
 }
 
@@ -95,6 +99,8 @@ class _MyOrderPageState extends State<MyOrderPage> {
                     price: transactionData['total'].toString(),
                     isApproved: transactionData['isApproved'] ?? '',
                     id: transactionData['_id'] ?? '',
+                    pickupImages: transactionData['pickupImages'] ?? '',
+                    completionImages: transactionData['completionImages'] ?? '',
                     completed: transactionData['completed'] ?? '',
                   ))
               .toList();
@@ -205,58 +211,188 @@ class _TransactionCardState extends State<TransactionCard> {
     return widget.transaction.completed == true ? 'Feedback' : 'Track Order';
   }
 
+  void _showTransactionDetailsModal(Transaction transaction) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return TransactionDetailsModal(transaction: transaction);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(30),
       child: SizedBox(
         height: 250,
-        child: Card(
-          elevation: 2,
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      'Order #${widget.orderNumber}',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+        child: GestureDetector(
+          onTap: () {
+            _showTransactionDetailsModal(widget.transaction);
+          },
+          child: Card(
+            elevation: 2,
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        'Order #${widget.orderNumber}',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    const Spacer(),
-                    Text(widget.transaction.price),
-                  ],
-                ),
-                Text("Status: ${widget.transaction.isApproved}"),
-                CustomButton(
-                  backgroundColor: getTrackOrderButtonColor(),
-                  onPressed: getTrackOrderButtonColor() == Color(0xFFAFB7C9)
-                      ? () {} // Provide an empty function for disabled state
-                      : () {
-                          Navigator.pushNamed(
-                            context,
-                            authenticationPage,
-                            arguments: widget.transaction,
-                          );
-                        },
-                  text: getTrackOrderButtonText(),
-                ),
-                CustomButton(
-                  backgroundColor: getCancelOrderButtonColor(),
-                  onPressed: getCancelOrderButtonColor() == Color(0xFFAFB7C9)
-                      ? () {}
-                      : widget.onDeleteTransaction,
-                  text: 'Cancel Order',
-                ),
-              ],
+                      const Spacer(),
+                      Text(widget.transaction.price),
+                    ],
+                  ),
+                  Text("Status: ${widget.transaction.isApproved}"),
+                  CustomButton(
+                    backgroundColor: getTrackOrderButtonColor(),
+                    onPressed: getTrackOrderButtonColor() == Color(0xFFAFB7C9)
+                        ? () {} // Provide an empty function for disabled state
+                        : () {
+                            Navigator.pushNamed(
+                              context,
+                              authenticationPage,
+                              arguments: widget.transaction,
+                            );
+                          },
+                    text: getTrackOrderButtonText(),
+                  ),
+                  CustomButton(
+                    backgroundColor: getCancelOrderButtonColor(),
+                    onPressed: getCancelOrderButtonColor() == Color(0xFFAFB7C9)
+                        ? () {}
+                        : widget.onDeleteTransaction,
+                    text: 'Cancel Order',
+                  ),
+                ],
+              ),
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class TransactionDetailsModal extends StatelessWidget {
+  final Transaction transaction;
+
+  TransactionDetailsModal({required this.transaction});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            'Transaction Number',
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            '${transaction.id}',
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 5),
+          Divider(),
+          SizedBox(height: 5),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.perm_identity_outlined),
+                  Text(' : ${transaction.name}'),
+                ],
+              ),
+              Row(
+                children: [
+                  Icon(Icons.phone_rounded),
+                  Text(' : ${transaction.contactNumber}'),
+                ],
+              ),
+              Row(
+                children: [
+                  Icon(Icons.house_outlined),
+                  Text(' : ${transaction.houseLotBlk}'),
+                ],
+              ),
+              Row(
+                children: [
+                  Icon(Icons.location_on_outlined),
+                  Text(' ${transaction.deliveryLocation}'),
+                ],
+              ),
+              SizedBox(height: 10),
+              Row(
+                children: [
+                  Icon(Icons.payment_outlined),
+                  Text(' : ${transaction.paymentMethod}'),
+                ],
+              ),
+              Text('Assembly Option : ${transaction.assembly}'),
+              Text('Delivery Date/Time : ${transaction.deliveryTime}'),
+              Text('Items: ${transaction.items}'),
+              Row(
+                children: [
+                  Text(' ₱  ',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                  Text('${transaction.price}'),
+                ],
+              ),
+              Divider(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    children: [
+                      Text('Proof of Pick up:'),
+                      if (transaction.pickupImages != null &&
+                          transaction.pickupImages!.isNotEmpty)
+                        Image.network(
+                          transaction.pickupImages!,
+                          width: 100,
+                          height: 100,
+                        )
+                      else
+                        Text('N/A'),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      Text('Proof of Drop off:'),
+                      if (transaction.completionImages != null &&
+                          transaction.completionImages!.isNotEmpty)
+                        Image.network(
+                          transaction.completionImages!,
+                          width: 100,
+                          height: 100,
+                        )
+                      else
+                        Text('N/A'),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
