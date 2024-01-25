@@ -107,6 +107,32 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
+  Future<void> sendMessage(String content) async {
+    final Map<String, dynamic> messageData = {
+      "user": "65b251323deddfd62fa5523d",
+      "content": content,
+    };
+
+    final response = await http.post(
+      Uri.parse('https://lpg-api-06n8.onrender.com/api/v1/messages'),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(messageData),
+    );
+
+    if (response.statusCode == 200) {
+      // Message sent successfully
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      final Map<String, dynamic> newMessage = responseData['data'][0];
+
+      // Update the UI with the new message
+      MessageProvider messageProvider = MessageProvider();
+      messageProvider.addMessage(newMessage);
+    } else {
+      // Handle error
+      print('Failed to send message. Status code: ${response.statusCode}');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -196,6 +222,12 @@ class _ChatPageState extends State<ChatPage> {
               onPressed: () {
                 // Handle send button action here
                 // You can access the entered text using _textController.text
+                String messageContent = _textController.text;
+                if (messageContent.isNotEmpty) {
+                  sendMessage(messageContent);
+                  _textController
+                      .clear(); // Clear the text field after sending the message
+                }
               },
             ),
           ],
