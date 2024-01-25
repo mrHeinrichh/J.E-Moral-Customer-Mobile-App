@@ -13,11 +13,6 @@ class MessageProvider extends ChangeNotifier {
 
   List<Map<String, dynamic>> get messages => _messages;
 
-  // Add a method to fetch messages from the API
-  Future<void> fetchMessages() async {
-    // Implement the logic to fetch messages here
-  }
-
   // Add a method to add a new message
   void addMessage(Map<String, dynamic> message) {
     _messages.add(message);
@@ -59,16 +54,49 @@ class _ChatPageState extends State<ChatPage> {
     socket.connect();
   }
 
+  Future<void> loadMoreMessages() async {
+    _isLoading = true;
+    try {
+      _currentPage++;
+      final moreMessages = await fetchMessages();
+      final List<Map<String, dynamic>> currentMessages =
+          await messages; // Get the current messages
+      final List<Map<String, dynamic>> updatedMessages =
+          List.from(currentMessages)..addAll(moreMessages);
+
+      // Sort the updated messages
+      updatedMessages.sort(
+        (a, b) => b['createdAt'].compareTo(a['createdAt']),
+      );
+
+      setState(() {
+        messages = Future.value(updatedMessages);
+      });
+
+      // Scroll back to the original position before loading more messages
+      _scrollController.jumpTo(_scrollController.offset +
+          (_scrollController.position.viewportDimension * moreMessages.length));
+    } catch (e) {
+      // Handle error
+    } finally {
+      _isLoading = false;
+    }
+  }
+
   Future<List<Map<String, dynamic>>> fetchMessages() async {
     final response = await http.get(
       Uri.parse(
-          'https://lpg-api-06n8.onrender.com/api/v1/messages?user=65b251323deddfd62fa5523d'),
+          'https://lpg-api-06n8.onrender.com/api/v1/messages?user=65b251323deddfd62fa5523d&page=$_currentPage&limit=100'),
     );
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
       if (data['status'] == 'success') {
-        return List<Map<String, dynamic>>.from(data['data']);
+        List<Map<String, dynamic>> messages =
+            List<Map<String, dynamic>>.from(data['data']);
+        messages.sort((a, b) => b['createdAt']
+            .compareTo(a['createdAt'])); // Sort in descending order
+        return messages;
       } else {
         print('Failed to fetch messages');
         return [];
@@ -95,31 +123,42 @@ class _ChatPageState extends State<ChatPage> {
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
-            // Use a FutureBuilder to handle the asynchronous data fetching
-            FutureBuilder<List<Map<String, dynamic>>>(
-              future: messages,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator(); // Show a loading indicator while fetching data
-                } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                } else {
-                  final List<Map<String, dynamic>> messageList =
-                      snapshot.data ?? [];
-                  return Expanded(
-                    child: ListView.builder(
-                      itemCount: messageList.length,
-                      itemBuilder: (context, index) {
-                        final message = messageList[index];
-                        return ListTile(
-                          title: Text(message['content']),
-                          subtitle: Text(message['createdAt']),
-                        );
-                      },
-                    ),
-                  );
+            NotificationListener(
+              onNotification: (ScrollNotification scrollInfo) {
+                if (!_isLoading &&
+                    scrollInfo.metrics.pixels ==
+                        scrollInfo.metrics.maxScrollExtent) {
+                  loadMoreMessages();
                 }
+                return true;
               },
+              child: Expanded(
+                child: FutureBuilder<List<Map<String, dynamic>>>(
+                  future: messages,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      final List<Map<String, dynamic>> messageList =
+                          snapshot.data ?? [];
+                      return ListView.builder(
+                        reverse: true,
+                        controller: _scrollController,
+                        itemCount: messageList.length,
+                        itemBuilder: (context, index) {
+                          final message = messageList[index];
+                          return ListTile(
+                            title: Text(message['content']),
+                            subtitle: Text(message['createdAt']),
+                          );
+                        },
+                      );
+                    }
+                  },
+                ),
+              ),
             ),
           ],
         ),
