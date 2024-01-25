@@ -1,10 +1,8 @@
 import 'dart:convert';
 import 'package:customer_app/routes/app_routes.dart';
-import 'package:customer_app/view/dashboard.page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:customer_app/widgets/custom_button.dart';
-import 'package:customer_app/widgets/date_time_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:customer_app/view/user_provider.dart';
 
@@ -15,10 +13,8 @@ class AppointmentPage extends StatefulWidget {
 
 class _AppointmentPageState extends State<AppointmentPage> {
   DateTime? selectedDate = DateTime.now();
-  TimeOfDay selectedTime = TimeOfDay.now();
 
   TextEditingController dateController = TextEditingController();
-  TextEditingController timeController = TextEditingController();
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -30,21 +26,31 @@ class _AppointmentPageState extends State<AppointmentPage> {
     if (picked != null && picked != selectedDate) {
       setState(() {
         selectedDate = picked;
+        // Format the selected date
         dateController.text = '${picked.toLocal()}'.split(' ')[0];
       });
     }
   }
 
-  Future<void> _selectTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: selectedTime,
-    );
-    if (picked != null) {
-      setState(() {
-        selectedTime = picked;
-        timeController.text = picked.format(context);
-      });
+  Future<void> _fetchUserById() async {
+    String? userId = Provider.of<UserProvider>(context, listen: false).userId;
+
+    if (userId != null) {
+      final apiUrl = 'https://lpg-api-06n8.onrender.com/api/v1/users/$userId';
+
+      try {
+        final response = await http.get(Uri.parse(apiUrl));
+
+        if (response.statusCode == 200) {
+          print('User details fetched successfully');
+          print('Response body: ${response.body}');
+        } else {
+          print(
+              'Failed to fetch user details. Status code: ${response.statusCode}');
+        }
+      } catch (e) {
+        print('Error fetching user details: $e');
+      }
     }
   }
 
@@ -54,10 +60,12 @@ class _AppointmentPageState extends State<AppointmentPage> {
     if (userId != null && selectedDate != null) {
       final apiUrl = 'https://lpg-api-06n8.onrender.com/api/v1/users/$userId';
 
+      // Format the selected date to the desired format
+      String formattedDate = '${selectedDate!.toLocal()}'.split(' ')[0];
+
       final patchData = {
-        "dateInterview": dateController.text,
-        "timeInterview": timeController.text,
-        "hasAppointment": "true",
+        "appointmentDate": formattedDate,
+        "appointmentStatus": "Pending",
         "type": "Customer"
       };
 
@@ -86,6 +94,13 @@ class _AppointmentPageState extends State<AppointmentPage> {
         print('Error updating appointment: $e');
       }
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Call the fetch user method when the page is loaded
+    _fetchUserById();
   }
 
   @override
@@ -149,11 +164,18 @@ class _AppointmentPageState extends State<AppointmentPage> {
           Padding(
             padding: const EdgeInsets.all(30.0),
             child: Column(children: [
-              DateTimePicker(
-                dateController: dateController,
-                timeController: timeController,
-                onDateTap: () => _selectDate(context),
-                onTimeTap: () => _selectTime(context),
+              GestureDetector(
+                onTap: () => _selectDate(context),
+                child: AbsorbPointer(
+                  child: TextFormField(
+                    readOnly: true,
+                    controller: dateController,
+                    decoration: InputDecoration(
+                      labelText: 'Date',
+                      hintText: 'Select date',
+                    ),
+                  ),
+                ),
               ),
               const SizedBox(height: 20),
               SizedBox(

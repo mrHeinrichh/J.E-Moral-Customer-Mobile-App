@@ -17,6 +17,7 @@ class Transaction {
   final String contactNumber;
   final String houseLotBlk;
   final String paymentMethod;
+  final String status;
   final String assembly;
   final String deliveryTime;
   final double total;
@@ -35,6 +36,7 @@ class Transaction {
     required this.houseLotBlk,
     required this.paymentMethod,
     required this.assembly,
+    required this.status,
     required this.deliveryTime,
     required this.total,
     required this.createdAt,
@@ -68,7 +70,10 @@ class _MyOrderPageState extends State<MyOrderPage> {
 
   Future<void> fetchTransactions(String userId) async {
     final apiUrl = 'https://lpg-api-06n8.onrender.com/api/v1/transactions';
-    final searchUrl = '$apiUrl/?search=$userId';
+
+    // Use the query parameter to filter by 'to' and '__t' fields
+    final filterQuery = '{"to": "$userId", "__t": "Delivery"}';
+    final searchUrl = '$apiUrl/?filter=$filterQuery';
 
     final response = await http.get(Uri.parse(searchUrl));
 
@@ -81,27 +86,38 @@ class _MyOrderPageState extends State<MyOrderPage> {
         setState(() {
           visibleTransactions = transactionsData
               .where((transactionData) =>
-                  transactionData['hasFeedback'] == false &&
-                  transactionData['cancelled'] == false)
+                  transactionData['status'] == 'Pending' ||
+                  transactionData['status'] == 'Approved' ||
+                  transactionData['status'] == 'On Going')
               .map((transactionData) => Transaction(
-                    name: transactionData['name'] ?? '',
-                    contactNumber: transactionData['contactNumber'] ?? '',
-                    houseLotBlk: transactionData['houseLotBlk'] ?? '',
-                    paymentMethod: transactionData['paymentMethod'] ?? '',
-                    assembly: transactionData['assembly'] ?? '',
-                    deliveryTime: transactionData['deliveryTime'] ?? '',
-                    total: transactionData['total'] ?? 0,
-                    createdAt: transactionData['createdAt'] ?? '',
-                    items: List<Map<String, dynamic>>.from(
-                        transactionData['items'] ?? []),
-                    deliveryLocation: transactionData['deliveryLocation'] ?? '',
-                    hasFeedback: transactionData['hasFeedback'] ?? false,
-                    price: transactionData['total'].toString(),
-                    isApproved: transactionData['isApproved'] ?? '',
-                    id: transactionData['_id'] ?? '',
-                    pickupImages: transactionData['pickupImages'] ?? '',
-                    completionImages: transactionData['completionImages'] ?? '',
-                    completed: transactionData['completed'] ?? '',
+                    deliveryLocation: transactionData['deliveryLocation'],
+                    price: transactionData['price'] != null
+                        ? transactionData['price'].toString()
+                        : 'N/A',
+                    isApproved: transactionData['isApproved'],
+                    id: transactionData['_id'],
+                    name: transactionData['name'],
+                    contactNumber: transactionData['contactNumber'],
+                    houseLotBlk: transactionData['houseLotBlk'],
+                    paymentMethod: transactionData['paymentMethod'],
+                    assembly: transactionData['assembly'] is bool
+                        ? transactionData['assembly'].toString()
+                        : transactionData['assembly'],
+                    status: transactionData['status'],
+                    deliveryTime: transactionData['deliveryTime'] != null
+                        ? transactionData['deliveryTime'].toString()
+                        : 'N/A',
+                    total: transactionData['total'],
+                    createdAt: transactionData['createdAt'],
+                    items: (transactionData['items'] as List<dynamic>?)
+                            ?.map<Map<String, dynamic>>((item) =>
+                                item is Map<String, dynamic> ? item : {})
+                            .toList() ??
+                        [],
+                    completed: transactionData['completed'],
+                    pickupImages: transactionData['pickupImages'],
+                    hasFeedback: transactionData['hasFeedback'],
+                    completionImages: transactionData['completionImages'],
                   ))
               .toList();
         });
@@ -248,10 +264,10 @@ class _TransactionCardState extends State<TransactionCard> {
                         ),
                       ),
                       const Spacer(),
-                      Text(widget.transaction.price),
+                      Text("${widget.transaction.total}"),
                     ],
                   ),
-                  Text("Status: ${widget.transaction.isApproved}"),
+                  Text("Status: ${widget.transaction.status}"),
                   CustomButton(
                     backgroundColor: getTrackOrderButtonColor(),
                     onPressed: getTrackOrderButtonColor() == Color(0xFFAFB7C9)
@@ -311,6 +327,12 @@ class TransactionDetailsModal extends StatelessWidget {
           SizedBox(height: 5),
           Divider(),
           SizedBox(height: 5),
+          Row(
+            children: [
+              Text('Status'),
+              Text(' : ${transaction.status}'),
+            ],
+          ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

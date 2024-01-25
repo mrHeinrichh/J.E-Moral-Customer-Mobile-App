@@ -153,6 +153,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       onPressed: () {
                         cartProvider.addToCart(
                           CartItem(
+                            id: widget.productName.hashCode,
                             name: widget.productName,
                             price: double.parse(widget.productPrice),
                             quantity: quantity,

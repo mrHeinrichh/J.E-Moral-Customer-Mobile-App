@@ -3,6 +3,7 @@ import 'package:customer_app/view/appointment.page.dart';
 import 'package:customer_app/view/authentication.page.dart';
 import 'package:customer_app/view/cart.page.dart' as CartView;
 import 'package:customer_app/view/cart_provider.dart' as CartProviderView;
+import 'package:customer_app/view/chat.page.dart';
 import 'package:customer_app/view/dashboard.page.dart';
 import 'package:customer_app/view/faq.page.dart';
 import 'package:customer_app/view/feedback.page.dart';
@@ -29,6 +30,7 @@ void main() {
             create: (context) => CartProviderView.CartProvider()),
         ChangeNotifierProvider(
             create: (context) => UserProvider()), // Add UserProvider
+        ChangeNotifierProvider(create: (context) => MessageProvider()),
       ],
       child: MyApp(),
     ),
@@ -70,6 +72,7 @@ class MyApp extends StatelessWidget {
             completed: 'Sample Completed',
             hasFeedback: false,
             createdAt: 'Sample Created At',
+            status: 'Sample Status',
             items: [
               {
                 'productId': 'Sample Product ID',

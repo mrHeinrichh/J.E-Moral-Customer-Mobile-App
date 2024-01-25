@@ -60,6 +60,7 @@ class _HomePageState extends State<HomePage> {
         data.forEach((item) {
           final category = item['category'];
           final product = {
+            'id': item['_id'] ?? 'ID Not Available',
             'name': item['name'] ?? 'Name Not Available',
             'price': (item['customerPrice'] ?? 0.0).toString(),
             'imageUrl': item['image'] ?? 'Image URL Not Available',
@@ -102,6 +103,7 @@ class _HomePageState extends State<HomePage> {
         data.forEach((item) {
           final category = item['category'];
           final product = {
+            '_id': item['_id'] ?? 'ID Not Available',
             'name': item['name'] ?? 'Name Not Available',
             'price': (item['customerPrice'] ?? 0.0).toString(),
             'imageUrl': item['image'] ?? 'Image URL Not Available',

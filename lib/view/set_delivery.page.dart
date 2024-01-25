@@ -18,14 +18,22 @@ class SetDeliveryPage extends StatefulWidget {
 
 DateTime? selectedDateTime;
 
-enum PaymentMethod { cashOnDelivery, gcashPayment }
-
-enum AssemblyOption { yes, no }
-
 class _SetDeliveryPageState extends State<SetDeliveryPage> {
   String? selectedLocation;
-  PaymentMethod? selectedPaymentMethod;
-  AssemblyOption? selectedAssemblyOption;
+  String? selectedPaymentMethod; // Declare this variable in your class
+  String paymentMethodToString(String? paymentMethod) {
+    switch (paymentMethod) {
+      case 'COD':
+        return 'COD';
+      case 'GCASH':
+        return 'GCASH';
+      default:
+        return ''; // Handle other cases or return a default value
+    }
+  }
+
+  bool? selectedAssemblyOption;
+
   List<String> searchResults = [];
   TextEditingController locationController = TextEditingController();
   TextEditingController nameController = TextEditingController();
@@ -38,7 +46,10 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
       if (cartItem.isSelected) {
         itemsList.add({
           "productId":
-              cartItem.name, // Use the name as a placeholder for the product ID
+              cartItem.id, // Use the name as a placeholder for the product ID
+          "name": cartItem.name,
+          "customerPrice": cartItem.price,
+
           "quantity": cartItem.quantity,
         });
       }
@@ -101,19 +112,18 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
       // You might want to display an error message to the user.
       return;
     }
+
     final Map<String, dynamic> requestData = {
       "deliveryLocation": locationController.text,
       "name": nameController.text,
       "contactNumber": contactNumberController.text,
       "houseLotBlk": houseNumberController.text,
-      "paymentMethod": selectedPaymentMethod.toString(),
+      "paymentMethod": paymentMethodToString(selectedPaymentMethod),
       "assembly": selectedAssemblyOption.toString(),
-      "deliveryTime": selectedDateTime.toString(),
+      "deliveryDate": selectedDateTime.toString(),
       "barangay": selectedBarangay,
-      "total": totalPrice.toString(),
       "items": itemsList,
-      "customer": userId,
-      "rider": "",
+      "to": userId,
       "hasFeedback": "false",
       "feedback": "",
       "rating": "0",
@@ -124,7 +134,8 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
       "pickedUp": "false",
       "cancelled": "false",
       "completed": "false",
-      "type": "{Online}",
+      "type": "Delivery",
+      "status": "Pending",
     };
 
     try {
@@ -169,7 +180,9 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
               Text('House#/Lot/Blk: ${houseNumberController.text}'),
               Text('Barangay $selectedBarangay'),
               Text('Scheduled Date and Time: ${selectedDateTime.toString()}'),
-              Text('Payment Method: ${selectedPaymentMethod.toString()}'),
+              Text(
+                'Payment Method: ${paymentMethodToString(selectedPaymentMethod)}',
+              ),
               Text(
                   'Needs to be assembled: ${selectedAssemblyOption.toString()}'),
             ],
@@ -216,7 +229,9 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
               Text('House#/Lot/Blk: ${houseNumberController.text}'),
               Text('Barangay $selectedBarangay'),
               Text('Scheduled Date and Time: ${selectedDateTime.toString()}'),
-              Text('Payment Method: ${selectedPaymentMethod.toString()}'),
+              Text(
+                'Payment Method: ${paymentMethodToString(selectedPaymentMethod)}',
+              ),
               Text(
                   'Needs to be assembled: ${selectedAssemblyOption.toString()}'),
             ],
@@ -395,10 +410,10 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                 const Text("Choose Payment Method"),
                 ListTile(
                   title: const Text('Cash On Delivery'),
-                  leading: Radio<PaymentMethod>(
-                    value: PaymentMethod.cashOnDelivery,
+                  leading: Radio<String>(
+                    value: 'COD',
                     groupValue: selectedPaymentMethod,
-                    onChanged: (PaymentMethod? value) {
+                    onChanged: (String? value) {
                       setState(() {
                         selectedPaymentMethod = value;
                       });
@@ -407,10 +422,10 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                 ),
                 ListTile(
                   title: const Text('Gcash Payment'),
-                  leading: Radio<PaymentMethod>(
-                    value: PaymentMethod.gcashPayment,
+                  leading: Radio<String>(
+                    value: 'GCASH',
                     groupValue: selectedPaymentMethod,
-                    onChanged: (PaymentMethod? value) {
+                    onChanged: (String? value) {
                       setState(() {
                         selectedPaymentMethod = value;
                       });
@@ -420,10 +435,10 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                 Text("Needs to be assembled?"),
                 ListTile(
                   title: const Text('Yes'),
-                  leading: Radio<AssemblyOption>(
-                    value: AssemblyOption.yes,
+                  leading: Radio<bool>(
+                    value: true,
                     groupValue: selectedAssemblyOption,
-                    onChanged: (AssemblyOption? value) {
+                    onChanged: (bool? value) {
                       setState(() {
                         selectedAssemblyOption = value;
                       });
@@ -432,10 +447,10 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                 ),
                 ListTile(
                   title: const Text('No'),
-                  leading: Radio<AssemblyOption>(
-                    value: AssemblyOption.no,
+                  leading: Radio<bool>(
+                    value: false,
                     groupValue: selectedAssemblyOption,
-                    onChanged: (AssemblyOption? value) {
+                    onChanged: (bool? value) {
                       setState(() {
                         selectedAssemblyOption = value;
                       });

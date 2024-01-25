@@ -1,12 +1,83 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class ChatPage extends StatefulWidget {
   @override
   _ChatPageState createState() => _ChatPageState();
 }
 
+class MessageProvider extends ChangeNotifier {
+  List<Map<String, dynamic>> _messages = [];
+
+  List<Map<String, dynamic>> get messages => _messages;
+
+  // Add a method to fetch messages from the API
+  Future<void> fetchMessages() async {
+    // Implement the logic to fetch messages here
+  }
+
+  // Add a method to add a new message
+  void addMessage(Map<String, dynamic> message) {
+    _messages.add(message);
+    notifyListeners();
+  }
+}
+
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController _textController = TextEditingController();
+  late IO.Socket socket;
+  late Future<List<Map<String, dynamic>>> messages;
+  final ScrollController _scrollController = ScrollController();
+  bool _isLoading = false;
+  int _currentPage = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize Socket.IO and connect
+    initializeSocketIO();
+    // Fetch messages from the API
+    messages = fetchMessages();
+    print('initState: fetchMessages called');
+  }
+
+  void initializeSocketIO() {
+    // Your existing Socket.IO initialization code goes here
+    socket = IO.io('https://lpg-api-06n8.onrender.com', <String, dynamic>{
+      'transports': ['websocket'],
+      'autoConnect': false,
+    });
+
+    socket.on('message', (data) {
+      print('Incoming message: $data');
+      // Handle the incoming message, update the UI, etc.
+    });
+
+    // Connect to the server
+    socket.connect();
+  }
+
+  Future<List<Map<String, dynamic>>> fetchMessages() async {
+    final response = await http.get(
+      Uri.parse(
+          'https://lpg-api-06n8.onrender.com/api/v1/messages?user=65b251323deddfd62fa5523d'),
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      if (data['status'] == 'success') {
+        return List<Map<String, dynamic>>.from(data['data']);
+      } else {
+        print('Failed to fetch messages');
+        return [];
+      }
+    } else {
+      print('Failed to fetch messages. Status code: ${response.statusCode}');
+      return [];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +95,32 @@ class _ChatPageState extends State<ChatPage> {
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
-            Text("Hi, how can we help you?"),
+            // Use a FutureBuilder to handle the asynchronous data fetching
+            FutureBuilder<List<Map<String, dynamic>>>(
+              future: messages,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator(); // Show a loading indicator while fetching data
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  final List<Map<String, dynamic>> messageList =
+                      snapshot.data ?? [];
+                  return Expanded(
+                    child: ListView.builder(
+                      itemCount: messageList.length,
+                      itemBuilder: (context, index) {
+                        final message = messageList[index];
+                        return ListTile(
+                          title: Text(message['content']),
+                          subtitle: Text(message['createdAt']),
+                        );
+                      },
+                    ),
+                  );
+                }
+              },
+            ),
           ],
         ),
       ),
@@ -67,5 +163,12 @@ class _ChatPageState extends State<ChatPage> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    // Disconnect from the Socket.IO server when the widget is disposed
+    socket.disconnect();
+    super.dispose();
   }
 }

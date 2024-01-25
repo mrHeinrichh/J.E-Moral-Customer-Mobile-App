@@ -116,33 +116,9 @@ class _CartPageState extends State<CartPage> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    isDiscountApplied = !isDiscountApplied;
-                                  });
-                                },
-                                child: isDiscountApplied
-                                    ? Text(
-                                        "Remove Discount",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 10,
-                                          decoration: TextDecoration.underline,
-                                        ),
-                                      )
-                                    : Text(
-                                        "Apply Discount",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 10,
-                                          decoration: TextDecoration.underline,
-                                        ),
-                                      ),
-                              ),
                               const Text("Price:"),
                               Text(
-                                "₱${isDiscountApplied ? (_calculateTotalPrice() * 0.8) : _calculateTotalPrice()}",
+                                "₱${_calculateTotalPrice()}",
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                             ],
