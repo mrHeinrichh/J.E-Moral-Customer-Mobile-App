@@ -153,7 +153,7 @@ class _ChatPageState extends State<ChatPage> {
   Future<List<Map<String, dynamic>>> fetchMessages() async {
     final response = await http.get(
       Uri.parse(
-          'https://lpg-api-06n8.onrender.com/api/v1/messages?user=65b251323deddfd62fa5523d&page=$_currentPage&limit=100'),
+          'https://lpg-api-06n8.onrender.com/api/v1/messages?user=65b22992487344e8f166604d&page=$_currentPage&limit=100'),
     );
 
     if (response.statusCode == 200) {
@@ -174,8 +174,16 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Future<void> sendMessage(String content) async {
+    final String? userId =
+        Provider.of<UserProvider>(context, listen: false).userId;
+
+    if (userId == null) {
+      // Handle the case where the user ID is not available
+      return;
+    }
+
     final Map<String, dynamic> messageData = {
-      "user": "65b22992487344e8f166604d",
+      "user": userId,
       "content": content,
     };
 
@@ -185,6 +193,7 @@ class _ChatPageState extends State<ChatPage> {
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(messageData),
       );
+
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
         final Map<String, dynamic> newMessage = responseData['data'][0];
@@ -249,12 +258,12 @@ class _ChatPageState extends State<ChatPage> {
                           margin: EdgeInsets.symmetric(vertical: 8.0),
                           child: Row(
                             mainAxisAlignment: isCurrentUser
-                                ? MainAxisAlignment.start
-                                : MainAxisAlignment.end,
+                                ? MainAxisAlignment.end
+                                : MainAxisAlignment.start,
                             children: [
                               Card(
                                 color:
-                                    isCurrentUser ? Colors.grey : Colors.blue,
+                                    isCurrentUser ? Colors.blue : Colors.grey,
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Text(
