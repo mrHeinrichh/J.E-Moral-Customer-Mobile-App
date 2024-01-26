@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class ChatPage extends StatefulWidget {
@@ -13,9 +14,8 @@ class MessageProvider extends ChangeNotifier {
 
   List<Map<String, dynamic>> get messages => _messages;
 
-  // Add a method to add a new message
-  void addMessage(Map<String, dynamic> message) {
-    _messages.add(message);
+  void addMessages(List<Map<String, dynamic>> newMessages) {
+    _messages.insertAll(0, newMessages.reversed);
     notifyListeners();
   }
 }
@@ -23,59 +23,66 @@ class MessageProvider extends ChangeNotifier {
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController _textController = TextEditingController();
   late IO.Socket socket;
-  late Future<List<Map<String, dynamic>>> messages;
   final ScrollController _scrollController = ScrollController();
   bool _isLoading = false;
   int _currentPage = 1;
+  int _totalMessagesLoaded = 0;
 
   @override
   void initState() {
     super.initState();
-    // Initialize Socket.IO and connect
     initializeSocketIO();
-    // Fetch messages from the API
-    messages = fetchMessages();
-    print('initState: fetchMessages called');
+    fetchMessages().then((initialMessages) {
+      Provider.of<MessageProvider>(context, listen: false)
+          .addMessages(initialMessages);
+    });
+    print('initState: Socket.IO initialized');
   }
 
   void initializeSocketIO() {
-    // Your existing Socket.IO initialization code goes here
     socket = IO.io('https://lpg-api-06n8.onrender.com', <String, dynamic>{
       'transports': ['websocket'],
-      'autoConnect': false,
+      'autoConnect': true,
     });
 
-    socket.on('message', (data) {
+    socket.on('createdMessage', (data) {
       print('Incoming message: $data');
-      // Handle the incoming message, update the UI, etc.
+      Provider.of<MessageProvider>(context, listen: false).addMessages([data]);
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
     });
-
-    // Connect to the server
     socket.connect();
   }
 
   Future<void> loadMoreMessages() async {
+    if (_isLoading) {
+      return;
+    }
+
     _isLoading = true;
+
     try {
-      _currentPage++;
       final moreMessages = await fetchMessages();
+
+      if (moreMessages.isEmpty) {
+        return;
+      }
+
       final List<Map<String, dynamic>> currentMessages =
-          await messages; // Get the current messages
+          await Provider.of<MessageProvider>(context, listen: false).messages;
+
+      // Insert new messages at the beginning of the list
       final List<Map<String, dynamic>> updatedMessages =
-          List.from(currentMessages)..addAll(moreMessages);
+          List.from(currentMessages)..insertAll(0, moreMessages);
 
-      // Sort the updated messages
-      updatedMessages.sort(
-        (a, b) => b['createdAt'].compareTo(a['createdAt']),
-      );
+      Provider.of<MessageProvider>(context, listen: false)
+          .addMessages(updatedMessages);
 
-      setState(() {
-        messages = Future.value(updatedMessages);
-      });
-
-      // Scroll back to the original position before loading more messages
-      _scrollController.jumpTo(_scrollController.offset +
-          (_scrollController.position.viewportDimension * moreMessages.length));
+      // Update the total number of messages loaded
+      _totalMessagesLoaded += moreMessages.length;
     } catch (e) {
       // Handle error
     } finally {
@@ -94,8 +101,7 @@ class _ChatPageState extends State<ChatPage> {
       if (data['status'] == 'success') {
         List<Map<String, dynamic>> messages =
             List<Map<String, dynamic>>.from(data['data']);
-        messages.sort((a, b) => b['createdAt']
-            .compareTo(a['createdAt'])); // Sort in descending order
+        messages.sort((a, b) => a['createdAt'].compareTo(b['createdAt']));
         return messages;
       } else {
         print('Failed to fetch messages');
@@ -113,23 +119,22 @@ class _ChatPageState extends State<ChatPage> {
       "content": content,
     };
 
-    final response = await http.post(
-      Uri.parse('https://lpg-api-06n8.onrender.com/api/v1/messages'),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode(messageData),
-    );
-
-    if (response.statusCode == 200) {
-      // Message sent successfully
-      final Map<String, dynamic> responseData = json.decode(response.body);
-      final Map<String, dynamic> newMessage = responseData['data'][0];
-
-      // Update the UI with the new message
-      MessageProvider messageProvider = MessageProvider();
-      messageProvider.addMessage(newMessage);
-    } else {
-      // Handle error
-      print('Failed to send message. Status code: ${response.statusCode}');
+    try {
+      final response = await http.post(
+        Uri.parse('https://lpg-api-06n8.onrender.com/api/v1/messages'),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(messageData),
+      );
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        final Map<String, dynamic> newMessage = responseData['data'][0];
+        Provider.of<MessageProvider>(context, listen: false)
+            .addMessages([newMessage]);
+      } else {
+        print('Failed to send message. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error sending message: $e');
     }
   }
 
@@ -152,36 +157,47 @@ class _ChatPageState extends State<ChatPage> {
             NotificationListener(
               onNotification: (ScrollNotification scrollInfo) {
                 if (!_isLoading &&
-                    scrollInfo.metrics.pixels ==
-                        scrollInfo.metrics.maxScrollExtent) {
+                    scrollInfo.metrics.pixels == 0 &&
+                    scrollInfo is ScrollEndNotification &&
+                    _totalMessagesLoaded >
+                        Provider.of<MessageProvider>(context, listen: false)
+                            .messages
+                            .length) {
                   loadMoreMessages();
                 }
-                return true;
+                return false;
               },
               child: Expanded(
-                child: FutureBuilder<List<Map<String, dynamic>>>(
-                  future: messages,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator();
-                    } else if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    } else {
-                      final List<Map<String, dynamic>> messageList =
-                          snapshot.data ?? [];
-                      return ListView.builder(
-                        reverse: true,
-                        controller: _scrollController,
-                        itemCount: messageList.length,
-                        itemBuilder: (context, index) {
-                          final message = messageList[index];
-                          return ListTile(
-                            title: Text(message['content']),
-                            subtitle: Text(message['createdAt']),
-                          );
-                        },
-                      );
-                    }
+                child: Consumer<MessageProvider>(
+                  builder: (context, messageProvider, _) {
+                    final List<Map<String, dynamic>> messageList =
+                        messageProvider.messages;
+                    return ListView.builder(
+                      key: UniqueKey(),
+                      controller: _scrollController,
+                      reverse: true,
+                      itemCount: messageList.length,
+                      itemBuilder: (context, index) {
+                        final message = messageList[index];
+                        final isCurrentUser = message['user'] ==
+                            "65b251323deddfd62fa5523d"; // Change to your user ID
+
+                        return ListTile(
+                          title: Align(
+                            alignment: isCurrentUser
+                                ? Alignment.centerRight
+                                : Alignment.centerLeft,
+                            child: Text(message['content']),
+                          ),
+                          subtitle: Align(
+                            alignment: isCurrentUser
+                                ? Alignment.centerRight
+                                : Alignment.centerLeft,
+                            child: Text(message['createdAt']),
+                          ),
+                        );
+                      },
+                    );
                   },
                 ),
               ),
@@ -220,13 +236,10 @@ class _ChatPageState extends State<ChatPage> {
             IconButton(
               icon: Icon(Icons.send),
               onPressed: () {
-                // Handle send button action here
-                // You can access the entered text using _textController.text
                 String messageContent = _textController.text;
                 if (messageContent.isNotEmpty) {
                   sendMessage(messageContent);
-                  _textController
-                      .clear(); // Clear the text field after sending the message
+                  _textController.clear();
                 }
               },
             ),
@@ -238,7 +251,6 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   void dispose() {
-    // Disconnect from the Socket.IO server when the widget is disposed
     socket.disconnect();
     super.dispose();
   }
