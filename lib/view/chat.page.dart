@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:customer_app/view/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -32,6 +33,7 @@ class _ChatPageState extends State<ChatPage> {
   void initState() {
     super.initState();
     initializeSocketIO();
+    fetchAndUpdateMessages();
     fetchMessages().then((initialMessages) {
       Provider.of<MessageProvider>(context, listen: false)
           .addMessages(initialMessages);
@@ -55,6 +57,53 @@ class _ChatPageState extends State<ChatPage> {
       );
     });
     socket.connect();
+  }
+
+  Future<List<Map<String, dynamic>>> fetchRealTimeMessages() async {
+    final userId = Provider.of<UserProvider>(context, listen: false).userId;
+
+    // Ensure there's a valid userId before making the request
+    if (userId != null && userId.isNotEmpty) {
+      final response = await http.get(
+        Uri.parse(
+          'https://lpg-api-06n8.onrender.com/api/v1/realtime-messages?user=$userId',
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        if (data['status'] == 'success') {
+          List<Map<String, dynamic>> messages =
+              List<Map<String, dynamic>>.from(data['data']);
+          messages.sort((a, b) => a['createdAt'].compareTo(b['createdAt']));
+          return messages;
+        } else {
+          print('Failed to fetch real-time messages');
+          return [];
+        }
+      } else {
+        print(
+            'Failed to fetch real-time messages. Status code: ${response.statusCode}');
+        return [];
+      }
+    } else {
+      print('Invalid userId');
+      return [];
+    }
+  }
+
+  Future<void> fetchAndUpdateMessages() async {
+    final historicalMessages = await fetchMessages();
+    final realTimeMessages = await fetchRealTimeMessages();
+
+    final List<Map<String, dynamic>> allMessages = [
+      ...historicalMessages,
+      ...realTimeMessages
+    ];
+    allMessages.sort((a, b) => a['createdAt'].compareTo(b['createdAt']));
+
+    Provider.of<MessageProvider>(context, listen: false)
+        .addMessages(allMessages);
   }
 
   Future<void> loadMoreMessages() async {
@@ -179,23 +228,27 @@ class _ChatPageState extends State<ChatPage> {
                       itemCount: messageList.length,
                       itemBuilder: (context, index) {
                         final message = messageList[index];
-                        final isCurrentUser = message['user'] ==
-                            "65b251323deddfd62fa5523d"; // Change to your user ID
-
-                        return ListTile(
-                          title: Align(
-                            alignment: isCurrentUser
-                                ? Alignment.centerRight
-                                : Alignment.centerLeft,
-                            child: Text(message['content']),
-                          ),
-                          subtitle: Align(
-                            alignment: isCurrentUser
-                                ? Alignment.centerRight
-                                : Alignment.centerLeft,
-                            child: Text(message['createdAt']),
+                        final userId =
+                            Provider.of<UserProvider>(context, listen: false)
+                                .userId;
+                        final isCurrentUser = message['user'] == userId;
+                        return Container(
+                          margin: EdgeInsets.symmetric(vertical: 8.0),
+                          child: Row(
+                            mainAxisAlignment: isCurrentUser
+                                ? MainAxisAlignment.start
+                                : MainAxisAlignment.end,
+                            children: [
+                              Text(message["content"] ?? ""),
+                            ],
                           ),
                         );
+                        // return Container(
+                        //   margin: EdgeInsets.symmetric(vertical: 8.0),
+                        //   child: isCurrentUser
+                        //       ? CurrentUserMessageWidget(message: message)
+                        //       : OtherUserMessageWidget(message: message),
+                        // );
                       },
                     );
                   },
@@ -253,5 +306,89 @@ class _ChatPageState extends State<ChatPage> {
   void dispose() {
     socket.disconnect();
     super.dispose();
+  }
+}
+
+class CurrentUserMessageWidget extends StatelessWidget {
+  final Map<String, dynamic> message;
+
+  CurrentUserMessageWidget({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.blue, // Adjust colors as needed
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(10.0),
+              topRight: Radius.circular(10.0),
+              bottomLeft: Radius.circular(10.0),
+              bottomRight: Radius.circular(0),
+            ),
+          ),
+          padding: EdgeInsets.all(8.0),
+          child: Text(
+            message['content'],
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4.0),
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: Text(
+              message['createdAt'],
+              style: TextStyle(fontSize: 12.0),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class OtherUserMessageWidget extends StatelessWidget {
+  final Map<String, dynamic> message;
+
+  OtherUserMessageWidget({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.grey, // Adjust colors as needed
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(10.0),
+              topRight: Radius.circular(10.0),
+              bottomLeft: Radius.circular(0),
+              bottomRight: Radius.circular(10.0),
+            ),
+          ),
+          padding: EdgeInsets.all(8.0),
+          child: Text(
+            message['content'],
+            style: TextStyle(color: Colors.black),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4.0),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              message['createdAt'],
+              style: TextStyle(fontSize: 12.0),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
