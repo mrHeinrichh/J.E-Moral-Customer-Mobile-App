@@ -16,7 +16,18 @@ class MessageProvider extends ChangeNotifier {
   List<Map<String, dynamic>> get messages => _messages;
 
   void addMessages(List<Map<String, dynamic>> newMessages) {
-    _messages.insertAll(0, newMessages.reversed);
+    for (var message in newMessages.reversed) {
+      // Check if the message is not already in the list
+      if (!_messages
+          .any((existingMessage) => existingMessage['_id'] == message['_id'])) {
+        _messages.insert(0, message);
+      }
+    }
+    notifyListeners();
+  }
+
+  void clearMessages() {
+    _messages.clear();
     notifyListeners();
   }
 }
@@ -33,7 +44,7 @@ class _ChatPageState extends State<ChatPage> {
   void initState() {
     super.initState();
     initializeSocketIO();
-    fetchAndUpdateMessages();
+    // fetchAndUpdateMessages();
     fetchMessages().then((initialMessages) {
       Provider.of<MessageProvider>(context, listen: false)
           .addMessages(initialMessages);
@@ -49,7 +60,7 @@ class _ChatPageState extends State<ChatPage> {
 
     socket.on('createdMessage', (data) {
       print('Incoming message: $data');
-      Provider.of<MessageProvider>(context, listen: false).addMessages([data]);
+      // Provider.of<MessageProvider>(context, listen: false).addMessages([data]);
       _scrollController.animateTo(
         _scrollController.position.maxScrollExtent,
         duration: Duration(milliseconds: 300),
@@ -59,85 +70,85 @@ class _ChatPageState extends State<ChatPage> {
     socket.connect();
   }
 
-  Future<List<Map<String, dynamic>>> fetchRealTimeMessages() async {
-    final userId = Provider.of<UserProvider>(context, listen: false).userId;
+  // Future<List<Map<String, dynamic>>> fetchRealTimeMessages() async {
+  //   final userId = Provider.of<UserProvider>(context, listen: false).userId;
 
-    // Ensure there's a valid userId before making the request
-    if (userId != null && userId.isNotEmpty) {
-      final response = await http.get(
-        Uri.parse(
-          'https://lpg-api-06n8.onrender.com/api/v1/realtime-messages?user=$userId',
-        ),
-      );
+  //   // Ensure there's a valid userId before making the request
+  //   if (userId != null && userId.isNotEmpty) {
+  //     final response = await http.get(
+  //       Uri.parse(
+  //         'https://lpg-api-06n8.onrender.com/api/v1/realtime-messages?user=$userId',
+  //       ),
+  //     );
 
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        if (data['status'] == 'success') {
-          List<Map<String, dynamic>> messages =
-              List<Map<String, dynamic>>.from(data['data']);
-          messages.sort((a, b) => a['createdAt'].compareTo(b['createdAt']));
-          return messages;
-        } else {
-          print('Failed to fetch real-time messages');
-          return [];
-        }
-      } else {
-        print(
-            'Failed to fetch real-time messages. Status code: ${response.statusCode}');
-        return [];
-      }
-    } else {
-      print('Invalid userId');
-      return [];
-    }
-  }
+  //     if (response.statusCode == 200) {
+  //       final Map<String, dynamic> data = json.decode(response.body);
+  //       if (data['status'] == 'success') {
+  //         List<Map<String, dynamic>> messages =
+  //             List<Map<String, dynamic>>.from(data['data']);
+  //         messages.sort((a, b) => a['createdAt'].compareTo(b['createdAt']));
+  //         return messages;
+  //       } else {
+  //         print('Failed to fetch real-time messages');
+  //         return [];
+  //       }
+  //     } else {
+  //       print(
+  //           'Failed to fetch real-time messages. Status code: ${response.statusCode}');
+  //       return [];
+  //     }
+  //   } else {
+  //     print('Invalid userId');
+  //     return [];
+  //   }
+  // }
 
-  Future<void> fetchAndUpdateMessages() async {
-    final historicalMessages = await fetchMessages();
-    final realTimeMessages = await fetchRealTimeMessages();
+  // Future<void> fetchAndUpdateMessages() async {
+  //   final historicalMessages = await fetchMessages();
+  //   // final realTimeMessages = await fetchRealTimeMessages();
 
-    final List<Map<String, dynamic>> allMessages = [
-      ...historicalMessages,
-      ...realTimeMessages
-    ];
-    allMessages.sort((a, b) => a['createdAt'].compareTo(b['createdAt']));
+  //   final List<Map<String, dynamic>> allMessages = [
+  //     ...historicalMessages,
+  //     // ...realTimeMessages
+  //   ];
+  //   allMessages.sort((a, b) => a['createdAt'].compareTo(b['createdAt']));
 
-    Provider.of<MessageProvider>(context, listen: false)
-        .addMessages(allMessages);
-  }
+  //   Provider.of<MessageProvider>(context, listen: false)
+  //       .addMessages(allMessages);
+  // }
 
-  Future<void> loadMoreMessages() async {
-    if (_isLoading) {
-      return;
-    }
+  // Future<void> loadMoreMessages() async {
+  //   if (_isLoading) {
+  //     return;
+  //   }
 
-    _isLoading = true;
+  //   _isLoading = true;
 
-    try {
-      final moreMessages = await fetchMessages();
+  //   try {
+  //     final moreMessages = await fetchMessages();
 
-      if (moreMessages.isEmpty) {
-        return;
-      }
+  //     if (moreMessages.isEmpty) {
+  //       return;
+  //     }
 
-      final List<Map<String, dynamic>> currentMessages =
-          await Provider.of<MessageProvider>(context, listen: false).messages;
+  //     final List<Map<String, dynamic>> currentMessages =
+  //         await Provider.of<MessageProvider>(context, listen: false).messages;
 
-      // Insert new messages at the beginning of the list
-      final List<Map<String, dynamic>> updatedMessages =
-          List.from(currentMessages)..insertAll(0, moreMessages);
+  //     // Insert new messages at the beginning of the list
+  //     final List<Map<String, dynamic>> updatedMessages =
+  //         List.from(currentMessages)..insertAll(0, moreMessages);
 
-      Provider.of<MessageProvider>(context, listen: false)
-          .addMessages(updatedMessages);
+  //     Provider.of<MessageProvider>(context, listen: false)
+  //         .addMessages(updatedMessages);
 
-      // Update the total number of messages loaded
-      _totalMessagesLoaded += moreMessages.length;
-    } catch (e) {
-      // Handle error
-    } finally {
-      _isLoading = false;
-    }
-  }
+  //     // Update the total number of messages loaded
+  //     _totalMessagesLoaded += moreMessages.length;
+  //   } catch (e) {
+  //     // Handle error
+  //   } finally {
+  //     _isLoading = false;
+  //   }
+  // }
 
   Future<List<Map<String, dynamic>>> fetchMessages() async {
     final response = await http.get(
@@ -164,7 +175,7 @@ class _ChatPageState extends State<ChatPage> {
 
   Future<void> sendMessage(String content) async {
     final Map<String, dynamic> messageData = {
-      "user": "65b251323deddfd62fa5523d",
+      "user": "65b22992487344e8f166604d",
       "content": content,
     };
 
@@ -212,7 +223,7 @@ class _ChatPageState extends State<ChatPage> {
                         Provider.of<MessageProvider>(context, listen: false)
                             .messages
                             .length) {
-                  loadMoreMessages();
+                  // loadMoreMessages();
                 }
                 return false;
               },
@@ -221,6 +232,8 @@ class _ChatPageState extends State<ChatPage> {
                   builder: (context, messageProvider, _) {
                     final List<Map<String, dynamic>> messageList =
                         messageProvider.messages;
+                    print("Number of messages: ${messageList.length}");
+
                     return ListView.builder(
                       key: UniqueKey(),
                       controller: _scrollController,
@@ -239,16 +252,24 @@ class _ChatPageState extends State<ChatPage> {
                                 ? MainAxisAlignment.start
                                 : MainAxisAlignment.end,
                             children: [
-                              Text(message["content"] ?? ""),
+                              Card(
+                                color:
+                                    isCurrentUser ? Colors.grey : Colors.blue,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    message["content"] ?? "",
+                                    style: TextStyle(
+                                      color: isCurrentUser
+                                          ? Colors.white
+                                          : Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
                         );
-                        // return Container(
-                        //   margin: EdgeInsets.symmetric(vertical: 8.0),
-                        //   child: isCurrentUser
-                        //       ? CurrentUserMessageWidget(message: message)
-                        //       : OtherUserMessageWidget(message: message),
-                        // );
                       },
                     );
                   },
@@ -306,89 +327,5 @@ class _ChatPageState extends State<ChatPage> {
   void dispose() {
     socket.disconnect();
     super.dispose();
-  }
-}
-
-class CurrentUserMessageWidget extends StatelessWidget {
-  final Map<String, dynamic> message;
-
-  CurrentUserMessageWidget({required this.message});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.blue, // Adjust colors as needed
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(10.0),
-              topRight: Radius.circular(10.0),
-              bottomLeft: Radius.circular(10.0),
-              bottomRight: Radius.circular(0),
-            ),
-          ),
-          padding: EdgeInsets.all(8.0),
-          child: Text(
-            message['content'],
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4.0),
-          child: Align(
-            alignment: Alignment.centerRight,
-            child: Text(
-              message['createdAt'],
-              style: TextStyle(fontSize: 12.0),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class OtherUserMessageWidget extends StatelessWidget {
-  final Map<String, dynamic> message;
-
-  OtherUserMessageWidget({required this.message});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.grey, // Adjust colors as needed
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(10.0),
-              topRight: Radius.circular(10.0),
-              bottomLeft: Radius.circular(0),
-              bottomRight: Radius.circular(10.0),
-            ),
-          ),
-          padding: EdgeInsets.all(8.0),
-          child: Text(
-            message['content'],
-            style: TextStyle(color: Colors.black),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4.0),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              message['createdAt'],
-              style: TextStyle(fontSize: 12.0),
-            ),
-          ),
-        ),
-      ],
-    );
   }
 }
