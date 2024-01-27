@@ -88,7 +88,8 @@ class _MyOrderPageState extends State<MyOrderPage> {
               .where((transactionData) =>
                   transactionData['status'] == 'Pending' ||
                   transactionData['status'] == 'Approved' ||
-                  transactionData['status'] == 'On Going')
+                  transactionData['status'] == 'On Going' &&
+                      transactionData['hasFeedback'] == false)
               .map((transactionData) => Transaction(
                     deliveryLocation: transactionData['deliveryLocation'],
                     price: transactionData['price'] != null
@@ -212,13 +213,13 @@ class TransactionCard extends StatefulWidget {
 
 class _TransactionCardState extends State<TransactionCard> {
   Color getTrackOrderButtonColor() {
-    return widget.transaction.isApproved.toString() == "true"
+    return widget.transaction.status.toString() == "On Going"
         ? Color(0xFF232937)
         : Color(0xFFAFB7C9);
   }
 
   Color getCancelOrderButtonColor() {
-    return widget.transaction.isApproved.toString() == "true"
+    return widget.transaction.status.toString() == "On Going"
         ? Color(0xFFAFB7C9)
         : Color(0xFF232937);
   }
