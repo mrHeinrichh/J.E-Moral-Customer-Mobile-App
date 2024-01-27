@@ -83,7 +83,7 @@ class _FaqPageState extends State<FaqPage> {
                   _showCustomerDetailsModal(faq);
                 },
                 child: Card(
-                  elevation: 2,
+                  elevation: 3,
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Column(
@@ -91,11 +91,10 @@ class _FaqPageState extends State<FaqPage> {
                       children: [
                         Row(
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("${faq['question']}"),
-                              ],
+                            Expanded(
+                              child: Text("${faq['question']}",
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold)),
                             ),
                           ],
                         ),
@@ -131,7 +130,12 @@ class _FaqPageState extends State<FaqPage> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                Text('${faq['answer']}'),
+                Text(
+                  '${faq['answer']}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
                 const SizedBox(height: 15),
                 faq['image'] != null
                     ? Image.network(
