@@ -34,7 +34,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   Widget build(BuildContext context) {
     final cartProvider = Provider.of<CartProvider>(context, listen: false);
 
-    final titleText = "${widget.productName} - ${widget.category}";
+    final titleText = "${widget.category}";
 
     return Scaffold(
       appBar: AppBar(
@@ -42,34 +42,82 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         backgroundColor: Colors.white,
         title: Text(
           titleText,
-          style: TextStyle(color: Color(0xFF232937), fontSize: 24),
+          style: const TextStyle(color: Color(0xFF232937), fontSize: 24),
         ),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              children: [
-                Image.network(
-                  widget.productImageUrl,
-                  width: 400,
-                  height: 400,
-                  fit: BoxFit.cover,
-                ),
-                SizedBox(height: 20),
-                Text(
-                    "Description: ${widget.description}"), // Display description
-                Text("Weight: ${widget.weight}"), // Display weight
-                Text("Quantity: ${widget.quantity}"), // Display quantity
-              ],
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                children: [
+                  Image.network(
+                    widget.productImageUrl,
+                    width: 320,
+                    height: 320,
+                    fit: BoxFit.cover,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    "${widget.productName}",
+                    style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                          fontWeight: FontWeight.bold,
+                          // decoration: TextDecoration.underline,
+                        ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: Text(
+                          "Description:",
+                          style: Theme.of(context).textTheme.labelMedium,
+                        ),
+                      ),
+                      Expanded(
+                        flex: 4,
+                        child: Text(
+                          "${widget.description}",
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium!
+                              .copyWith(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: Text(
+                          "Weight:",
+                          style: Theme.of(context).textTheme.labelMedium,
+                        ),
+                      ),
+                      Expanded(
+                        flex: 4,
+                        child: Text(
+                          "${widget.weight}",
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium!
+                              .copyWith(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-      bottomNavigationBar: Container(
+      bottomNavigationBar: SizedBox(
         height: 170,
         child: BottomAppBar(
           child: Padding(
@@ -79,95 +127,94 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("Stock Available: 10"),
-                    SizedBox(
-                      width: 100,
-                    ),
-                    Expanded(
-                      child: Container(
-                        height: 30,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.grey,
-                            width: 0.50,
+                    Row(
+                      children: [
+                        const Text("Stock Available:"),
+                        Text(
+                          " ${widget.quantity}",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                        child: IconButton(
-                          icon: Icon(
-                            Icons.remove,
-                            size: 15,
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Container(
+                          height: 30,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.grey, width: 0.50),
                           ),
-                          onPressed: () {
-                            setState(() {
-                              if (quantity > 1) {
-                                quantity--;
-                              }
-                            });
-                          },
+                          child: IconButton(
+                            icon: const Icon(Icons.remove, size: 15),
+                            onPressed: () {
+                              setState(() {
+                                if (quantity > 1) {
+                                  quantity--;
+                                }
+                              });
+                            },
+                          ),
                         ),
-                      ),
-                    ),
-                    Text(
-                      "$quantity",
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Color(0xFF232937),
-                      ),
-                    ),
-                    Container(
-                      height: 30,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.grey,
-                          width: 0.50,
+                        Text(
+                          "$quantity",
+                          style: const TextStyle(
+                            fontSize: 18,
+                            color: Color(0xFF232937),
+                          ),
                         ),
-                      ),
-                      child: IconButton(
-                        icon: Icon(
-                          Icons.add,
-                          size: 15,
+                        Container(
+                          height: 30,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.grey,
+                              width: 0.50,
+                            ),
+                          ),
+                          child: IconButton(
+                            icon: const Icon(
+                              Icons.add,
+                              size: 15,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                quantity++;
+                              });
+                            },
+                          ),
                         ),
-                        onPressed: () {
-                          setState(() {
-                            quantity++;
-                          });
-                        },
-                      ),
+                      ],
                     ),
                   ],
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Price: \n₱${(double.tryParse(widget.productPrice) ?? 0) * quantity}",
-                      style: const TextStyle(
-                        fontSize: 18,
-                        color: Color(0xFF232937),
-                        fontWeight: FontWeight.bold,
+                const SizedBox(height: 5),
+                Text(
+                  "Price: ₱${((double.tryParse(widget.productPrice) ?? 0) * quantity).toStringAsFixed(2)}",
+                  style: const TextStyle(
+                    fontSize: 18,
+                    color: Color(0xFF232937),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                CustomizedButton(
+                  onPressed: () {
+                    cartProvider.addToCart(
+                      CartItem(
+                        id: widget.productName.hashCode,
+                        name: widget.productName,
+                        price: double.parse(widget.productPrice),
+                        quantity: quantity,
+                        imageUrl: widget.productImageUrl,
                       ),
-                    ),
-                    CustomizedButton(
-                      onPressed: () {
-                        cartProvider.addToCart(
-                          CartItem(
-                            id: widget.productName.hashCode,
-                            name: widget.productName,
-                            price: double.parse(widget.productPrice),
-                            quantity: quantity,
-                            imageUrl: widget.productImageUrl,
-                          ),
-                        );
-                        Navigator.pushNamed(context, cartRoute);
-                      },
-                      text: 'Add to Cart',
-                      height: 60,
-                      width: 220,
-                      fontz: 20,
-                    ),
-                  ],
+                    );
+                    Navigator.pushNamed(context, cartRoute);
+                  },
+                  text: 'Add to Cart',
+                  height: 50,
+                  width: 220,
+                  fontz: 20,
                 ),
               ],
             ),

@@ -23,7 +23,6 @@ class _ProfilePageState extends State<ProfilePage> {
   TextEditingController _passwordController = TextEditingController();
 
   File? _image;
-  bool showPersonalInfo = false;
 
   Future<void> _pickImage() async {
     final pickedFile =
@@ -342,124 +341,48 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(8.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (showPersonalInfo) ...[
-                    const Divider(),
-                    Text("Personal Information",
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium!
-                            .apply(color: Colors.black)),
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 3,
-                          child: Text(
-                            'Name:',
-                            style: Theme.of(context).textTheme.bodySmall,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        Expanded(
-                          flex: 5,
-                          child: Text(
-                            '${userData['name']}',
+                  Card(
+                    elevation: 5,
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Column(
+                        children: [
+                          Text(
+                            "Personal Information",
                             style: Theme.of(context)
                                 .textTheme
-                                .bodyMedium!
-                                .copyWith(fontWeight: FontWeight.bold),
-                            overflow: TextOverflow.ellipsis,
+                                .titleMedium!
+                                .apply(color: Colors.black),
                           ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 3,
-                          child: Text(
+                          const Divider(),
+                          buildInfoRow(context, 'Name:', '${userData['name']}'),
+                          buildInfoRow(
+                            context,
                             'Address:',
-                            style: Theme.of(context).textTheme.bodySmall,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        Expanded(
-                          flex: 5,
-                          child: Text(
                             '${userData['address']}',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(fontWeight: FontWeight.bold),
-                            overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 3,
-                          child: Text(
+                          buildInfoRow(
+                            context,
                             'Contact Number:',
-                            style: Theme.of(context).textTheme.bodySmall,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        Expanded(
-                          flex: 5,
-                          child: Text(
                             '${userData['contactNumber']}',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(fontWeight: FontWeight.bold),
-                            overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 3,
-                          child: Text(
+                          buildInfoRow(
+                            context,
                             'Email:',
-                            style: Theme.of(context).textTheme.bodySmall,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        Expanded(
-                          flex: 5,
-                          child: Text(
                             '${userData['email']}',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(fontWeight: FontWeight.bold),
-                            overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 10),
-                  ],
+                  ),
+                  const SizedBox(height: 5),
                   Center(
                     child: Column(
                       children: [
-                        ProfileButton(
-                          onPressed: () {
-                            setState(() {
-                              showPersonalInfo = !showPersonalInfo;
-                            });
-                          },
-                          text: showPersonalInfo
-                              ? 'Hide'
-                              : 'Personal Information',
-                        ),
                         const SizedBox(height: 5),
                         ProfileButton(
                           onPressed: () {
@@ -667,6 +590,32 @@ class _ProfilePageState extends State<ProfilePage> {
           ],
         );
       },
+    );
+  }
+
+  Widget buildInfoRow(BuildContext context, String label, String value) {
+    return Row(
+      children: [
+        Expanded(
+          flex: 3,
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.bodySmall,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        Expanded(
+          flex: 5,
+          child: Text(
+            value,
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium!
+                .copyWith(fontWeight: FontWeight.bold),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
     );
   }
 

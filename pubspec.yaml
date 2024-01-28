@@ -52,6 +52,7 @@ dependencies:
   url_launcher: ^6.0.12
   carousel_slider: ^4.2.1
   socket_io_client: ^2.0.3+1
+  photo_view: ^0.14.0
   
 dev_dependencies:
   flutter_test:
