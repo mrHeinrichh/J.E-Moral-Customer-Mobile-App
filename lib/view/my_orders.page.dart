@@ -109,7 +109,7 @@ class _MyOrderPageState extends State<MyOrderPage> {
                     deliveryTime: transactionData['deliveryTime'] != null
                         ? transactionData['deliveryTime'].toString()
                         : 'N/A',
-                    total: transactionData['total'],
+                    total: transactionData['total'].toDouble(),
                     createdAt: transactionData['createdAt'],
                     items: (transactionData['items'] as List<dynamic>?)
                             ?.map<Map<String, dynamic>>((item) =>
