@@ -35,8 +35,18 @@ class _HomePageState extends State<HomePage> {
       final parsedData = json.decode(response.body);
       final data = parsedData['data'];
 
+      final DateTime currentDate = DateTime.now();
+
+      // Filter announcements based on the current date
+      final filteredAnnouncements =
+          List<Map<String, dynamic>>.from(data).where((announcement) {
+        final DateTime startTime = DateTime.parse(announcement['start']);
+        final DateTime endTime = DateTime.parse(announcement['end']);
+        return currentDate.isAfter(startTime) && currentDate.isBefore(endTime);
+      }).toList();
+
       setState(() {
-        announcements = List<Map<String, dynamic>>.from(data);
+        announcements = filteredAnnouncements;
       });
     }
   }
@@ -213,7 +223,7 @@ class _HomePageState extends State<HomePage> {
                       (BuildContext context, int index, int realIndex) {
                     if (index == 0) {
                       // Initial section to be shown first
-                      return Container(
+                      return SizedBox(
                         child: Column(
                           children: [
                             const Text(
