@@ -210,6 +210,90 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
     );
   }
 
+  bool validateFields() {
+    if (locationController.text.isEmpty ||
+        nameController.text.isEmpty ||
+        contactNumberController.text.isEmpty ||
+        houseNumberController.text.isEmpty ||
+        selectedBarangay == null ||
+        selectedPaymentMethod == null ||
+        selectedAssemblyOption == null) {
+      // Show a message or perform any action to indicate validation failure
+      print("Please fill in all the required fields");
+      return false;
+    }
+
+    return true;
+  }
+
+  List<String> fieldErrors = [];
+
+  void clearFieldErrors() {
+    // Clear previous error messages
+    fieldErrors.clear();
+  }
+
+  void displayFieldErrors() {
+    // Check individual fields and add error messages to fieldErrors list
+    if (locationController.text.isEmpty) {
+      fieldErrors.add('Location is required.');
+    }
+    if (nameController.text.isEmpty) {
+      fieldErrors.add('Receiver Name is required.');
+    }
+    if (contactNumberController.text.isEmpty) {
+      fieldErrors.add('Contact Number is required.');
+    }
+    if (houseNumberController.text.isEmpty) {
+      fieldErrors.add('House Number is required.');
+    }
+    if (selectedBarangay == null) {
+      fieldErrors.add('Barangay is required.');
+    }
+    if (selectedPaymentMethod == null) {
+      fieldErrors.add('Payment Method is required.');
+    }
+    if (selectedAssemblyOption == null) {
+      fieldErrors.add('Assembly Option is required.');
+    }
+    // Add more checks for other fields...
+
+    // Display error messages next to each field
+    showFieldErrorMessages();
+  }
+
+  void showFieldErrorMessages() {
+    // Display error messages next to each field based on the fieldErrors list
+    List<String> fieldErrors = [
+      if (locationController.text.isEmpty) 'Location is required.',
+      if (nameController.text.isEmpty) 'Receiver Name is required.',
+      if (contactNumberController.text.isEmpty) 'Contact Number is required.',
+      if (houseNumberController.text.isEmpty) 'House Number is required.',
+      if (selectedBarangay == null) 'Barangay is required.',
+      if (selectedPaymentMethod == null) 'Payment Method is required.',
+      if (selectedAssemblyOption == null) 'Assembly Option is required.',
+
+      // Add similar logic for other fields...
+    ];
+    if (fieldErrors.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            fieldErrors.join('\n'),
+            style: TextStyle(color: Colors.white), // Set text color to white
+          ),
+          backgroundColor: Colors.red, // Set the background color to red
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  bool areThereNoErrors() {
+    // Return true if there are no errors, false otherwise
+    return fieldErrors.isEmpty;
+  }
+
   Future<void> confirmDialog() async {
     selectedDateTime = DateTime.now();
     BuildContext currentContext = context;
@@ -465,12 +549,21 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
             children: [
               CustomizedButton(
                 onPressed: () async {
-                  final selectedDate = await showDateTimePicker(context);
-                  if (selectedDate != null) {
-                    setState(() {
-                      selectedDateTime = selectedDate;
-                      showConfirmationDialog();
-                    });
+                  // Clear previous error messages
+                  clearFieldErrors();
+
+                  // Check and display field-specific errors
+                  displayFieldErrors();
+
+                  // If there are no errors, proceed with showConfirmationDialog
+                  if (areThereNoErrors()) {
+                    final selectedDate = await showDateTimePicker(context);
+                    if (selectedDate != null) {
+                      setState(() {
+                        selectedDateTime = selectedDate;
+                        showConfirmationDialog();
+                      });
+                    }
                   }
                 },
                 text: 'Scheduled',
@@ -480,7 +573,16 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
               ),
               CustomizedButton(
                 onPressed: () {
-                  confirmDialog();
+                  // Clear previous error messages
+                  clearFieldErrors();
+
+                  // Check and display field-specific errors
+                  displayFieldErrors();
+
+                  // If there are no errors, proceed with confirmDialog
+                  if (areThereNoErrors()) {
+                    confirmDialog();
+                  }
                 },
                 text: 'Deliver Now',
                 height: 50,
