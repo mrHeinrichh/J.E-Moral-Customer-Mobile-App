@@ -89,7 +89,8 @@ class _MyOrderPageState extends State<MyOrderPage> {
                   transactionData['status'] == 'Pending' ||
                   transactionData['status'] == 'Approved' ||
                   transactionData['status'] == 'On Going' &&
-                      transactionData['hasFeedback'] == false)
+                      transactionData['hasFeedback'] == false &&
+                      transactionData['deleted'] == false)
               .map((transactionData) => Transaction(
                     deliveryLocation: transactionData['deliveryLocation'],
                     price: transactionData['price'] != null
@@ -131,16 +132,20 @@ class _MyOrderPageState extends State<MyOrderPage> {
   }
 
   Future<void> deleteTransaction(String transactionId) async {
-    final apiUrl = 'https://lpg-api-06n8.onrender.com/api/v1/transactions';
-    final deleteUrl = '$apiUrl/$transactionId';
-
-    final response = await http.delete(Uri.parse(deleteUrl));
+    final response = await http.patch(
+      Uri.parse(
+          'https://lpg-api-06n8.onrender.com/api/v1/transactions/$transactionId'),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(
+          {'status': "Cancelled", '__t': 'Delivery', 'deleted': true}),
+    );
 
     if (response.statusCode == 200) {
-      // Transaction deleted successfully, update UI or handle as needed
-    } else {
-      // Handle HTTP error
-    }
+      print(response.body);
+      setState(() {});
+    } else {}
   }
 
   @override
