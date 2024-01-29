@@ -61,7 +61,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
         child: ListView(
           children: [
             const Text(
-              'User Interface',
+              'Rider Performance',
               style: TextStyle(
                 color: Color(0xFF232937),
                 fontSize: 20,
@@ -69,7 +69,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
               ),
             ),
             const Text(
-              'How would you rate the usability and user interface of our application?',
+              'How satisfied are you with the communication skills and punctuality of the delivery rider in delivering your LPG order?',
               style: TextStyle(
                 color: Color(0xFF232937),
                 fontSize: 15,
@@ -105,7 +105,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
               controller: userInterfaceController,
             ),
             const Text(
-              'EASE OF NAVIGATION',
+              'Visually Appearance',
               style: TextStyle(
                 color: Color(0xFF232937),
                 fontSize: 20,
@@ -113,7 +113,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
               ),
             ),
             const Text(
-              'How would you rate the ease of navigation of the application?',
+              'How well does the visual appeal of the platform translate across different devices, such as web and mobile?',
               style: TextStyle(
                 color: Color(0xFF232937),
                 fontSize: 15,
@@ -149,7 +149,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
               controller: easeofNavigationController,
             ),
             const Text(
-              'ORDER TIME',
+              'Transaction Speed',
               style: TextStyle(
                 color: Color(0xFF232937),
                 fontSize: 20,
@@ -157,7 +157,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
               ),
             ),
             const Text(
-              'How satisfied are you with the order time from placement to confirmation on the application?',
+              'How satisfied are you with the speed of the application in processing your LPG transactions?',
               style: TextStyle(
                 color: Color(0xFF232937),
                 fontSize: 15,
@@ -193,7 +193,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
               controller: orderTimeController,
             ),
             const Text(
-              'RIDER AND DELIVERY SERVICE',
+              'Payment Method',
               style: TextStyle(
                 color: Color(0xFF232937),
                 fontSize: 20,
@@ -201,7 +201,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
               ),
             ),
             const Text(
-              'How would you rate the overall delivery service and behavior of our riders?',
+              'How satisfied are you with the efficiency and security of the payment processing system within the application?',
               style: TextStyle(
                 color: Color(0xFF232937),
                 fontSize: 15,
@@ -237,7 +237,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
               controller: riderandDeliveryserviceController,
             ),
             const Text(
-              'ANNOUNCEMENTS',
+              'Announcements Efficiency',
               style: TextStyle(
                 color: Color(0xFF232937),
                 fontSize: 20,
@@ -245,7 +245,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
               ),
             ),
             const Text(
-              'How satisfied are you with the information dissemination through announcements? (e.g. pricelists)',
+              'How valuable do you find the announcements section in keeping you informed -about the trends in the LPG Industry',
               style: TextStyle(
                 color: Color(0xFF232937),
                 fontSize: 15,
@@ -281,7 +281,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
               controller: announcementsController,
             ),
             const Text(
-              'QUALITY OF SERVICE',
+              'FAQ Efficiency',
               style: TextStyle(
                 color: Color(0xFF232937),
                 fontSize: 20,
@@ -289,7 +289,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
               ),
             ),
             const Text(
-              'How would you rate the overall quality of service on the application?',
+              'How effective was the FAQ section in addressing any concerns or queries you had about the platform or your order?',
               style: TextStyle(
                 color: Color(0xFF232937),
                 fontSize: 15,
@@ -325,7 +325,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
               controller: qualityofServiceController,
             ),
             const Text(
-              'RECOMMENDATION TO OTHERS',
+              'Overall Satisfaction',
               style: TextStyle(
                 color: Color(0xFF232937),
                 fontSize: 20,
@@ -333,7 +333,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
               ),
             ),
             const Text(
-              'How likely are you to recommend the application to your friends or family?',
+              'On a scale of 1 to 10, how satisfied are you with your overall experience using the LPG E-Commerce Web and Mobile Platform for this transaction?',
               style: TextStyle(
                 color: Color(0xFF232937),
                 fontSize: 15,
@@ -369,7 +369,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
               controller: recommendationToOthersController,
             ),
             const Text(
-              'SUGGESTIONS FOR IMPROVEMENT',
+              'Suggestion for improvement',
               style: TextStyle(
                 color: Color(0xFF232937),
                 fontSize: 20,
@@ -377,7 +377,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
               ),
             ),
             const Text(
-              'Do you have any specific suggestions or comments on how we can enhance our application and delivery services?',
+              'Are there specific areas in the applications performance that you believe could be improved to better fulfill its main goal?',
               style: TextStyle(
                 color: Color(0xFF232937),
                 fontSize: 15,
