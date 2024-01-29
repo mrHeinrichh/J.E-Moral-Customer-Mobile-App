@@ -369,12 +369,25 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                           overflow: TextOverflow.ellipsis,
                                         ),
-                                        subtitle: Text(
-                                          '\₱${product['price']}',
-                                          style: const TextStyle(
-                                            fontSize: 13,
-                                            color: Color(0xFFE98500),
-                                          ),
+                                        subtitle: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            Text(
+                                              '${product['weight']} kg.',
+                                              style: const TextStyle(
+                                                fontSize: 13,
+                                                color: Color(0xFFE98500),
+                                              ),
+                                            ),
+                                            Text(
+                                              '\₱${product['price']}',
+                                              style: const TextStyle(
+                                                fontSize: 13,
+                                                color: Color(0xFFE98500),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ],

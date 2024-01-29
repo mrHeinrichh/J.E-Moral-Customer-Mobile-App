@@ -90,6 +90,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 10),
                   Row(
                     children: [
                       Expanded(
@@ -102,7 +103,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       Expanded(
                         flex: 4,
                         child: Text(
-                          "${widget.weight}",
+                          "${widget.weight} kg.",
                           style: Theme.of(context)
                               .textTheme
                               .titleMedium!
