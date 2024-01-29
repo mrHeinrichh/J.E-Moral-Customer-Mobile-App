@@ -235,6 +235,14 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  Future<void> _handleRefresh() async {
+    // Reload user details when pulling down to refresh
+    String? userId = Provider.of<UserProvider>(context, listen: false).userId;
+    setState(() {
+      _userDetailsFuture = fetchUserDetails(userId!);
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -377,8 +385,17 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           buildInfoRow(
                             context,
-                            'PWD/Senior Discounted:',
-                            '${userData['discounted']}',
+                            'PWD/Senior:',
+                            userData['discounted'] == true
+                                ? 'I am a PWD/Senior'
+                                : 'I\'m not a PWD/Senior',
+                          ),
+                          buildInfoRow(
+                            context,
+                            'Discounts:',
+                            userData['discounted'] == true
+                                ? 'Discounted'
+                                : 'Not Discounted',
                           ),
                         ],
                       ),
@@ -641,7 +658,10 @@ class _ProfilePageState extends State<ProfilePage> {
           } else {
             Map<String, dynamic> userDetails = snapshot.data!;
             print('User details loaded successfully: $userDetails');
-            return buildProfileWidget(userDetails, userId);
+            return RefreshIndicator(
+              onRefresh: _handleRefresh,
+              child: buildProfileWidget(userDetails, userId),
+            );
           }
         },
       );
