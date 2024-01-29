@@ -35,18 +35,8 @@ class _HomePageState extends State<HomePage> {
       final parsedData = json.decode(response.body);
       final data = parsedData['data'];
 
-      final DateTime currentDate = DateTime.now();
-
-      // Filter announcements based on the current date
-      final filteredAnnouncements =
-          List<Map<String, dynamic>>.from(data).where((announcement) {
-        final DateTime startTime = DateTime.parse(announcement['start']);
-        final DateTime endTime = DateTime.parse(announcement['end']);
-        return currentDate.isAfter(startTime) && currentDate.isBefore(endTime);
-      }).toList();
-
       setState(() {
-        announcements = filteredAnnouncements;
+        announcements = List<Map<String, dynamic>>.from(data);
       });
     }
   }
@@ -229,7 +219,7 @@ class _HomePageState extends State<HomePage> {
                         (BuildContext context, int index, int realIndex) {
                       if (index == 0) {
                         // Initial section to be shown first
-                        return SizedBox(
+                        return Container(
                           child: Column(
                             children: [
                               const Text(
@@ -378,25 +368,12 @@ class _HomePageState extends State<HomePage> {
                                             ),
                                             overflow: TextOverflow.ellipsis,
                                           ),
-                                          subtitle: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceEvenly,
-                                            children: [
-                                              Text(
-                                                '${product['weight']} kg.',
-                                                style: const TextStyle(
-                                                  fontSize: 13,
-                                                  color: Color(0xFFE98500),
-                                                ),
-                                              ),
-                                              Text(
-                                                '\₱${product['price']}',
-                                                style: const TextStyle(
-                                                  fontSize: 13,
-                                                  color: Color(0xFFE98500),
-                                                ),
-                                              ),
-                                            ],
+                                          subtitle: Text(
+                                            '\₱${product['price']}',
+                                            style: const TextStyle(
+                                              fontSize: 13,
+                                              color: Color(0xFFE98500),
+                                            ),
                                           ),
                                         ),
                                       ],
