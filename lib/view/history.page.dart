@@ -31,16 +31,16 @@ class _HistoryPageState extends State<HistoryPage> {
     }
 
     final apiUrl = 'https://lpg-api-06n8.onrender.com/api/v1/transactions';
-    final searchUrl = '$apiUrl/?search=$userId';
+    final filterUrl = '$apiUrl/?filter={"to":"$userId", "__t" : "Delivery"}';
 
-    final response = await http.get(Uri.parse(searchUrl));
+    final response = await http.get(Uri.parse(filterUrl));
     if (!mounted) {
       return; // Check if the widget is still in the tree
     }
 
     if (response.statusCode == 200) {
       final Map<String, dynamic>? data = jsonDecode(response.body);
-
+      print(response.body);
       if (data != null && data['status'] == 'success') {
         final List<dynamic> transactionsData = data['data'] ?? [];
 
@@ -58,7 +58,9 @@ class _HistoryPageState extends State<HistoryPage> {
   @override
   Widget build(BuildContext context) {
     List<Map<String, dynamic>> completedTransactions = visibleTransactions
-        .where((transaction) => transaction['completed'] == true)
+        .where((transaction) =>
+            transaction['completed'] == true &&
+            transaction['status'] == "Completed")
         .toList();
 
     return Scaffold(

@@ -375,6 +375,11 @@ class _ProfilePageState extends State<ProfilePage> {
                             'Email:',
                             '${userData['email']}',
                           ),
+                          buildInfoRow(
+                            context,
+                            'PWD/Senior Discounted:',
+                            '${userData['discounted']}',
+                          ),
                         ],
                       ),
                     ),

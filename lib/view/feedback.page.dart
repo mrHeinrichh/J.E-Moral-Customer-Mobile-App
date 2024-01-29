@@ -5,7 +5,6 @@ import 'package:customer_app/view/my_orders.page.dart';
 import 'package:customer_app/widgets/text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:qr_flutter/qr_flutter.dart';
 import 'package:customer_app/widgets/custom_button.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
@@ -434,6 +433,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
       "feedback":
           getFeedbackValues().join(', '), // Join the array into a string
       "_id": transaction.id,
+      "__t": "Delivery"
     };
 
     String jsonData = jsonEncode(feedbackData);
