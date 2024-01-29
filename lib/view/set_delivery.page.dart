@@ -20,7 +20,7 @@ DateTime? selectedDateTime;
 
 class _SetDeliveryPageState extends State<SetDeliveryPage> {
   String? selectedLocation;
-  String? selectedPaymentMethod; // Declare this variable in your class
+  String? selectedPaymentMethod;
   String paymentMethodToString(String? paymentMethod) {
     switch (paymentMethod) {
       case 'COD':
@@ -28,7 +28,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
       case 'GCASH':
         return 'GCASH';
       default:
-        return ''; // Handle other cases or return a default value
+        return '';
     }
   }
 
@@ -109,7 +109,6 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
 
     if (userId == null || userId.isEmpty) {
       print('Error: User ID is null or empty.');
-      // You might want to display an error message to the user.
       return;
     }
 
@@ -148,17 +147,13 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
       if (response.statusCode == 200) {
         print('Transaction successful');
         print('Response: ${response.body}');
-        // If the transaction is successful, you can proceed with navigation.
         Navigator.pushNamed(context, myOrdersPage);
       } else {
         print('Transaction failed with status code: ${response.statusCode}');
         print('Response: ${response.body}');
-        // You might want to display an error message to the user.
       }
     } catch (e) {
       print('Error: $e');
-      // Handle other types of errors, if any.
-      // You might want to display an error message to the user.
     }
   }
 
@@ -169,7 +164,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Confirmation'),
+          title: const Text('Confirmation'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -197,12 +192,12 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
             TextButton(
               onPressed: () async {
                 Navigator.of(context).pop();
-                await sendTransactionData(); // Wait for the transaction to complete.
+                await sendTransactionData();
                 Provider.of<CartProvider>(currentContext, listen: false)
                     .clearCart();
                 Navigator.pushNamed(currentContext, myOrdersPage);
               },
-              child: Text('Confirm'),
+              child: const Text('Confirm'),
             ),
           ],
         );
@@ -218,7 +213,6 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
         selectedBarangay == null ||
         selectedPaymentMethod == null ||
         selectedAssemblyOption == null) {
-      // Show a message or perform any action to indicate validation failure
       print("Please fill in all the required fields");
       return false;
     }
@@ -229,12 +223,10 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
   List<String> fieldErrors = [];
 
   void clearFieldErrors() {
-    // Clear previous error messages
     fieldErrors.clear();
   }
 
   void displayFieldErrors() {
-    // Check individual fields and add error messages to fieldErrors list
     if (locationController.text.isEmpty) {
       fieldErrors.add('Location is required.');
     }
@@ -256,14 +248,11 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
     if (selectedAssemblyOption == null) {
       fieldErrors.add('Assembly Option is required.');
     }
-    // Add more checks for other fields...
 
-    // Display error messages next to each field
     showFieldErrorMessages();
   }
 
   void showFieldErrorMessages() {
-    // Display error messages next to each field based on the fieldErrors list
     List<String> fieldErrors = [
       if (locationController.text.isEmpty) 'Location is required.',
       if (nameController.text.isEmpty) 'Receiver Name is required.',
@@ -272,8 +261,6 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
       if (selectedBarangay == null) 'Barangay is required.',
       if (selectedPaymentMethod == null) 'Payment Method is required.',
       if (selectedAssemblyOption == null) 'Assembly Option is required.',
-
-      // Add similar logic for other fields...
     ];
     if (fieldErrors.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -290,9 +277,10 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
   }
 
   bool areThereNoErrors() {
-    // Return true if there are no errors, false otherwise
     return fieldErrors.isEmpty;
   }
+
+  bool deliveryNoticeShown = false;
 
   Future<void> confirmDialog() async {
     selectedDateTime = DateTime.now();
@@ -302,7 +290,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Confirmation'),
+          title: const Text('Confirmation'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -325,17 +313,17 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () async {
                 Navigator.of(context).pop();
-                await sendTransactionData(); // Wait for the transaction to complete.
+                await sendTransactionData();
                 Provider.of<CartProvider>(currentContext, listen: false)
                     .clearCart();
                 Navigator.pushNamed(currentContext, myOrdersPage);
               },
-              child: Text('Confirm'),
+              child: const Text('Confirm'),
             ),
           ],
         );
@@ -396,7 +384,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
           style: TextStyle(color: Color(0xFF232937), fontSize: 24),
         ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pushReplacementNamed(context, dashboardRoute);
           },
@@ -408,10 +396,8 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
             padding: const EdgeInsets.all(15.0),
             child: Column(
               children: [
-                const Text(
-                  "Set Delivery Location",
-                ),
-                const SizedBox(height: 20),
+                const Text("Set Delivery Location"),
+                const SizedBox(height: 5),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   decoration: BoxDecoration(
@@ -445,12 +431,13 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 5),
                 LocationButtonWidget(
                   onLocationChanged: (String address) {
                     locationController.text = address;
                   },
                 ),
+                const SizedBox(height: 10),
                 CustomTextField1(
                   labelText: 'Name',
                   hintText: 'Enter your Name',
@@ -466,8 +453,9 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                   hintText: 'Enter your house number',
                   controller: houseNumberController,
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 5),
                 const Text("Choose Barangay"),
+                const SizedBox(height: 5),
                 SingleChildScrollView(
                   child: DropdownButtonFormField<String>(
                     value: selectedBarangay,
@@ -482,11 +470,9 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                         selectedBarangay = value;
                       });
                     },
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Select your Barangay',
                       border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(
-                          vertical: 20.0, horizontal: 16.0), // Adjust padding
                     ),
                   ),
                 ),
@@ -516,7 +502,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                     },
                   ),
                 ),
-                Text("Needs to be assembled?"),
+                const Text("Needs to be assembled?"),
                 ListTile(
                   title: const Text('Yes'),
                   leading: Radio<bool>(
@@ -549,13 +535,10 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
             children: [
               CustomizedButton(
                 onPressed: () async {
-                  // Clear previous error messages
                   clearFieldErrors();
 
-                  // Check and display field-specific errors
                   displayFieldErrors();
 
-                  // If there are no errors, proceed with showConfirmationDialog
                   if (areThereNoErrors()) {
                     final selectedDate = await showDateTimePicker(context);
                     if (selectedDate != null) {
@@ -568,26 +551,32 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                 },
                 text: 'Scheduled',
                 height: 50,
-                width: 180,
+                width: 160,
                 fontz: 20,
               ),
               CustomizedButton(
                 onPressed: () {
-                  // Clear previous error messages
                   clearFieldErrors();
-
-                  // Check and display field-specific errors
                   displayFieldErrors();
 
-                  // If there are no errors, proceed with confirmDialog
                   if (areThereNoErrors()) {
-                    confirmDialog();
+                    if (isWithinDeliveryHours()) {
+                      confirmDialog();
+                    } else {
+                      if (!deliveryNoticeShown) {
+                        showAlertDialog(context);
+                        setState(() {
+                          deliveryNoticeShown = true;
+                        });
+                      }
+                    }
                   }
                 },
                 text: 'Deliver Now',
                 height: 50,
-                width: 180,
+                width: 160,
                 fontz: 20,
+                enabled: !deliveryNoticeShown,
               ),
             ],
           ),
@@ -595,4 +584,48 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
       ),
     );
   }
+}
+
+void showAlertDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Delivery Hours Notice'),
+        content: const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Dear Valued Customer,',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'We sincerely apologize for any inconvenience.\n\n'
+              'We regret to inform you that we cannot process your order at the moment.\n\n'
+              'Our delivery service is only available between 7 am and 7 pm.\n\n'
+              'To ensure a seamless and timely delivery experience, kindly place your order during our operational hours.\n\n'
+              'Thank you for your understanding.',
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Ok, I Understand'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+bool isWithinDeliveryHours() {
+  DateTime now = DateTime.now();
+  int currentHour = now.hour;
+
+  return currentHour >= 7 && currentHour < 19;
 }

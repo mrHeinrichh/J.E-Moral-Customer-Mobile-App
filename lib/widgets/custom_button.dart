@@ -75,14 +75,16 @@ class CustomizedButton extends StatelessWidget {
   final String text;
   final double height;
   final double width;
-  final double fontz; // Add the type declaration 'double' here
+  final double fontz;
+  final bool enabled; // Add the 'enabled' parameter
 
   CustomizedButton({
     required this.onPressed,
     required this.text,
     required this.height,
     required this.width,
-    required this.fontz, // Add the type declaration 'double' here
+    required this.fontz,
+    this.enabled = true, // Provide a default value of true
   });
 
   @override
@@ -93,9 +95,11 @@ class CustomizedButton extends StatelessWidget {
         height: height,
         width: width,
         child: ElevatedButton(
-          onPressed: onPressed,
+          onPressed: enabled ? onPressed : null, // Use null if not enabled
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF232937), // Background color
+            backgroundColor: enabled
+                ? const Color(0xFF232937)
+                : Colors.grey, // Use grey color if not enabled
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(30),
             ),

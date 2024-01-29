@@ -52,13 +52,14 @@ class _CartPageState extends State<CartPage> {
         iconTheme: const IconThemeData(
           color: Colors.black,
         ),
-        title: const Padding(
-          padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
-          child: Text(
-            'Cart',
-            style: TextStyle(color: Color(0xFF232937), fontSize: 24),
-          ),
-        ),
+        // title: const Padding(
+        //   padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
+        //   child: Text(
+        //     'Cart',
+        //     style: TextStyle(color: Color(0xFF232937), fontSize: 24),
+        //   ),
+        // ),
+        title: const Text('Cart'),
       ),
       body: Consumer2<CartProvider, UserProvider>(
         builder: (context, cartProvider, userProvider, child) {
@@ -80,7 +81,7 @@ class _CartPageState extends State<CartPage> {
             future: userData,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator());
               } else if (snapshot.hasError) {
                 return Center(child: Text('Error: ${snapshot.error}'));
               } else {
@@ -89,8 +90,8 @@ class _CartPageState extends State<CartPage> {
 
                 return Column(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 20, 5, 5),
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(0, 20, 5, 5),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,7 +120,10 @@ class _CartPageState extends State<CartPage> {
                               const Text("Price:"),
                               Text(
                                 "₱${_calculateTotalPrice()}",
-                                style: TextStyle(fontWeight: FontWeight.bold),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
                               ),
                             ],
                           ),
@@ -127,9 +131,9 @@ class _CartPageState extends State<CartPage> {
                             onPressed: () {
                               Navigator.pushNamed(context, setDeliveryPage);
                             },
-                            text: 'Place Order',
+                            text: 'Checkout',
                             height: 60,
-                            width: 240,
+                            width: 200,
                             fontz: 20,
                           ),
                         ],
@@ -153,45 +157,51 @@ class CartItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return Container(
       width: double.infinity,
       child: ListTile(
-        contentPadding: EdgeInsets.all(20),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Checkbox(
-                  value: cartItem.isSelected,
-                  onChanged: (value) {
-                    Provider.of<CartProvider>(context, listen: false)
-                        .toggleSelection(cartItem);
-                  },
-                ),
-                Image.network(
-                  cartItem.imageUrl,
-                  width: 90,
-                  height: 90,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Icon(Icons.error);
-                  },
-                ),
-                Column(
+        contentPadding: const EdgeInsets.all(20),
+        subtitle: IntrinsicHeight(
+          child: Row(
+            children: [
+              Checkbox(
+                value: cartItem.isSelected,
+                onChanged: (value) {
+                  Provider.of<CartProvider>(context, listen: false)
+                      .toggleSelection(cartItem);
+                },
+              ),
+              const SizedBox(width: 10), // Add some spacing
+
+              Image.network(
+                cartItem.imageUrl,
+                width: 90,
+                height: 90,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return const Icon(Icons.error);
+                },
+              ),
+              const SizedBox(width: 10), // Add some spacing
+
+              Expanded(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       cartItem.name,
-                      style: TextStyle(fontSize: 18),
+                      style: const TextStyle(fontSize: 18),
                     ),
+                    const SizedBox(height: 5), // Add some vertical spacing
                     Text(
                       '₱${cartItem.price * cartItem.quantity}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
                       ),
                     ),
+                    const SizedBox(height: 5), // Add some vertical spacing
+
                     Row(
                       children: [
                         IconButton(
@@ -209,9 +219,7 @@ class CartItemWidget extends StatelessWidget {
                                 .incrementQuantity(cartItem);
                           },
                         ),
-                        SizedBox(
-                          width: 50,
-                        ),
+                        const Spacer(), // Use Spacer to push the following IconButton to the right
                         IconButton(
                           icon: const Icon(
                             Icons.delete,
@@ -226,9 +234,9 @@ class CartItemWidget extends StatelessWidget {
                     ),
                   ],
                 ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );
