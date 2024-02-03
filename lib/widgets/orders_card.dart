@@ -57,7 +57,7 @@ class _TransactionCardState extends State<TransactionCard> {
                     Text(widget.transaction.price),
                   ],
                 ),
-                Text("Status: ${widget.transaction.isApproved}"),
+                Text("Status: ${widget.transaction.status}"),
                 CustomButton(
                   backgroundColor: getTrackOrderButtonColor(),
                   onPressed: () {

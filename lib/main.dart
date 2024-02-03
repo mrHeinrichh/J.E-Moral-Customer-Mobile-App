@@ -73,6 +73,7 @@ class MyApp extends StatelessWidget {
             hasFeedback: false,
             createdAt: 'Sample Created At',
             status: 'Sample Status',
+            cancelReason: 'Sample Cancel Reason',
             items: [
               {
                 'productId': 'Sample Product ID',

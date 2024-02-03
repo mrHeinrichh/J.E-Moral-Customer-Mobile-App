@@ -19,8 +19,6 @@ class _FeedbackPageState extends State<FeedbackPage> {
   double rating2 = 0.0;
   double rating3 = 0.0;
   double rating4 = 0.0;
-  double rating5 = 0.0;
-  double rating6 = 0.0;
 
   final userInterfaceController = TextEditingController();
 
@@ -31,12 +29,6 @@ class _FeedbackPageState extends State<FeedbackPage> {
   final riderandDeliveryserviceController = TextEditingController();
 
   final announcementsController = TextEditingController();
-
-  final qualityofServiceController = TextEditingController();
-
-  final recommendationToOthersController = TextEditingController();
-
-  final suggestionsForImprovementController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -280,114 +272,6 @@ class _FeedbackPageState extends State<FeedbackPage> {
               hintText: '',
               controller: announcementsController,
             ),
-            const Text(
-              'FAQ Efficiency',
-              style: TextStyle(
-                color: Color(0xFF232937),
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const Text(
-              'How effective was the FAQ section in addressing any concerns or queries you had about the platform or your order?',
-              style: TextStyle(
-                color: Color(0xFF232937),
-                fontSize: 15,
-              ),
-            ),
-            RatingBar.builder(
-              initialRating: rating5,
-              minRating: 1,
-              direction: Axis.horizontal,
-              allowHalfRating: false,
-              itemCount: 5,
-              itemSize: 30,
-              itemBuilder: (context, _) => Icon(
-                Icons.star,
-                color: Colors.amber,
-              ),
-              onRatingUpdate: (newRating) {
-                setState(() {
-                  rating5 = newRating;
-                });
-              },
-            ),
-            const Text(
-              'Explain why you give such rating?',
-              style: TextStyle(
-                color: Color(0xFF232937),
-                fontSize: 15,
-              ),
-            ),
-            FeedbackTextField(
-              labelText: '',
-              hintText: '',
-              controller: qualityofServiceController,
-            ),
-            const Text(
-              'Overall Satisfaction',
-              style: TextStyle(
-                color: Color(0xFF232937),
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const Text(
-              'On a scale of 1 to 10, how satisfied are you with your overall experience using the LPG E-Commerce Web and Mobile Platform for this transaction?',
-              style: TextStyle(
-                color: Color(0xFF232937),
-                fontSize: 15,
-              ),
-            ),
-            RatingBar.builder(
-              initialRating: rating6,
-              minRating: 1,
-              direction: Axis.horizontal,
-              allowHalfRating: false,
-              itemCount: 5,
-              itemSize: 30,
-              itemBuilder: (context, _) => Icon(
-                Icons.star,
-                color: Colors.amber,
-              ),
-              onRatingUpdate: (newRating) {
-                setState(() {
-                  rating6 = newRating;
-                });
-              },
-            ),
-            const Text(
-              'Explain why you give such rating?',
-              style: TextStyle(
-                color: Color(0xFF232937),
-                fontSize: 15,
-              ),
-            ),
-            FeedbackTextField(
-              labelText: '',
-              hintText: '',
-              controller: recommendationToOthersController,
-            ),
-            const Text(
-              'Suggestion for improvement',
-              style: TextStyle(
-                color: Color(0xFF232937),
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const Text(
-              'Are there specific areas in the applications performance that you believe could be improved to better fulfill its main goal?',
-              style: TextStyle(
-                color: Color(0xFF232937),
-                fontSize: 15,
-              ),
-            ),
-            FeedbackTextField(
-              labelText: '',
-              hintText: '',
-              controller: suggestionsForImprovementController,
-            ),
             CustomizedButton(
               onPressed: () {
                 submitFeedback(transaction);
@@ -412,16 +296,11 @@ class _FeedbackPageState extends State<FeedbackPage> {
       rating2.toString(),
       rating3.toString(),
       rating4.toString(),
-      rating5.toString(),
-      rating6.toString(),
       userInterfaceController.text,
       easeofNavigationController.text,
       orderTimeController.text,
       riderandDeliveryserviceController.text,
       announcementsController.text,
-      qualityofServiceController.text,
-      recommendationToOthersController.text,
-      suggestionsForImprovementController.text,
     ];
   }
 

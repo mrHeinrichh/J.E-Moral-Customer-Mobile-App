@@ -21,6 +21,7 @@ class Transaction {
   final String assembly;
   final String deliveryTime;
   final double total;
+  final String cancelReason;
   final String createdAt;
   final String pickupImages;
   final String completionImages;
@@ -42,6 +43,7 @@ class Transaction {
     required this.createdAt,
     required this.items,
     required this.completed,
+    required this.cancelReason,
     required this.pickupImages,
     required this.hasFeedback,
     required this.completionImages,
@@ -89,6 +91,7 @@ class _MyOrderPageState extends State<MyOrderPage> {
                   transactionData['status'] == 'Pending' ||
                   transactionData['status'] == 'Approved' ||
                   transactionData['status'] == 'On Going' ||
+                  transactionData['status'] == 'Cancelled' ||
                   transactionData['status'] == 'Completed' &&
                       transactionData['hasFeedback'] == false &&
                       transactionData['deleted'] == false)
@@ -107,6 +110,9 @@ class _MyOrderPageState extends State<MyOrderPage> {
                         ? transactionData['assembly'].toString()
                         : transactionData['assembly'],
                     status: transactionData['status'],
+                    cancelReason: transactionData['cancelReason'] != null
+                        ? transactionData['cancelReason'].toString()
+                        : 'N/A',
                     deliveryTime: transactionData['deliveryTime'] != null
                         ? transactionData['deliveryTime'].toString()
                         : 'N/A',
@@ -140,7 +146,7 @@ class _MyOrderPageState extends State<MyOrderPage> {
         'Content-Type': 'application/json',
       },
       body: jsonEncode(
-          {'status': "Cancelled", '__t': 'Delivery', 'deleted': true}),
+          {'status': "Archived", '__t': 'Delivery', 'deleted': true}),
     );
 
     if (response.statusCode == 200) {
@@ -278,6 +284,15 @@ class _TransactionCardState extends State<TransactionCard> {
                     ],
                   ),
                   Text("Status: ${widget.transaction.status}"),
+                  Visibility(
+                    visible: widget.transaction.cancelReason != null &&
+                        widget.transaction.cancelReason.isNotEmpty,
+                    child: Text(
+                      "Cancel Reason: ${widget.transaction.cancelReason}",
+                      style: TextStyle(
+                          fontSize: 16), // Adjust the font size as needed
+                    ),
+                  ),
                   CustomButton(
                     backgroundColor: getTrackOrderButtonColor(),
                     onPressed: getTrackOrderButtonColor() == Color(0xFFAFB7C9)
@@ -296,7 +311,7 @@ class _TransactionCardState extends State<TransactionCard> {
                     onPressed: getCancelOrderButtonColor() == Color(0xFFAFB7C9)
                         ? () {}
                         : widget.onDeleteTransaction,
-                    text: 'Cancel Order',
+                    text: 'Archive Order',
                   ),
                 ],
               ),

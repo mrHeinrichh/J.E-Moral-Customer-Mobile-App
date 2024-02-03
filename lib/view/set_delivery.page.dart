@@ -100,6 +100,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
     }
   }
 
+  Map<String, dynamic>? discountIdImageResponse;
   Future<void> sendTransactionData() async {
     final apiUrl = 'https://lpg-api-06n8.onrender.com/api/v1/transactions';
 
@@ -117,8 +118,12 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
       print('Error: User ID is null or empty.');
       return;
     }
-    final Map<String, dynamic>? discountIdImageResponse =
-        await uploadImageToServer(_image!);
+    if (_image != null) {
+      discountIdImageResponse = await uploadImageToServer(_image!);
+      final String? discountIdImage =
+          discountIdImageResponse?["data"]?[0]?["path"] as String?;
+      // Use discountIdImage as needed...
+    }
     final String? discountIdImage =
         discountIdImageResponse?["data"]?[0]?["path"] as String?;
 
