@@ -17,7 +17,7 @@ class SignupPage extends StatefulWidget {
 
 class _SignupPageState extends State<SignupPage> {
   File? _image;
-  File? _image2;
+
   bool isPWDClicked = false;
   bool isLoading = false;
   final nameController = TextEditingController();
@@ -36,17 +36,6 @@ class _SignupPageState extends State<SignupPage> {
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
-      });
-    }
-  }
-
-  Future<void> _pickImage2() async {
-    final pickedFile2 =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-
-    if (pickedFile2 != null) {
-      setState(() {
-        _image2 = File(pickedFile2.path);
       });
     }
   }
@@ -80,14 +69,6 @@ class _SignupPageState extends State<SignupPage> {
           if (responseImage1 != null) {
             final imageUrl1 = responseImage1["data"][0]["path"];
             userData["image"] = imageUrl1;
-          }
-          if (_image2 != null) {
-            final responseImage2 = await uploadImageToServer(_image2!);
-
-            if (responseImage2 != null) {
-              final imageUrl2 = responseImage2["data"][0]["path"];
-              userData["discountIdImage"] = imageUrl2;
-            }
           }
 
           final userResponse = await http.post(
@@ -300,65 +281,6 @@ class _SignupPageState extends State<SignupPage> {
                           ),
                           const SizedBox(
                             height: 10,
-                          ),
-                          Column(
-                            children: [
-                              TextButton(
-                                onPressed: () {
-                                  setState(() {
-                                    isPWDClicked = true;
-                                  });
-                                },
-                                child: Text(
-                                  "Are you a Person with Disability (PWD)?",
-                                  style: TextStyle(
-                                    color: isPWDClicked
-                                        ? Colors.blue
-                                        : Colors.black,
-                                    fontSize: 15.0,
-                                  ),
-                                ),
-                              ),
-                              isPWDClicked
-                                  ? (_image2 == null
-                                      ? Container(
-                                          width: 250,
-                                          height: 100,
-                                          decoration: const BoxDecoration(
-                                            shape: BoxShape.rectangle,
-                                            color: Colors.grey,
-                                          ),
-                                          child: const Icon(
-                                            Icons.person,
-                                            color: Colors.white,
-                                            size: 50,
-                                          ),
-                                        )
-                                      : Container(
-                                          width: 100,
-                                          height: 100,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            image: DecorationImage(
-                                              image: FileImage(_image2!),
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                        ))
-                                  : Container(),
-                              isPWDClicked
-                                  ? TextButton(
-                                      onPressed: _pickImage2,
-                                      child: Text(
-                                        "Upload your PWD ID",
-                                        style: TextStyle(
-                                          color: Colors.blue,
-                                          fontSize: 15.0,
-                                        ),
-                                      ),
-                                    )
-                                  : Container(),
-                            ],
                           ),
                           Row(
                             children: <Widget>[
