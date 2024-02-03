@@ -26,7 +26,6 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
   String? selectedLocation;
   String? selectedPaymentMethod;
   bool isSeniorCheckboxVisible = false;
-  bool isSeniorChecked = false;
 
   String paymentMethodToString(String? paymentMethod) {
     switch (paymentMethod) {
@@ -146,7 +145,6 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
       "completed": "false",
       "type": "Delivery",
       "status": "Pending",
-      "discounted": isSeniorChecked,
       "discountIdImage": discountIdImage,
     };
     print('isSeniorCheckboxVisible: $isSeniorCheckboxVisible');
@@ -196,8 +194,6 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
               ),
               Text(
                   'Needs to be assembled: ${selectedAssemblyOption.toString()}'),
-              Text(
-                  'Senior Citizen/PWD Discount: ${isSeniorChecked.toString()}'),
             ],
           ),
           actions: [
@@ -324,8 +320,6 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
               ),
               Text(
                   'Needs to be assembled: ${selectedAssemblyOption.toString()}'),
-              Text(
-                  'Senior Citizen/PWD Discount: ${isSeniorChecked.toString()}'),
             ],
           ),
           actions: [
@@ -625,37 +619,39 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                   Column(
                     children: [
                       _image == null
-                          ? const CircleAvatar(
-                              radius: 50,
-                              backgroundColor: Colors.grey,
+                          ? Container(
+                              width: 300,
+                              height: 300,
+                              decoration: BoxDecoration(
+                                color: Colors.grey,
+                                borderRadius: BorderRadius.circular(
+                                    10), // half of width/height for a circle
+                              ),
                               child: Icon(
                                 Icons.person,
                                 color: Colors.white,
                                 size: 50,
                               ),
                             )
-                          : CircleAvatar(
-                              radius: 50,
-                              backgroundImage: FileImage(_image!),
+                          : ClipRRect(
+                              borderRadius: BorderRadius.circular(
+                                  8), // adjust the borderRadius as needed
+                              child: Image.file(
+                                _image!,
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover,
+                              ),
                             ),
                       TextButton(
                         onPressed: _pickImage,
                         child: const Text(
-                          "Upload Image",
+                          "Upload your Discount ID Image",
                           style: TextStyle(
                             color: Colors.blue,
                             fontSize: 15.0,
                           ),
                         ),
-                      ),
-                      CheckboxListTile(
-                        title: const Text('Yes'),
-                        value: isSeniorChecked,
-                        onChanged: (bool? value) {
-                          setState(() {
-                            isSeniorChecked = value ?? false;
-                          });
-                        },
                       ),
                     ],
                   ),
