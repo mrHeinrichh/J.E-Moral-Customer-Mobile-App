@@ -9,7 +9,10 @@ import 'package:customer_app/widgets/custom_timepicker.dart';
 import 'package:customer_app/widgets/location_button.dart';
 import 'package:customer_app/widgets/location_search.dart';
 import 'package:customer_app/widgets/text_field.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'dart:io';
+import 'package:http_parser/http_parser.dart';
 
 class SetDeliveryPage extends StatefulWidget {
   @override
@@ -17,10 +20,14 @@ class SetDeliveryPage extends StatefulWidget {
 }
 
 DateTime? selectedDateTime;
+File? _image;
 
 class _SetDeliveryPageState extends State<SetDeliveryPage> {
   String? selectedLocation;
   String? selectedPaymentMethod;
+  bool isSeniorCheckboxVisible = false;
+  bool isSeniorChecked = false;
+
   String paymentMethodToString(String? paymentMethod) {
     switch (paymentMethod) {
       case 'COD':
@@ -111,6 +118,10 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
       print('Error: User ID is null or empty.');
       return;
     }
+    final Map<String, dynamic>? discountIdImageResponse =
+        await uploadImageToServer(_image!);
+    final String? discountIdImage =
+        discountIdImageResponse?["data"]?[0]?["path"] as String?;
 
     final Map<String, dynamic> requestData = {
       "deliveryLocation": locationController.text,
@@ -135,7 +146,12 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
       "completed": "false",
       "type": "Delivery",
       "status": "Pending",
+      "discounted": isSeniorChecked,
+      "discountIdImage": discountIdImage,
     };
+    print('isSeniorCheckboxVisible: $isSeniorCheckboxVisible');
+    print('_image: $_image');
+    print('requestData["discountIdImage"]: ${requestData["discountIdImage"]}');
 
     try {
       final response = await http.post(
@@ -180,6 +196,8 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
               ),
               Text(
                   'Needs to be assembled: ${selectedAssemblyOption.toString()}'),
+              Text(
+                  'Senior Citizen/PWD Discount: ${isSeniorChecked.toString()}'),
             ],
           ),
           actions: [
@@ -306,6 +324,8 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
               ),
               Text(
                   'Needs to be assembled: ${selectedAssemblyOption.toString()}'),
+              Text(
+                  'Senior Citizen/PWD Discount: ${isSeniorChecked.toString()}'),
             ],
           ),
           actions: [
@@ -372,6 +392,70 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
     'West Rembo',
     'Western Bicutan'
   ];
+
+  Future<void> _pickImage() async {
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+
+      // Call the function to upload the image to the server
+      await uploadImageToServer(_image!);
+    }
+  }
+
+  Future<Map<String, dynamic>?> uploadImageToServer(File imageFile) async {
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('https://lpg-api-06n8.onrender.com/api/v1/upload/image'),
+      );
+
+      var fileStream = http.ByteStream(Stream.castFrom(imageFile.openRead()));
+      var length = await imageFile.length();
+
+      String fileExtension = imageFile.path.split('.').last.toLowerCase();
+      var contentType = MediaType('image', 'png');
+
+      Map<String, String> imageExtensions = {
+        'png': 'png',
+        'jpg': 'jpeg',
+        'jpeg': 'jpeg',
+        'gif': 'gif',
+      };
+
+      if (imageExtensions.containsKey(fileExtension)) {
+        contentType = MediaType('image', imageExtensions[fileExtension]!);
+      }
+
+      var multipartFile = http.MultipartFile(
+        'image',
+        fileStream,
+        length,
+        filename: 'image.$fileExtension',
+        contentType: contentType,
+      );
+
+      request.files.add(multipartFile);
+
+      var response = await request.send();
+      if (response.statusCode == 200) {
+        final responseBody = await response.stream.bytesToString();
+        final parsedResponse = json.decode(responseBody);
+        print(parsedResponse);
+        return parsedResponse;
+      } else {
+        print("Image upload failed with status code: ${response.statusCode}");
+        return null;
+      }
+    } catch (e) {
+      print("Image upload failed with error: $e");
+      return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -527,6 +611,54 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                     },
                   ),
                 ),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      isSeniorCheckboxVisible = !isSeniorCheckboxVisible;
+                    });
+                  },
+                  child: const Text("Tap here if you are a Senior Citizen/PWD"),
+                ),
+
+                // Conditionally show the checkbox
+                if (isSeniorCheckboxVisible)
+                  Column(
+                    children: [
+                      _image == null
+                          ? const CircleAvatar(
+                              radius: 50,
+                              backgroundColor: Colors.grey,
+                              child: Icon(
+                                Icons.person,
+                                color: Colors.white,
+                                size: 50,
+                              ),
+                            )
+                          : CircleAvatar(
+                              radius: 50,
+                              backgroundImage: FileImage(_image!),
+                            ),
+                      TextButton(
+                        onPressed: _pickImage,
+                        child: const Text(
+                          "Upload Image",
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontSize: 15.0,
+                          ),
+                        ),
+                      ),
+                      CheckboxListTile(
+                        title: const Text('Yes'),
+                        value: isSeniorChecked,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            isSeniorChecked = value ?? false;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
               ],
             ),
           ),
