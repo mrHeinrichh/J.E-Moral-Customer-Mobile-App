@@ -87,7 +87,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> fetchDataFromAPI() async {
-    final url = Uri.parse('https://lpg-api-06n8.onrender.com/api/v1/items');
+    final url = Uri.parse(
+        'https://lpg-api-06n8.onrender.com/api/v1/items/?&page=1&limit=300');
     final response = await http.get(url);
     if (!mounted) {
       return; // Check if the widget is still in the tree
