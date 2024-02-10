@@ -49,7 +49,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                         children: [
                           Text(item[
                               'productId']), // Assuming 'productId' is the correct field
-                          Text("Quantity: ${item['quantity']}"),
+                          Text("Stock: ${item['stock']}"),
                         ],
                       ),
                     Divider(
@@ -61,7 +61,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                     Text("House#/Lot/Blk: ${widget.transaction.houseLotBlk}"),
                     Text("Payment Method: ${widget.transaction.paymentMethod}"),
                     Text("Assembly: ${widget.transaction.assembly}"),
-                    Text("Delivery Time: ${widget.transaction.deliveryTime}"),
+                    Text("Delivery Time: ${widget.transaction.deliveryDate}"),
                     Text("Total Price: ${widget.transaction.total}"),
                     Text("Date: ${widget.transaction.createdAt}"),
                   ],

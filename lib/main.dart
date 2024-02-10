@@ -67,7 +67,7 @@ class MyApp extends StatelessWidget {
             houseLotBlk: 'Sample House/Lot/Block',
             paymentMethod: 'Sample Payment Method',
             assembly: 'Sample Assembly',
-            deliveryTime: 'Sample Delivery Time',
+            deliveryDate: 'Sample Delivery Time',
             total: 0.0,
             completed: 'Sample Completed',
             hasFeedback: false,
@@ -77,7 +77,7 @@ class MyApp extends StatelessWidget {
             items: [
               {
                 'productId': 'Sample Product ID',
-                'quantity': 0,
+                'stock': 0,
               },
             ],
             deliveryLocation: 'Sample Location',
@@ -96,7 +96,7 @@ class MyApp extends StatelessWidget {
           const productImageUrl = "Placeholder Image URL";
           const description = "Placeholder Description";
           const weight = "Placeholder Weight";
-          const quantity = "Placeholder Quantity";
+          const stock = "Placeholder Stock";
 
           return ProductDetailsPage(
             productName: productName,
@@ -105,7 +105,7 @@ class MyApp extends StatelessWidget {
             category: "Placeholder Category Name",
             description: description,
             weight: weight,
-            quantity: quantity,
+            stock: stock,
           );
         },
       },

@@ -19,7 +19,7 @@ class Transaction {
   final String paymentMethod;
   final String status;
   final String assembly;
-  final String deliveryTime;
+  final String deliveryDate;
   final double total;
   final String cancelReason;
   final String createdAt;
@@ -38,7 +38,7 @@ class Transaction {
     required this.paymentMethod,
     required this.assembly,
     required this.status,
-    required this.deliveryTime,
+    required this.deliveryDate,
     required this.total,
     required this.createdAt,
     required this.items,
@@ -113,8 +113,8 @@ class _MyOrderPageState extends State<MyOrderPage> {
                     cancelReason: transactionData['cancelReason'] != null
                         ? transactionData['cancelReason'].toString()
                         : 'N/A',
-                    deliveryTime: transactionData['deliveryTime'] != null
-                        ? transactionData['deliveryTime'].toString()
+                    deliveryDate: transactionData['deliveryDate'] != null
+                        ? transactionData['deliveryDate'].toString()
                         : 'N/A',
                     total: transactionData['total'].toDouble(),
                     createdAt: transactionData['createdAt'],
@@ -393,14 +393,14 @@ class TransactionDetailsModal extends StatelessWidget {
                 ],
               ),
               Text('Assembly Option : ${transaction.assembly}'),
-              Text('Delivery Date/Time : ${transaction.deliveryTime}'),
+              Text('Delivery Date/Time : ${transaction.deliveryDate}'),
               Text('Items: ${transaction.items}'),
               Row(
                 children: [
                   Text(' ₱  ',
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                  Text('${transaction.price}'),
+                  Text('${transaction.total}'),
                 ],
               ),
               Divider(),

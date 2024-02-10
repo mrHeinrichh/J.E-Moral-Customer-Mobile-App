@@ -39,11 +39,11 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                     Text("List of Products:"),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [Text("Regasco"), Text("Quantity: 1")],
+                      children: [Text("Regasco"), Text("stock: 1")],
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [Text("Regasco"), Text("Quantity: 1")],
+                      children: [Text("Regasco"), Text("stock: 1")],
                     ),
                     Divider(
                       thickness: 1,

@@ -383,20 +383,6 @@ class _ProfilePageState extends State<ProfilePage> {
                             'Email:',
                             '${userData['email']}',
                           ),
-                          buildInfoRow(
-                            context,
-                            'PWD/Senior:',
-                            userData['discounted'] == true
-                                ? 'I am a PWD/Senior'
-                                : 'I\'m not a PWD/Senior',
-                          ),
-                          buildInfoRow(
-                            context,
-                            'Discounts:',
-                            userData['discounted'] == true
-                                ? 'Discounted'
-                                : 'Not Discounted',
-                          ),
                         ],
                       ),
                     ),

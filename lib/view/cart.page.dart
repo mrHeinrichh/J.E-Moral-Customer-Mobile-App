@@ -71,7 +71,7 @@ class _CartPageState extends State<CartPage> {
             double totalPrice = 0.0;
             for (var cartItem in cartItems) {
               if (cartItem.isSelected) {
-                totalPrice += cartItem.price * cartItem.quantity;
+                totalPrice += cartItem.price * cartItem.stock;
               }
             }
             return totalPrice;
@@ -194,7 +194,7 @@ class CartItemWidget extends StatelessWidget {
                     ),
                     const SizedBox(height: 5), // Add some vertical spacing
                     Text(
-                      '₱${cartItem.price * cartItem.quantity}',
+                      '₱${cartItem.price * cartItem.stock}',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
@@ -208,15 +208,15 @@ class CartItemWidget extends StatelessWidget {
                           icon: const Icon(Icons.remove),
                           onPressed: () {
                             Provider.of<CartProvider>(context, listen: false)
-                                .decrementQuantity(cartItem);
+                                .decrementStock(cartItem);
                           },
                         ),
-                        Text('${cartItem.quantity}'),
+                        Text('${cartItem.stock}'),
                         IconButton(
                           icon: const Icon(Icons.add),
                           onPressed: () {
                             Provider.of<CartProvider>(context, listen: false)
-                                .incrementQuantity(cartItem);
+                                .incrementStock(cartItem);
                           },
                         ),
                         const Spacer(), // Use Spacer to push the following IconButton to the right

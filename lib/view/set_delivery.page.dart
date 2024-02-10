@@ -56,7 +56,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
           "name": cartItem.name,
           "customerPrice": cartItem.price,
 
-          "quantity": cartItem.quantity,
+          "stock": cartItem.stock,
         });
       }
     }
