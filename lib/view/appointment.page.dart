@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:customer_app/widgets/custom_button.dart';
 import 'package:provider/provider.dart';
 import 'package:customer_app/view/user_provider.dart';
+import 'package:intl/intl.dart';
 
 class AppointmentPage extends StatefulWidget {
   @override
@@ -13,22 +14,98 @@ class AppointmentPage extends StatefulWidget {
 
 class _AppointmentPageState extends State<AppointmentPage> {
   DateTime? selectedDate = DateTime.now();
+  String? appointmentStatus;
 
   TextEditingController dateController = TextEditingController();
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
+  // Future<void> _selectDateTime(BuildContext context) async {
+  //   final DateTime? pickedDate = await showDatePicker(
+  //     context: context,
+  //     initialDate: DateTime.now(),
+  //     firstDate: DateTime.now(),
+  //     lastDate: DateTime(DateTime.now().year + 1),
+  //   );
+
+  //   if (pickedDate != null) {
+  //     final TimeOfDay? pickedTime = await showTimePicker(
+  //       context: context,
+  //       initialTime: TimeOfDay.now(),
+  //     );
+
+  //     if (pickedTime != null) {
+  //       final selectedDateTime = DateTime(
+  //         pickedDate.year,
+  //         pickedDate.month,
+  //         pickedDate.day,
+  //         pickedTime.hour,
+  //         pickedTime.minute,
+  //       );
+
+  //       setState(() {
+  //         selectedDate = selectedDateTime;
+  //         dateController.text =
+  //             DateFormat('yyyy-MM-dd HH:mm').format(selectedDateTime);
+  //       });
+  //     }
+  //   }
+  // }
+
+  Future<void> _selectDateTime(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: selectedDate ?? DateTime.now(),
-      firstDate: DateTime(2023),
-      lastDate: DateTime(2101),
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(DateTime.now().year + 1),
     );
-    if (picked != null && picked != selectedDate) {
-      setState(() {
-        selectedDate = picked;
-        // Format the selected date
-        dateController.text = '${picked.toLocal()}'.split(' ')[0];
-      });
+
+    if (pickedDate != null) {
+      final TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime:
+            TimeOfDay(hour: 11, minute: 0), // Set initial time to 11:00 AM
+      );
+
+      if (pickedTime != null) {
+        // Check if the picked time is between 11 AM and 3 PM
+        if (pickedTime.hour >= 7 && pickedTime.hour < 19) {
+          final selectedDateTime = DateTime(
+            pickedDate.year,
+            pickedDate.month,
+            pickedDate.day,
+            pickedTime.hour,
+            pickedTime.minute,
+          );
+
+          setState(() {
+            selectedDate = selectedDateTime;
+            dateController.text =
+                DateFormat('yyyy-MM-dd HH:mm').format(selectedDateTime);
+          });
+        } else {
+          // Clear the previous value in the text box
+          dateController.clear();
+
+          // Notify the user that the selected time is not allowed
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: Text('Invalid Time'),
+                content: Text(
+                    'Please select a time between store hours 7:00 AM and 7:00 PM.'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      }
     }
   }
 
@@ -54,45 +131,121 @@ class _AppointmentPageState extends State<AppointmentPage> {
     }
   }
 
-  Future<void> _updateAppointment() async {
+  // Future<void> _updateAppointment() async {
+  //   String? userId = Provider.of<UserProvider>(context, listen: false).userId;
+
+  //   if (userId != null && selectedDate != null) {
+  //     final apiUrl = 'https://lpg-api-06n8.onrender.com/api/v1/users/$userId';
+
+  //     // Format the selected date to the desired format
+  //     String formattedDate = '${selectedDate!.toLocal()}'.split(' ')[0];
+
+  //     final patchData = {
+  //       "appointmentDate": formattedDate,
+  //       "appointmentStatus": "Pending",
+  //       "type": "Customer"
+  //     };
+
+  //     print('Request body: ${jsonEncode(patchData)}'); // Log the request body
+
+  //     try {
+  //       final response = await http.patch(
+  //         Uri.parse(apiUrl),
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //         },
+  //         body: jsonEncode(patchData),
+  //       );
+
+  //       print('Response body: ${response.body}'); // Log the response body
+
+  //       if (response.statusCode == 200) {
+  //         print(response.statusCode);
+  //         print('Appointment updated successfully');
+  //         Navigator.pushNamed(context, dashboardRoute);
+  //       } else {
+  //         print(
+  //             'Failed to update appointment. Status code: ${response.statusCode}');
+  //       }
+  //     } catch (e) {
+  //       print('Error updating appointment: $e');
+  //     }
+  //   }
+  // }
+  Future<void> _updateAppointment(BuildContext context) async {
     String? userId = Provider.of<UserProvider>(context, listen: false).userId;
 
     if (userId != null && selectedDate != null) {
       final apiUrl = 'https://lpg-api-06n8.onrender.com/api/v1/users/$userId';
 
       // Format the selected date to the desired format
-      String formattedDate = '${selectedDate!.toLocal()}'.split(' ')[0];
+      String formattedDateTime =
+          DateFormat('yyyy-MM-dd HH:mm').format(selectedDate!);
 
+      // Define the patch data
       final patchData = {
-        "appointmentDate": formattedDate,
+        "appointmentDate": formattedDateTime, // Include both date and time
         "appointmentStatus": "Pending",
         "type": "Customer"
       };
 
-      print('Request body: ${jsonEncode(patchData)}'); // Log the request body
+      // Create the confirmation dialog
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Confirm Appointment'),
+            content: Text('Selected Date and Time:\n$formattedDateTime'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                },
+                child: Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  // Proceed with setting the appointment
+                  try {
+                    final response = await http.patch(
+                      Uri.parse(apiUrl),
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: jsonEncode(patchData),
+                    );
 
-      try {
-        final response = await http.patch(
-          Uri.parse(apiUrl),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: jsonEncode(patchData),
-        );
+                    if (response.statusCode == 200) {
+                      print(response.statusCode);
+                      print('Appointment updated successfully');
+                      Navigator.of(context).pop(); // Close the dialog
+                      dateController.clear();
 
-        print('Response body: ${response.body}'); // Log the response body
-
-        if (response.statusCode == 200) {
-          print(response.statusCode);
-          print('Appointment updated successfully');
-          Navigator.pushNamed(context, dashboardRoute);
-        } else {
-          print(
-              'Failed to update appointment. Status code: ${response.statusCode}');
-        }
-      } catch (e) {
-        print('Error updating appointment: $e');
-      }
+                      // Display a message
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Appointment confirmed!'),
+                        ),
+                      );
+                      // You can redirect to the same page if needed
+                      // Navigator.pushReplacement(
+                      //   context,
+                      //   MaterialPageRoute(builder: (_) => YourWidget()),
+                      // );
+                    } else {
+                      print(
+                          'Failed to update appointment. Status code: ${response.statusCode}');
+                    }
+                  } catch (e) {
+                    print('Error updating appointment: $e');
+                  }
+                },
+                child: Text('Confirm'),
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
@@ -117,7 +270,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
           color: Colors.black,
         ),
         title: const Padding(
-          padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
+          padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
           child: Text(
             'Applying for a Rider',
             style: TextStyle(color: Color(0xFF232937), fontSize: 24),
@@ -127,61 +280,69 @@ class _AppointmentPageState extends State<AppointmentPage> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(0, 60, 5, 5),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  'Must have...',
-                  style: TextStyle(fontSize: 20),
-                ),
-                SizedBox(height: 20),
-                Text(
-                  '*BioData',
-                  style: TextStyle(fontSize: 20),
-                ),
-                Text(
-                  '*Drivers License ',
-                  style: TextStyle(fontSize: 20),
-                ),
-                Text(
-                  '*NBI Clearance(if available) ',
-                  style: TextStyle(fontSize: 20),
-                ),
-                Text(
-                  '*Fire Safety Certification ',
-                  style: TextStyle(fontSize: 20),
-                ),
-                Text(
-                  '*Verified Maya/Gcash ',
-                  style: TextStyle(fontSize: 20),
-                ),
-                SizedBox(height: 20),
-              ],
+            padding: const EdgeInsets.fromLTRB(30, 30, 30,
+                5), // Adjust the left and right padding values as needed
+            child: Flexible(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    'Greetings user! We appreciate clicking this section and showing your interest in applying as delivery driver. Few reminders, your submission of requirements do not actually mean that you are already accepted. You are still subject to interview based on your appointment date. To expect fast transaction once your application is accepted, prepare the following requirements below: ',
+                    style: TextStyle(fontSize: 17),
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    '-Biodata',
+                    style: TextStyle(fontSize: 17),
+                  ),
+                  Text(
+                    '-Drivers License (1 or 2 - Professional)',
+                    style: TextStyle(fontSize: 17),
+                  ),
+                  Text(
+                    '-Barangay/Police/NBI Clearance(if available)',
+                    style: TextStyle(fontSize: 17),
+                  ),
+                  Text(
+                    '-Fire Safety Certification',
+                    style: TextStyle(fontSize: 17),
+                  ),
+                  Text(
+                    '-Verified Gcash Account',
+                    style: TextStyle(fontSize: 17),
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    'Note: You are required to undergo seminar once hired. Other details will be provided during the interview.',
+                    style: TextStyle(fontSize: 17),
+                  ),
+                ],
+              ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(30.0),
+            padding: const EdgeInsets.all(40.0),
             child: Column(children: [
               GestureDetector(
-                onTap: () => _selectDate(context),
+                onTap: () => _selectDateTime(context),
                 child: AbsorbPointer(
                   child: TextFormField(
                     readOnly: true,
                     controller: dateController,
                     decoration: InputDecoration(
-                      labelText: 'Date',
+                      labelText: 'Date and Time',
                       hintText: 'Select date',
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               SizedBox(
                 width: double.infinity,
                 child: CustomizedButton(
-                  onPressed: _updateAppointment,
+                  onPressed: () => _updateAppointment(
+                      context), // Pass the context to _updateAppointment
                   text: 'Book an Appointment',
                   height: 60,
                   width: 90,
