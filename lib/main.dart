@@ -84,6 +84,7 @@ class MyApp extends StatelessWidget {
             price: 'Sample Price',
             isApproved: 'Sample Status',
             pickupImages: 'Sample Pickup Images',
+            cancellationImages: 'Sample Cancellation Images',
             completionImages: 'Sample Completion Images',
             id: 'Sample ID',
           );

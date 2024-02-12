@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:provider/provider.dart';
 import 'user_provider.dart';
 import 'package:customer_app/routes/app_routes.dart';
+import 'package:photo_view/photo_view.dart';
 
 class Transaction {
   final String deliveryLocation;
@@ -24,7 +25,9 @@ class Transaction {
   final String cancelReason;
   final String createdAt;
   final String pickupImages;
+  final String cancellationImages;
   final String completionImages;
+
   final List<Map<String, dynamic>> items;
 
   Transaction({
@@ -46,8 +49,36 @@ class Transaction {
     required this.cancelReason,
     required this.pickupImages,
     required this.hasFeedback,
+    required this.cancellationImages,
     required this.completionImages,
   });
+}
+
+class ZoomableImage extends StatelessWidget {
+  final String imageUrl;
+
+  ZoomableImage({required this.imageUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Image Proof',
+          style: TextStyle(color: Colors.black),
+        ),
+        backgroundColor: Colors.white,
+        iconTheme:
+            IconThemeData(color: Colors.black), // Set back icon color to black
+      ),
+      body: Container(
+        color: Colors.white,
+        child: PhotoView(
+          imageProvider: NetworkImage(imageUrl),
+        ),
+      ),
+    );
+  }
 }
 
 class MyOrderPage extends StatefulWidget {
@@ -126,6 +157,7 @@ class _MyOrderPageState extends State<MyOrderPage> {
                     completed: transactionData['completed'],
                     pickupImages: transactionData['pickupImages'],
                     hasFeedback: transactionData['hasFeedback'],
+                    cancellationImages: transactionData['cancellationImages'],
                     completionImages: transactionData['completionImages'],
                   ))
               .toList();
@@ -330,116 +362,245 @@ class TransactionDetailsModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            'Transaction Number',
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+    return SingleChildScrollView(
+      child: Container(
+        padding: EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              'Transaction Number',
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          Text(
-            '${transaction.id}',
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+            Text(
+              '${transaction.id}',
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          SizedBox(height: 5),
-          Divider(),
-          SizedBox(height: 5),
-          Row(
-            children: [
-              Text('Status'),
-              Text(' : ${transaction.status}'),
-            ],
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.perm_identity_outlined),
-                  Text(' : ${transaction.name}'),
-                ],
-              ),
-              Row(
-                children: [
-                  Icon(Icons.phone_rounded),
-                  Text(' : ${transaction.contactNumber}'),
-                ],
-              ),
-              Row(
-                children: [
-                  Icon(Icons.house_outlined),
-                  Text(' : ${transaction.houseLotBlk}'),
-                ],
-              ),
-              Row(
-                children: [
-                  Icon(Icons.location_on_outlined),
-                  Text(' ${transaction.deliveryLocation}'),
-                ],
-              ),
-              SizedBox(height: 10),
-              Row(
-                children: [
-                  Icon(Icons.payment_outlined),
-                  Text(' : ${transaction.paymentMethod}'),
-                ],
-              ),
-              Text('Assembly Option : ${transaction.assembly}'),
-              Text('Delivery Date/Time : ${transaction.deliveryDate}'),
-              Text('Items: ${transaction.items}'),
-              Row(
-                children: [
-                  Text(' ₱  ',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                  Text('${transaction.total}'),
-                ],
-              ),
-              Divider(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    children: [
-                      Text('Proof of Pick up:'),
-                      if (transaction.pickupImages != null &&
-                          transaction.pickupImages!.isNotEmpty)
-                        Image.network(
-                          transaction.pickupImages!,
-                          width: 100,
-                          height: 100,
-                        )
-                      else
-                        Text('N/A'),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      Text('Proof of Drop off:'),
-                      if (transaction.completionImages != null &&
-                          transaction.completionImages!.isNotEmpty)
-                        Image.network(
-                          transaction.completionImages!,
-                          width: 100,
-                          height: 100,
-                        )
-                      else
-                        Text('N/A'),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
+            SizedBox(height: 5),
+            Divider(),
+            SizedBox(height: 5),
+            Row(
+              children: [
+                Text(
+                  'Transaction Status',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text(' : ${transaction.status}'),
+              ],
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.perm_identity_outlined),
+                    Text(' : ${transaction.name}'),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Icon(Icons.phone_rounded),
+                    Text(' : ${transaction.contactNumber}'),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Icon(Icons.house_outlined),
+                    Text(' : ${transaction.houseLotBlk}'),
+                  ],
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Icons.location_on_outlined),
+                    Expanded(
+                      child: Text(
+                        ' : ${transaction.deliveryLocation}',
+                        textAlign:
+                            TextAlign.start, // Align text to start (left)
+                      ),
+                    ),
+                  ],
+                ),
+
+                // SizedBox(height: 10),
+                Row(
+                  children: [
+                    Icon(Icons.payment_outlined),
+                    Text(' : ${transaction.paymentMethod}'),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Text(
+                      'Assemble Option',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text(' : ${transaction.assembly}'),
+                  ],
+                ),
+
+                Row(
+                  children: [
+                    Text(
+                      'Delivery Date/Time',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text(' : ${transaction.deliveryDate}'),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Text(
+                      'Items: ',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(
+                        width:
+                            5), // Add some space between "Items:" and the items list
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (transaction.items != null)
+                            Text(
+                              transaction.items!.map((item) {
+                                if (item is Map<String, dynamic> &&
+                                    item.containsKey('name') &&
+                                    item.containsKey('quantity')) {
+                                  return '${item['name']} (${item['quantity']})';
+                                }
+                                return ''; // Return an empty string if 'name' or 'quantity' is not available
+                              }).join(', '), // Join item texts with commas
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
+                Row(
+                  children: [
+                    Text('Total Price ₱',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 15)),
+                    Text('${transaction.total}'),
+                  ],
+                ),
+
+                Divider(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      children: [
+                        Text(
+                          'Pick Up Image',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        if (transaction.pickupImages != null &&
+                            transaction.pickupImages!.isNotEmpty)
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ZoomableImage(
+                                    imageUrl: transaction.pickupImages!,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: ClipOval(
+                              child: Image.network(
+                                transaction.pickupImages!,
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.fitHeight,
+                              ),
+                            ),
+                          )
+                        else
+                          Text('N/A'),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Text(
+                          'Cancellation Image',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        if (transaction.cancellationImages != null &&
+                            transaction.cancellationImages!.isNotEmpty)
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ZoomableImage(
+                                    imageUrl: transaction.cancellationImages!,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: ClipOval(
+                              child: Image.network(
+                                transaction.cancellationImages!,
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.fitHeight,
+                              ),
+                            ),
+                          )
+                        else
+                          Text('N/A'),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Text(
+                          'Dropoff Image',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        if (transaction.completionImages != null &&
+                            transaction.completionImages!.isNotEmpty)
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ZoomableImage(
+                                    imageUrl: transaction.completionImages!,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: ClipOval(
+                              child: Image.network(
+                                transaction.completionImages!,
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit
+                                    .fitHeight, // Make the image cover the circular area
+                              ),
+                            ),
+                          )
+                        else
+                          Text('N/A'),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
