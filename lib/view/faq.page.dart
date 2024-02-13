@@ -1,3 +1,5 @@
+import 'package:customer_app/routes/app_routes.dart';
+import 'package:customer_app/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -70,42 +72,59 @@ class _FaqPageState extends State<FaqPage> {
         ),
         automaticallyImplyLeading: false,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: RefreshIndicator(
-          onRefresh: refreshData,
-          child: ListView.builder(
-            itemCount: faqs.length,
-            itemBuilder: (context, index) {
-              final faq = faqs[index];
-              return GestureDetector(
-                onTap: () {
-                  _showCustomerDetailsModal(faq);
-                },
-                child: Card(
-                  elevation: 3,
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text("${faq['question']}",
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold)),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: CustomButton(
+              backgroundColor: Color(0xFF232937),
+              onPressed: () {
+                Navigator.pushNamed(context, forecastPage);
+              },
+              text: 'View Updated Prices',
+            ),
           ),
-        ),
+          Divider(),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: RefreshIndicator(
+                onRefresh: refreshData,
+                child: ListView.builder(
+                  itemCount: faqs.length,
+                  itemBuilder: (context, index) {
+                    final faq = faqs[index];
+                    return GestureDetector(
+                      onTap: () {
+                        _showCustomerDetailsModal(faq);
+                      },
+                      child: Card(
+                        elevation: 3,
+                        child: Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text("${faq['question']}",
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

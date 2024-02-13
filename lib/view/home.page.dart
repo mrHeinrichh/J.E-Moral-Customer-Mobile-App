@@ -35,9 +35,11 @@ class _HomePageState extends State<HomePage> {
       final parsedData = json.decode(response.body);
       final data = parsedData['data'];
 
-      setState(() {
-        announcements = List<Map<String, dynamic>>.from(data);
-      });
+      if (mounted) {
+        setState(() {
+          announcements = List<Map<String, dynamic>>.from(data);
+        });
+      }
     }
   }
 

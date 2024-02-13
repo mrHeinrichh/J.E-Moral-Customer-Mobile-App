@@ -14,6 +14,7 @@ import 'package:customer_app/view/maps.page.dart';
 import 'package:customer_app/view/my_orders.page.dart';
 import 'package:customer_app/view/onboarding.page.dart';
 import 'package:customer_app/view/orders_details.page.dart';
+import 'package:customer_app/view/price_forecast.page.dart';
 import 'package:customer_app/view/product_details.page.dart';
 import 'package:customer_app/view/set_delivery.page.dart';
 import 'package:customer_app/view/signup.page.dart';
@@ -59,6 +60,7 @@ class MyApp extends StatelessWidget {
         authenticationPage: (context) => AuthenticationPage(),
         feedBackPage: (context) => FeedbackPage(),
         mapsPage: (context) => MapsPage(),
+        forecastPage: (context) => ForecastPage(),
         orderDetailsPage: (context) {
           // Sample Transaction object
           Transaction sampleTransaction = Transaction(

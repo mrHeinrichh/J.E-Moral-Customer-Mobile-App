@@ -15,3 +15,4 @@ const String productDetailsPage = '/productDetailsPage';
 const String feedBackPage = "/feedBackPage";
 const String authenticationPage = '/authenticationPage';
 const String mapsPage = '/mapsPage';
+const String forecastPage = 'forecastPage';
