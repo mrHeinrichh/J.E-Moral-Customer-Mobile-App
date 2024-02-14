@@ -8,29 +8,35 @@ class ForecastPage extends StatefulWidget {
   _ForecastPageState createState() => _ForecastPageState();
 }
 
-Widget buildLineChart(List<PriceData> priceData) {
+Widget buildLineChart(
+    List<PriceData> priceData, DateTime startDate, DateTime endDate) {
   List<FlSpot> spots = priceData.map((data) {
-    // Convert DateTime to milliseconds since epoch for X-axis
-    double x = data.createdAt.millisecondsSinceEpoch.toDouble();
+    // Calculate days since the start date
+    double x = data.createdAt.difference(startDate).inDays.toDouble();
     return FlSpot(x, data.price);
   }).toList();
 
   return LineChart(
     LineChartData(
-      gridData: FlGridData(show: false),
-      titlesData: FlTitlesData(show: false),
+      gridData: FlGridData(show: true),
+      titlesData: FlTitlesData(
+        show: true,
+      ),
       borderData: FlBorderData(show: true),
-      minX: priceData.first.createdAt.millisecondsSinceEpoch.toDouble(),
-      maxX: priceData.last.createdAt.millisecondsSinceEpoch.toDouble(),
-      minY: 0,
+      minX: 0, // Start from 0 days
+      maxX: endDate
+          .difference(startDate)
+          .inDays
+          .toDouble(), // Set to the difference in days
+      minY: priceData.map((data) => data.price).reduce((a, b) => a < b ? a : b),
       maxY: priceData.map((data) => data.price).reduce((a, b) => a > b ? a : b),
       lineBarsData: [
         LineChartBarData(
           spots: spots,
-          isCurved: true,
+          isCurved: false,
           color: Colors.blue,
-          dotData: FlDotData(show: false),
-          belowBarData: BarAreaData(show: false),
+          dotData: FlDotData(show: true),
+          belowBarData: BarAreaData(show: true),
         ),
       ],
     ),
@@ -228,7 +234,7 @@ class _ForecastPageState extends State<ForecastPage> {
             Container(
               // Wrap your LineChart with a Container
               height: 300, // Set a fixed height or adjust based on your needs
-              child: buildLineChart(priceData),
+              child: buildLineChart(priceData, startDate!, endDate!),
             )
           else
             Text('No data available'),
