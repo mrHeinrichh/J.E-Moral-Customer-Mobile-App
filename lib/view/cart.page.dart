@@ -71,7 +71,7 @@ class _CartPageState extends State<CartPage> {
             double totalPrice = 0.0;
             for (var cartItem in cartItems) {
               if (cartItem.isSelected) {
-                totalPrice += cartItem.price * cartItem.stock;
+                totalPrice += cartItem.customerPrice * cartItem.stock;
               }
             }
             return totalPrice;
@@ -194,7 +194,7 @@ class CartItemWidget extends StatelessWidget {
                     ),
                     const SizedBox(height: 5), // Add some vertical spacing
                     Text(
-                      '₱${cartItem.price * cartItem.stock}',
+                      '₱${cartItem.customerPrice * cartItem.stock}',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,

@@ -205,7 +205,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       CartItem(
                         id: widget.productName.hashCode,
                         name: widget.productName,
-                        price: double.parse(widget.productPrice),
+                        customerPrice: double.parse(widget.productPrice),
                         stock: stock,
                         imageUrl: widget.productImageUrl,
                       ),

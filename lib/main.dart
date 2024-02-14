@@ -83,7 +83,7 @@ class MyApp extends StatelessWidget {
               },
             ],
             deliveryLocation: 'Sample Location',
-            price: 'Sample Price',
+            customerPrice: 'Sample CustomerPrice',
             isApproved: 'Sample Status',
             pickupImages: 'Sample Pickup Images',
             cancellationImages: 'Sample Cancellation Images',

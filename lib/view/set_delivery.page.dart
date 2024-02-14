@@ -54,9 +54,9 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
           "productId":
               cartItem.id, // Use the name as a placeholder for the product ID
           "name": cartItem.name,
-          "customerPrice": cartItem.price,
+          "customerPrice": cartItem.customerPrice,
 
-          "stock": cartItem.stock,
+          "quantity": cartItem.stock,
         });
       }
     }
@@ -108,8 +108,6 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
         Provider.of<CartProvider>(context, listen: false);
     final List<Map<String, dynamic>> itemsList =
         convertCartItems(cartProvider.cartItems);
-    double totalPrice = cartProvider.calculateTotalPrice();
-
     final UserProvider userProvider =
         Provider.of<UserProvider>(context, listen: false);
     final String userId = userProvider.userId ?? '';
@@ -162,6 +160,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
         body: json.encode(requestData),
         headers: {'Content-Type': 'application/json'},
       );
+      print(json.encode(requestData));
 
       if (response.statusCode == 200) {
         print('Transaction successful');

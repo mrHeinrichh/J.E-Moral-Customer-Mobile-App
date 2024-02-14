@@ -54,7 +54,7 @@ class _TransactionCardState extends State<TransactionCard> {
                       ),
                     ),
                     const Spacer(),
-                    Text(widget.transaction.price),
+                    Text(widget.transaction.customerPrice),
                   ],
                 ),
                 Text("Status: ${widget.transaction.status}"),

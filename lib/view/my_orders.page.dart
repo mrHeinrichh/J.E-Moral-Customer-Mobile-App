@@ -9,7 +9,7 @@ import 'package:photo_view/photo_view.dart';
 
 class Transaction {
   final String deliveryLocation;
-  final String price;
+  final String customerPrice;
   final dynamic isApproved;
   final bool hasFeedback;
   final dynamic completed;
@@ -32,7 +32,7 @@ class Transaction {
 
   Transaction({
     required this.deliveryLocation,
-    required this.price,
+    required this.customerPrice,
     required this.isApproved,
     required this.id,
     required this.name,
@@ -128,8 +128,8 @@ class _MyOrderPageState extends State<MyOrderPage> {
                       transactionData['deleted'] == false)
               .map((transactionData) => Transaction(
                     deliveryLocation: transactionData['deliveryLocation'],
-                    price: transactionData['price'] != null
-                        ? transactionData['price'].toString()
+                    customerPrice: transactionData['customerPrice'] != null
+                        ? transactionData['customerPrice'].toString()
                         : 'N/A',
                     isApproved: transactionData['isApproved'],
                     id: transactionData['_id'],
