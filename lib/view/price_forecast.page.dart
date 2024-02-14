@@ -2,10 +2,42 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class ForecastPage extends StatefulWidget {
   @override
   _ForecastPageState createState() => _ForecastPageState();
+}
+
+class ResponseCard extends StatelessWidget {
+  final PriceData priceData;
+
+  ResponseCard({required this.priceData});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+      child: Card(
+        margin: EdgeInsets.symmetric(vertical: 10),
+        child: ListTile(
+          title: Text(priceData.item),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Price: \₱${priceData.price.toString()}'),
+              Text('Changed at: ${_formatDate(priceData.createdAt)}'),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    // Customize the date format according to your needs
+    return DateFormat.yMMMd().add_Hm().format(date);
+  }
 }
 
 Widget buildLineChart(
@@ -23,11 +55,8 @@ Widget buildLineChart(
         show: true,
       ),
       borderData: FlBorderData(show: true),
-      minX: 0, // Start from 0 days
-      maxX: endDate
-          .difference(startDate)
-          .inDays
-          .toDouble(), // Set to the difference in days
+      minX: startDate.day.toDouble(), // Start from 0 days
+      maxX: endDate.difference(startDate).inDays.toDouble(),
       minY: priceData.map((data) => data.price).reduce((a, b) => a < b ? a : b),
       maxY: priceData.map((data) => data.price).reduce((a, b) => a > b ? a : b),
       lineBarsData: [
@@ -145,100 +174,103 @@ class _ForecastPageState extends State<ForecastPage> {
           style: TextStyle(color: Color(0xFF232937), fontSize: 24),
         ),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          FutureBuilder<List<Item>?>(
-            future: fetchItems(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator();
-              } else if (snapshot.hasError || snapshot.data == null) {
-                return Text(
-                    'Error: ${snapshot.error ?? "Unable to fetch data"}');
-              } else {
-                List<Item> items = snapshot.data!;
-                List<DropdownMenuItem<Item>> dropdownItems = items
-                    .map(
-                      (item) => DropdownMenuItem<Item>(
-                        value: item,
-                        child: Text(item.name ?? ''),
-                      ),
-                    )
-                    .toList();
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            FutureBuilder<List<Item>?>(
+              future: fetchItems(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                } else if (snapshot.hasError || snapshot.data == null) {
+                  return Text(
+                      'Error: ${snapshot.error ?? "Unable to fetch data"}');
+                } else {
+                  List<Item> items = snapshot.data!;
+                  List<DropdownMenuItem<Item>> dropdownItems = items
+                      .map(
+                        (item) => DropdownMenuItem<Item>(
+                          value: item,
+                          child: Text(item.name ?? ''),
+                        ),
+                      )
+                      .toList();
 
-                if (startDate != null && endDate != null) {
-                  dropdownItems.add(
-                    DropdownMenuItem<Item>(
-                      value: Item(id: 'custom_date', name: 'Custom Date'),
-                      child: Text(
-                        'Start: ${startDate?.toLocal()} - End: ${endDate?.toLocal()}',
+                  if (startDate != null && endDate != null) {
+                    dropdownItems.add(
+                      DropdownMenuItem<Item>(
+                        value: Item(id: 'custom_date', name: 'Custom Date'),
+                        child: Text(
+                          'Start: ${startDate?.toLocal()} - End: ${endDate?.toLocal()}',
+                        ),
                       ),
+                    );
+                  }
+
+                  return Padding(
+                    padding: const EdgeInsets.all(50.0),
+                    child: Column(
+                      children: [
+                        Container(
+                          width: 300,
+                          child: DropdownButton<Item>(
+                            isExpanded: true,
+                            items: dropdownItems,
+                            onChanged: (selectedItem) {
+                              setState(() {
+                                selectedDropdownItem = selectedItem;
+                              });
+
+                              if (selectedItem != null &&
+                                  selectedItem.id == 'custom_date') {
+                                _selectStartDate(context);
+                              } else if (selectedItem != null) {
+                                fetchData();
+                              }
+                            },
+                            hint: Text(
+                                selectedDropdownItem?.name ?? 'Select an item'),
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () => _selectStartDate(context),
+                              child: Text('Select Start Date'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () => _selectEndDate(context),
+                              child: Text('Select End Date'),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 20),
+                        Text(
+                          'Start Date: ${startDate?.toLocal().toString() ?? 'Not selected'}',
+                        ),
+                        Text(
+                          'End Date: ${endDate?.toLocal().toString() ?? 'Not selected'}',
+                        ),
+                      ],
                     ),
                   );
                 }
-
-                return Padding(
-                  padding: const EdgeInsets.all(50.0),
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 300,
-                        child: DropdownButton<Item>(
-                          isExpanded: true,
-                          items: dropdownItems,
-                          onChanged: (selectedItem) {
-                            setState(() {
-                              selectedDropdownItem = selectedItem;
-                            });
-
-                            if (selectedItem != null &&
-                                selectedItem.id == 'custom_date') {
-                              _selectStartDate(context);
-                            } else if (selectedItem != null) {
-                              fetchData();
-                            }
-                          },
-                          hint: Text(
-                              selectedDropdownItem?.name ?? 'Select an item'),
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () => _selectStartDate(context),
-                            child: Text('Select Start Date'),
-                          ),
-                          ElevatedButton(
-                            onPressed: () => _selectEndDate(context),
-                            child: Text('Select End Date'),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 20),
-                      Text(
-                        'Start Date: ${startDate?.toLocal().toString() ?? 'Not selected'}',
-                      ),
-                      Text(
-                        'End Date: ${endDate?.toLocal().toString() ?? 'Not selected'}',
-                      ),
-                    ],
-                  ),
-                );
-              }
-            },
-          ),
-          if (priceData.isNotEmpty)
-            Container(
-              // Wrap your LineChart with a Container
-              height: 300, // Set a fixed height or adjust based on your needs
-              child: buildLineChart(priceData, startDate!, endDate!),
-            )
-          else
-            Text('No data available'),
-        ],
+              },
+            ),
+            if (priceData.isNotEmpty)
+              Container(
+                // Wrap your LineChart with a Container
+                height: 300, // Set a fixed height or adjust based on your needs
+                child: buildLineChart(priceData, startDate!, endDate!),
+              )
+            else
+              Text('No data available'),
+            ...priceData.map((data) => ResponseCard(priceData: data)).toList(),
+          ],
+        ),
       ),
     );
   }
@@ -266,6 +298,7 @@ class PriceData {
   final bool deleted;
   final DateTime createdAt;
   final DateTime updatedAt;
+
   final int v;
 
   PriceData({
