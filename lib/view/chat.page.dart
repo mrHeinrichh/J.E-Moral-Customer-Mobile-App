@@ -14,10 +14,8 @@ class MessageProvider extends ChangeNotifier {
   List<Map<String, dynamic>> _messages = [];
 
   List<Map<String, dynamic>> get messages => _messages;
-
   void addMessages(List<Map<String, dynamic>> newMessages) {
     for (var message in newMessages.reversed) {
-      // Check if the message is not already in the list
       if (!_messages
           .any((existingMessage) => existingMessage['_id'] == message['_id'])) {
         _messages.insert(0, message);
@@ -40,16 +38,35 @@ class _ChatPageState extends State<ChatPage> {
   int _currentPage = 1;
   int _totalMessagesLoaded = 0;
 
+  String? _selectedCustomerId;
+
   @override
   void initState() {
     super.initState();
     initializeSocketIO();
-    // fetchAndUpdateMessages();
-    fetchMessages().then((initialMessages) {
-      Provider.of<MessageProvider>(context, listen: false)
-          .addMessages(initialMessages);
-    });
     print('initState: Socket.IO initialized');
+
+    // Use the user ID from UserProvider
+    String? userId = Provider.of<UserProvider>(context, listen: false).userId;
+
+    // Assuming you have the customer ID available
+    String customerId =
+        "65c73688e4f434d230d289e8"; // Set the appropriate customer ID
+
+    // Call fetchMessagesForCustomer to load initial messages
+    fetchAndAddMessages(userId, customerId);
+  }
+
+  Future<void> fetchAndAddMessages(
+      String? fromUserId, String toCustomerId) async {
+    if (fromUserId != null) {
+      List<Map<String, dynamic>> messages =
+          await fetchMessagesForCustomer(fromUserId, toCustomerId);
+      Provider.of<MessageProvider>(context, listen: false)
+          .addMessages(messages);
+    } else {
+      print('User ID is null');
+    }
   }
 
   void initializeSocketIO() {
@@ -60,7 +77,6 @@ class _ChatPageState extends State<ChatPage> {
 
     socket.on('createdMessage', (data) {
       print('Incoming message: $data');
-      // Provider.of<MessageProvider>(context, listen: false).addMessages([data]);
       _scrollController.animateTo(
         _scrollController.position.maxScrollExtent,
         duration: Duration(milliseconds: 300),
@@ -70,90 +86,19 @@ class _ChatPageState extends State<ChatPage> {
     socket.connect();
   }
 
-  // Future<List<Map<String, dynamic>>> fetchRealTimeMessages() async {
-  //   final userId = Provider.of<UserProvider>(context, listen: false).userId;
+  Future<List<Map<String, dynamic>>> fetchMessagesForCustomer(
+      String fromUserId, String toCustomerId) async {
+    final filter = {
+      "\$or": [
+        {"from": fromUserId, "to": toCustomerId},
+        {"from": toCustomerId, "to": fromUserId}
+      ]
+    };
 
-  //   // Ensure there's a valid userId before making the request
-  //   if (userId != null && userId.isNotEmpty) {
-  //     final response = await http.get(
-  //       Uri.parse(
-  //         'https://lpg-api-06n8.onrender.com/api/v1/realtime-messages?user=$userId',
-  //       ),
-  //     );
-
-  //     if (response.statusCode == 200) {
-  //       final Map<String, dynamic> data = json.decode(response.body);
-  //       if (data['status'] == 'success') {
-  //         List<Map<String, dynamic>> messages =
-  //             List<Map<String, dynamic>>.from(data['data']);
-  //         messages.sort((a, b) => a['createdAt'].compareTo(b['createdAt']));
-  //         return messages;
-  //       } else {
-  //         print('Failed to fetch real-time messages');
-  //         return [];
-  //       }
-  //     } else {
-  //       print(
-  //           'Failed to fetch real-time messages. Status code: ${response.statusCode}');
-  //       return [];
-  //     }
-  //   } else {
-  //     print('Invalid userId');
-  //     return [];
-  //   }
-  // }
-
-  // Future<void> fetchAndUpdateMessages() async {
-  //   final historicalMessages = await fetchMessages();
-  //   // final realTimeMessages = await fetchRealTimeMessages();
-
-  //   final List<Map<String, dynamic>> allMessages = [
-  //     ...historicalMessages,
-  //     // ...realTimeMessages
-  //   ];
-  //   allMessages.sort((a, b) => a['createdAt'].compareTo(b['createdAt']));
-
-  //   Provider.of<MessageProvider>(context, listen: false)
-  //       .addMessages(allMessages);
-  // }
-
-  // Future<void> loadMoreMessages() async {
-  //   if (_isLoading) {
-  //     return;
-  //   }
-
-  //   _isLoading = true;
-
-  //   try {
-  //     final moreMessages = await fetchMessages();
-
-  //     if (moreMessages.isEmpty) {
-  //       return;
-  //     }
-
-  //     final List<Map<String, dynamic>> currentMessages =
-  //         await Provider.of<MessageProvider>(context, listen: false).messages;
-
-  //     // Insert new messages at the beginning of the list
-  //     final List<Map<String, dynamic>> updatedMessages =
-  //         List.from(currentMessages)..insertAll(0, moreMessages);
-
-  //     Provider.of<MessageProvider>(context, listen: false)
-  //         .addMessages(updatedMessages);
-
-  //     // Update the total number of messages loaded
-  //     _totalMessagesLoaded += moreMessages.length;
-  //   } catch (e) {
-  //     // Handle error
-  //   } finally {
-  //     _isLoading = false;
-  //   }
-  // }
-
-  Future<List<Map<String, dynamic>>> fetchMessages() async {
     final response = await http.get(
       Uri.parse(
-          'https://lpg-api-06n8.onrender.com/api/v1/messages?user=65b22992487344e8f166604d&page=$_currentPage&limit=100'),
+        'https://lpg-api-06n8.onrender.com/api/v1/messages?filter=${jsonEncode(filter)}&page=$_currentPage&limit=100',
+      ),
     );
 
     if (response.statusCode == 200) {
@@ -161,14 +106,18 @@ class _ChatPageState extends State<ChatPage> {
       if (data['status'] == 'success') {
         List<Map<String, dynamic>> messages =
             List<Map<String, dynamic>>.from(data['data']);
-        messages.sort((a, b) => a['createdAt'].compareTo(b['createdAt']));
+
+        // Sort messages by createdAt timestamp in descending order
+        messages.sort((a, b) => b['createdAt'].compareTo(a['createdAt']));
+
         return messages;
       } else {
-        print('Failed to fetch messages');
+        print('Failed to fetch messages for customer $toCustomerId');
         return [];
       }
     } else {
-      print('Failed to fetch messages. Status code: ${response.statusCode}');
+      print(
+          'Failed to fetch messages for customer $toCustomerId. Status code: ${response.statusCode}');
       return [];
     }
   }
@@ -176,14 +125,15 @@ class _ChatPageState extends State<ChatPage> {
   Future<void> sendMessage(String content) async {
     final String? userId =
         Provider.of<UserProvider>(context, listen: false).userId;
+    String? customerId = _selectedCustomerId; // Get the selected customer ID
 
-    if (userId == null) {
-      // Handle the case where the user ID is not available
+    if (userId == null || customerId == null) {
       return;
     }
 
     final Map<String, dynamic> messageData = {
-      "user": userId,
+      "from": userId,
+      "to": customerId, // Set the selected customer ID as the 'to' field
       "content": content,
     };
 
@@ -231,9 +181,7 @@ class _ChatPageState extends State<ChatPage> {
                     _totalMessagesLoaded >
                         Provider.of<MessageProvider>(context, listen: false)
                             .messages
-                            .length) {
-                  // loadMoreMessages();
-                }
+                            .length) {}
                 return false;
               },
               child: Expanded(
@@ -253,7 +201,7 @@ class _ChatPageState extends State<ChatPage> {
                         final userId =
                             Provider.of<UserProvider>(context, listen: false)
                                 .userId;
-                        final isCurrentUser = message['user'] == userId;
+                        final isCurrentUser = message['from'] == userId;
                         return Container(
                           margin: EdgeInsets.symmetric(vertical: 8.0),
                           child: Row(
