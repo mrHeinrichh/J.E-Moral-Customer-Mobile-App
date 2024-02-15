@@ -123,17 +123,14 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Future<void> sendMessage(String content) async {
+    print('sendMessage called with content: $content');
     final String? userId =
         Provider.of<UserProvider>(context, listen: false).userId;
-    String? customerId = _selectedCustomerId; // Get the selected customer ID
-
-    if (userId == null || customerId == null) {
-      return;
-    }
 
     final Map<String, dynamic> messageData = {
       "from": userId,
-      "to": customerId, // Set the selected customer ID as the 'to' field
+      "to":
+          "65c73688e4f434d230d289e8", // Set the selected customer ID as the 'to' field
       "content": content,
     };
 
@@ -145,6 +142,8 @@ class _ChatPageState extends State<ChatPage> {
       );
 
       if (response.statusCode == 200) {
+        print(' ${response.statusCode}');
+        print('Response body: ${response.body}');
         final Map<String, dynamic> responseData = json.decode(response.body);
         final Map<String, dynamic> newMessage = responseData['data'][0];
         Provider.of<MessageProvider>(context, listen: false)
@@ -268,20 +267,25 @@ class _ChatPageState extends State<ChatPage> {
               icon: Icon(Icons.send),
               onPressed: () {
                 String messageContent = _textController.text;
+                print('Message content: $messageContent');
                 if (messageContent.isNotEmpty) {
                   sendMessage(messageContent);
                   _textController.clear();
                 }
               },
-            ),
+            )
           ],
         ),
       ),
     );
   }
 
+  FocusNode _focusNode = FocusNode();
+
   @override
   void dispose() {
+    _textController.dispose();
+    _focusNode.dispose();
     socket.disconnect();
     super.dispose();
   }
