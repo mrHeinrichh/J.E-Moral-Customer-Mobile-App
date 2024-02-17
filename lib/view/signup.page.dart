@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:customer_app/routes/app_routes.dart';
 import 'package:customer_app/view/login.page.dart';
 import 'package:customer_app/widgets/custom_button.dart';
@@ -37,8 +36,8 @@ class _SignupPageState extends State<SignupPage> {
         await ImagePicker().pickImage(source: ImageSource.camera);
 
     if (pickedFile != null) {
-      final imageFile = File(pickedFile.path); //
-      _imageStreamController.sink.add(imageFile); //
+      final imageFile = File(pickedFile.path);
+      _imageStreamController.sink.add(imageFile);
       setState(() {
         _image = File(pickedFile.path);
       });
@@ -50,8 +49,8 @@ class _SignupPageState extends State<SignupPage> {
         await ImagePicker().pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
-      final imageFile = File(pickedFile.path); //
-      _imageStreamController.sink.add(imageFile); //
+      final imageFile = File(pickedFile.path);
+      _imageStreamController.sink.add(imageFile);
       setState(() {
         _image = File(pickedFile.path);
       });
@@ -208,30 +207,6 @@ class _SignupPageState extends State<SignupPage> {
                           const SizedBox(height: 10.0),
                           const Divider(),
                           const SizedBox(height: 10.0),
-                          // _image == null
-                          //     ? const CircleAvatar(
-                          //         radius: 50,
-                          //         backgroundColor: Colors.grey,
-                          //         child: Icon(
-                          //           Icons.person,
-                          //           color: Colors.white,
-                          //           size: 50,
-                          //         ),
-                          //       )
-                          //     : CircleAvatar(
-                          //         radius: 50,
-                          //         backgroundImage: FileImage(_image!),
-                          //       ),
-                          // TextButton(
-                          //   onPressed: _pickImage,
-                          //   child: const Text(
-                          //     "Upload Image",
-                          //     style: TextStyle(
-                          //       color: Colors.blue,
-                          //       fontSize: 15.0,
-                          //     ),
-                          //   ),
-                          // ),
                           StreamBuilder<File?>(
                             stream: _imageStreamController.stream,
                             builder: (context, snapshot) {

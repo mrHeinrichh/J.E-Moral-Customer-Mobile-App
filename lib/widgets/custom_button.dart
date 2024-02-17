@@ -136,12 +136,11 @@ class ProfileButton extends StatelessWidget {
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         primary: text == 'Logout'
-            ? Colors.red
-            : Colors.black87, // Change the background color as needed
-        elevation: 2, // Add elevation to the button
+            ? Colors.red.withOpacity(0.9)
+            : const Color(0xFF232937),
+        elevation: 4,
         shape: RoundedRectangleBorder(
-          borderRadius:
-              BorderRadius.circular(10.0), // Adjust the border radius as needed
+          borderRadius: BorderRadius.circular(10.0),
         ),
       ),
       child: Container(
@@ -152,6 +151,42 @@ class ProfileButton extends StatelessWidget {
           text,
           style: const TextStyle(
             color: Colors.white,
+            fontSize: 16,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class OkButton extends StatelessWidget {
+  final VoidCallback onPressed;
+  final String text;
+
+  OkButton({
+    required this.onPressed,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        primary: Colors.white,
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+      ),
+      child: Container(
+        width: double.infinity,
+        alignment: Alignment.center,
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: Text(
+          text,
+          style: const TextStyle(
+            color: Colors.black,
             fontSize: 16,
           ),
         ),

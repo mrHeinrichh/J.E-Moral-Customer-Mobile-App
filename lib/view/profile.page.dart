@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:customer_app/routes/app_routes.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -8,6 +9,7 @@ import 'dart:convert';
 import 'package:customer_app/view/user_provider.dart';
 import 'package:customer_app/widgets/custom_button.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:intl/intl.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -251,6 +253,23 @@ class _ProfilePageState extends State<ProfilePage> {
     print(userId);
   }
 
+  bool isViewAppointmentVisible = true;
+  bool isCardVisible = false;
+
+  void _showAppointmentCard() {
+    setState(() {
+      isViewAppointmentVisible = false;
+      isCardVisible = true;
+    });
+  }
+
+  void _hideAppointmentCard() {
+    setState(() {
+      isViewAppointmentVisible = true;
+      isCardVisible = false;
+    });
+  }
+
   Widget buildProfileWidget(Map<String, dynamic> userDetails, String? userId) {
     final userData = userDetails['data'][0];
 
@@ -305,11 +324,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           bottomLeft: Radius.elliptical(50, 50),
                           bottomRight: Radius.elliptical(50, 50),
                         ),
-                        image: DecorationImage(
-                          fit: BoxFit.cover,
-                          image: NetworkImage(
-                              'https://res.cloudinary.com/dzcjbziwt/image/upload/v1706332431/images/kzy9lx9mrsuajd0vdqpy.jpg'),
-                        ),
+                        color: Color(0xFF232937),
                       ),
                     ),
                   ),
@@ -388,6 +403,81 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ),
                   const SizedBox(height: 5),
+                  if (userData['appointmentStatus'] == "Pending" ||
+                      userData['appointmentStatus'] == "Approved")
+                    Column(
+                      children: [
+                        if (isViewAppointmentVisible)
+                          ProfileButton(
+                            onPressed: _showAppointmentCard,
+                            text: "View Appointment",
+                          ),
+                        if (isCardVisible)
+                          Card(
+                            elevation: 5,
+                            child: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Column(
+                                children: [
+                                  Text(
+                                    "Appointment Schedule!",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium!
+                                        .apply(color: Colors.black),
+                                  ),
+                                  Text(
+                                    "*Applying as a Delivery Driver*",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall!
+                                        .apply(color: Colors.black),
+                                  ),
+                                  const Divider(),
+                                  buildInfoRowStatus(
+                                    context,
+                                    'Status: ',
+                                    '${userData['appointmentStatus']}',
+                                    userData,
+                                  ),
+                                  buildInfoRow(
+                                    context,
+                                    'Date:',
+                                    DateFormat('MMM d, y').format(
+                                      DateTime.parse(
+                                          userData['appointmentDate']),
+                                    ),
+                                  ),
+                                  buildInfoRow(
+                                    context,
+                                    'Time:',
+                                    DateFormat('h:mm a ').format(
+                                      DateTime.parse(
+                                          userData['appointmentDate']),
+                                    ),
+                                  ),
+                                  // ProfileButton(
+                                  //   onPressed: () async {
+                                  //     Navigator.pushNamed(
+                                  //         context, appointmentRoute);
+                                  //   },
+                                  //   text: "Update Appointment",
+                                  // ),
+                                  // const SizedBox(height: 5),
+                                  // OkButton(
+                                  //   onPressed: _hideAppointmentCard,
+                                  //   text: "Ok",
+                                  // ),
+                                  ProfileButton(
+                                    onPressed: _hideAppointmentCard,
+                                    text: "Ok",
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   Center(
                     child: Column(
                       children: [
@@ -431,8 +521,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             TextButton(
                                               onPressed: () async {
                                                 await _pickImage();
-                                                setState(
-                                                    () {}); // Rebuild the content after picking image
+                                                setState(() {});
                                               },
                                               child: const Text(
                                                 "Upload Image",
@@ -620,6 +709,35 @@ class _ProfilePageState extends State<ProfilePage> {
                 .textTheme
                 .bodyMedium!
                 .copyWith(fontWeight: FontWeight.bold),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget buildInfoRowStatus(BuildContext context, String label, String value,
+      Map<String, dynamic> userData) {
+    return Row(
+      children: [
+        Expanded(
+          flex: 3,
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.bodySmall,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        Expanded(
+          flex: 5,
+          child: Text(
+            value,
+            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: userData['appointmentStatus'] == "Pending"
+                      ? Colors.red
+                      : Colors.green,
+                ),
             overflow: TextOverflow.ellipsis,
           ),
         ),
