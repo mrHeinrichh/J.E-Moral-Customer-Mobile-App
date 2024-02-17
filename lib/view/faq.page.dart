@@ -156,14 +156,13 @@ class _FaqPageState extends State<FaqPage> {
                   ),
                 ),
                 const SizedBox(height: 15),
-                faq['image'] != null
-                    ? Image.network(
-                        faq['image'],
-                        width: 300,
-                        height: 300,
-                        fit: BoxFit.cover,
-                      )
-                    : Container(),
+                if (faq['image'] != "")
+                  Image.network(
+                    faq['image'],
+                    width: 300,
+                    height: 300,
+                    fit: BoxFit.cover,
+                  )
               ],
             ),
           ),

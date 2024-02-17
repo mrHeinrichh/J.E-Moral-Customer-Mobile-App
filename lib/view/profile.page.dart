@@ -755,7 +755,17 @@ class _ProfilePageState extends State<ProfilePage> {
           print('Connection State: ${snapshot.connectionState}');
           if (snapshot.connectionState == ConnectionState.waiting) {
             print('Waiting for data...');
-            return const CircularProgressIndicator();
+            return Center(
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 3,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                      Theme.of(context).primaryColor),
+                ),
+              ),
+            );
           } else if (snapshot.hasError || snapshot.data == null) {
             print('Error loading user details: ${snapshot.error}');
             return const Text('Error loading user details');
