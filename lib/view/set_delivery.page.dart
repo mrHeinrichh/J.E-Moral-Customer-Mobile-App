@@ -182,22 +182,163 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Confirmation'),
+          title: const Text('Delivery Confirmation'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Delivery Location: ${locationController.text}'),
-              Text('Name: ${nameController.text}'),
-              Text('Contact Number: ${contactNumberController.text}'),
-              Text('House#/Lot/Blk: ${houseNumberController.text}'),
-              Text('Barangay $selectedBarangay'),
-              Text('Scheduled Date and Time: ${selectedDateTime.toString()}'),
-              Text(
-                'Payment Method: ${paymentMethodToString(selectedPaymentMethod)}',
+              RichText(
+                text: TextSpan(
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: 'Delivery Location: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextSpan(
+                      text: locationController.text,
+                    ),
+                  ],
+                ),
               ),
-              Text(
-                  'Needs to be assembled: ${selectedAssemblyOption.toString()}'),
+              RichText(
+                text: TextSpan(
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: 'Receiver Name: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextSpan(
+                      text: nameController.text,
+                    ),
+                  ],
+                ),
+              ),
+              RichText(
+                text: TextSpan(
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: 'Receiver Contact Number: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextSpan(
+                      text: contactNumberController.text,
+                    ),
+                  ],
+                ),
+              ),
+              RichText(
+                text: TextSpan(
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: 'Receiver House #/Lot/Blk: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextSpan(
+                      text: houseNumberController.text,
+                    ),
+                  ],
+                ),
+              ),
+              RichText(
+                text: TextSpan(
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: 'Barangay: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextSpan(
+                      text: selectedBarangay,
+                    ),
+                  ],
+                ),
+              ),
+              RichText(
+                text: TextSpan(
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: 'Scheduled Date and Time: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextSpan(
+                      text: selectedDateTime.toString(),
+                    ),
+                  ],
+                ),
+              ),
+              RichText(
+                text: TextSpan(
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: 'Payment Method: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextSpan(
+                      text: paymentMethodToString(selectedPaymentMethod),
+                    ),
+                  ],
+                ),
+              ),
+              RichText(
+                text: TextSpan(
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: 'Need to be Assembled: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextSpan(
+                      text: selectedAssemblyOption.toString(),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
           actions: [
@@ -308,22 +449,163 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Confirmation'),
+          title: const Text('Delivery Confirmation'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Delivery Location: ${locationController.text}'),
-              Text('Name: ${nameController.text}'),
-              Text('Contact Number: ${contactNumberController.text}'),
-              Text('House#/Lot/Blk: ${houseNumberController.text}'),
-              Text('Barangay $selectedBarangay'),
-              Text('Scheduled Date and Time: ${selectedDateTime.toString()}'),
-              Text(
-                'Payment Method: ${paymentMethodToString(selectedPaymentMethod)}',
+              RichText(
+                text: TextSpan(
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: 'Delivery Location: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextSpan(
+                      text: locationController.text,
+                    ),
+                  ],
+                ),
               ),
-              Text(
-                  'Needs to be assembled: ${selectedAssemblyOption.toString()}'),
+              RichText(
+                text: TextSpan(
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: 'Receiver Name: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextSpan(
+                      text: nameController.text,
+                    ),
+                  ],
+                ),
+              ),
+              RichText(
+                text: TextSpan(
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: 'Receiver Contact Number: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextSpan(
+                      text: contactNumberController.text,
+                    ),
+                  ],
+                ),
+              ),
+              RichText(
+                text: TextSpan(
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: 'Receiver House #/Lot/Blk: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextSpan(
+                      text: houseNumberController.text,
+                    ),
+                  ],
+                ),
+              ),
+              RichText(
+                text: TextSpan(
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: 'Barangay: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextSpan(
+                      text: selectedBarangay,
+                    ),
+                  ],
+                ),
+              ),
+              RichText(
+                text: TextSpan(
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: 'Scheduled Date and Time: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextSpan(
+                      text: selectedDateTime.toString(),
+                    ),
+                  ],
+                ),
+              ),
+              RichText(
+                text: TextSpan(
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: 'Payment Method: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextSpan(
+                      text: paymentMethodToString(selectedPaymentMethod),
+                    ),
+                  ],
+                ),
+              ),
+              RichText(
+                text: TextSpan(
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: 'Need to be Assembled: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextSpan(
+                      text: selectedAssemblyOption.toString(),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
           actions: [
@@ -462,7 +744,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
         elevation: 0,
         backgroundColor: Colors.white,
         title: const Text(
-          'Set Delivery',
+          'Delivery Information',
           style: TextStyle(color: Color(0xFF232937), fontSize: 24),
         ),
         leading: IconButton(
@@ -521,18 +803,18 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                 ),
                 const SizedBox(height: 10),
                 CustomTextField1(
-                  labelText: 'Name',
-                  hintText: 'Enter your Name',
+                  labelText: 'Receiver Name',
+                  hintText: 'Enter Receiver Name',
                   controller: nameController,
                 ),
                 CustomTextField1(
-                  labelText: 'Contact Number',
-                  hintText: 'Enter your contact number',
+                  labelText: 'Receiver Contact Number',
+                  hintText: 'Enter Receiver Contact Number',
                   controller: contactNumberController,
                 ),
                 CustomTextField1(
-                  labelText: 'House#/Lot/Blk',
-                  hintText: 'Enter your house number',
+                  labelText: 'Receiver House #/Lot/Blk',
+                  hintText: 'Enter Receiver House Information',
                   controller: houseNumberController,
                 ),
                 const SizedBox(height: 5),
@@ -561,7 +843,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                 const SizedBox(height: 20),
                 const Text("Choose Payment Method"),
                 ListTile(
-                  title: const Text('Cash On Delivery'),
+                  title: const Text('Cash on Delivery'),
                   leading: Radio<String>(
                     value: 'COD',
                     groupValue: selectedPaymentMethod,
@@ -615,7 +897,19 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                       isSeniorCheckboxVisible = !isSeniorCheckboxVisible;
                     });
                   },
-                  child: const Text("Tap here if you are a Senior Citizen/PWD"),
+                  child: Center(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const Text(
+                          "Avail Discount for PWD/Senior Citizen",
+                        ),
+                        // const Text(
+                        //   "Click Here to Upload ID Image",
+                        // ),
+                      ],
+                    ),
+                  ),
                 ),
 
                 // Conditionally show the checkbox
@@ -625,7 +919,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                       _image == null
                           ? Container(
                               width: 300,
-                              height: 300,
+                              height: 150,
                               decoration: BoxDecoration(
                                 color: Colors.grey,
                                 borderRadius: BorderRadius.circular(
@@ -674,10 +968,42 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                   if (areThereNoErrors()) {
                     final selectedDate = await showDateTimePicker(context);
                     if (selectedDate != null) {
-                      setState(() {
-                        selectedDateTime = selectedDate;
-                        showConfirmationDialog();
-                      });
+                      // Extract the time from the selected date
+                      final selectedTime = TimeOfDay.fromDateTime(selectedDate);
+
+                      // Define the start and end times for delivery
+                      final startTime = TimeOfDay(hour: 7, minute: 0);
+                      final endTime = TimeOfDay(hour: 19, minute: 0);
+
+                      // Check if the selected time is within the valid range
+                      if (selectedTime.hour >= startTime.hour &&
+                          selectedTime.hour <= endTime.hour) {
+                        setState(() {
+                          selectedDateTime = selectedDate;
+                          showConfirmationDialog();
+                        });
+                      } else {
+                        // Show an error message if the selected time is outside the valid range
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Invalid Time'),
+                              content: Text(
+                                'Please select a time between 7 AM and 7 PM for delivery.',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text('OK'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
                     }
                   }
                 },
@@ -686,29 +1012,21 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                 width: 160,
                 fontz: 20,
               ),
+              // Button onPressed handler
               CustomizedButton(
                 onPressed: () {
                   clearFieldErrors();
                   displayFieldErrors();
 
                   if (areThereNoErrors()) {
-                    if (isWithinDeliveryHours()) {
-                      confirmDialog();
-                    } else {
-                      if (!deliveryNoticeShown) {
-                        showAlertDialog(context);
-                        setState(() {
-                          deliveryNoticeShown = true;
-                        });
-                      }
-                    }
+                    confirmDialog();
                   }
                 },
                 text: 'Deliver Now',
                 height: 50,
                 width: 160,
                 fontz: 20,
-                enabled: !deliveryNoticeShown,
+                enabled: true, // Enable the button regardless of the time
               ),
             ],
           ),
