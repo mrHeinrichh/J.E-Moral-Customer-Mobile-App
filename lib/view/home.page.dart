@@ -233,7 +233,7 @@ class _HomePageState extends State<HomePage> {
                                   color: Color(0xFF232937),
                                 ),
                               ),
-                              const Text('Applying for a Rider?'),
+                              const Text('Applying for a Delivery Driver?'),
                               CustomizedButton(
                                 onPressed: () {
                                   Navigator.pushNamed(

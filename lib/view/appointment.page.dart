@@ -272,7 +272,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
         title: const Padding(
           padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
           child: Text(
-            'Applying for a Rider',
+            'Applying for a Delivery Driver?',
             style: TextStyle(color: Color(0xFF232937), fontSize: 24),
           ),
         ),

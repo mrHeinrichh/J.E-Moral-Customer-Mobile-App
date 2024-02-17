@@ -53,7 +53,7 @@ class PrivacyPolicyDialog extends StatelessWidget {
               ),
 
               Text(
-                "\n•Delivery riders may also have access to your personal information, especially on the time of purchase for delivery.",
+                "\n•Delivery drivers may also have access to your personal information, especially on the time of purchase for delivery.",
                 style: TextStyle(
                   fontSize: 15.0,
                 ),
