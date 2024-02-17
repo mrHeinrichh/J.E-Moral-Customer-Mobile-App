@@ -91,27 +91,28 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     ],
                   ),
                   const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 2,
-                        child: Text(
-                          "Weight:",
-                          style: Theme.of(context).textTheme.labelMedium,
+                  if (widget.category != "Accessories")
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            "Weight:",
+                            style: Theme.of(context).textTheme.labelMedium,
+                          ),
                         ),
-                      ),
-                      Expanded(
-                        flex: 4,
-                        child: Text(
-                          "${widget.weight} kg.",
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium!
-                              .copyWith(fontWeight: FontWeight.bold),
+                        Expanded(
+                          flex: 4,
+                          child: Text(
+                            "${widget.weight} kg.",
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(fontWeight: FontWeight.bold),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
                 ],
               ),
             ),
@@ -201,16 +202,39 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 ),
                 CustomizedButton(
                   onPressed: () {
-                    cartProvider.addToCart(
-                      CartItem(
-                        id: widget.productName.hashCode,
-                        name: widget.productName,
-                        customerPrice: double.parse(widget.productPrice),
-                        stock: stock,
-                        imageUrl: widget.productImageUrl,
-                      ),
-                    );
-                    Navigator.pushNamed(context, cartRoute);
+                    // Check if the desired quantity exceeds the available stock
+                    if (stock <= int.parse(widget.stock)) {
+                      cartProvider.addToCart(
+                        CartItem(
+                          id: widget.productName.hashCode,
+                          name: widget.productName,
+                          customerPrice: double.parse(widget.productPrice),
+                          stock: stock,
+                          imageUrl: widget.productImageUrl,
+                        ),
+                      );
+                      Navigator.pushNamed(context, cartRoute);
+                    } else {
+                      // Show an error message or perform any other action when the quantity exceeds the available stock
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Error'),
+                            content: Text(
+                                'The quantity exceeds the available stock.'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text('OK'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }
                   },
                   text: 'Add to Cart',
                   height: 50,
