@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:provider/provider.dart';
 import 'user_provider.dart';
+import 'package:intl/intl.dart';
 
 class HistoryPage extends StatefulWidget {
   @override
@@ -102,26 +103,181 @@ class _HistoryPageState extends State<HistoryPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Order #${i + 1}'),
-                        Text('Name: ${completedTransactions[i]['name']}'),
                         Text(
-                            'Contact Number: ${completedTransactions[i]['contactNumber']}'),
-                        Text(
-                            'House/Lot/Blk: ${completedTransactions[i]['houseLotBlk']}'),
-                        Text(
-                            'Payment Method: ${completedTransactions[i]['paymentMethod']}'),
-                        Text(
-                            'Delivery Time: ${completedTransactions[i]['deliveryTime']}'),
-                        Text('Total: ${completedTransactions[i]['total']}'),
-                        Text(
-                            'Delivery Location: ${completedTransactions[i]['deliveryLocation']}'),
-                        Text('Price: ${completedTransactions[i]['price']}'),
-                        Text(
-                            'Is Approved: ${completedTransactions[i]['isApproved']}'),
-                        Text(
-                            'Barangay: ${completedTransactions[i]['barangay']}'),
-                        Text(
-                            'Picked Up: ${completedTransactions[i]['pickedUp']}'),
+                          'Order #${i + 1}',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              const TextSpan(
+                                text: "Receiver Name: ",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              TextSpan(
+                                text: '${completedTransactions[i]['name']}',
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              const TextSpan(
+                                text: "Receiver Contact Number: ",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              TextSpan(
+                                text:
+                                    '${completedTransactions[i]['contactNumber']}',
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              const TextSpan(
+                                text: "Pin Location: ",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              TextSpan(
+                                text:
+                                    '${completedTransactions[i]['deliveryLocation']}',
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              const TextSpan(
+                                text: "Receiver House Number: ",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              TextSpan(
+                                text:
+                                    '${completedTransactions[i]['houseLotBlk']}',
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              const TextSpan(
+                                text: "Barangay: ",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              TextSpan(
+                                text: '${completedTransactions[i]['barangay']}',
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              const TextSpan(
+                                text: "Payment Method: ",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              TextSpan(
+                                text:
+                                    '${completedTransactions[i]['paymentMethod']}',
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: 'Assemble Option: ',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              TextSpan(
+                                text: completedTransactions[i]['assembly']
+                                    ? 'Yes'
+                                    : 'No',
+                              ),
+                            ],
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Text(
+                              'Delivery Date/Time: ',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              completedTransactions[i]['deliveryTime'] != null
+                                  ? DateFormat('MMM d, y - h:mm a').format(
+                                      DateTime.parse(completedTransactions[i]
+                                          ['deliveryTime']),
+                                    )
+                                  : 'null',
+                            ),
+                          ],
+                        ),
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: "Items: ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              if (completedTransactions[i]['items'] != null)
+                                TextSpan(
+                                  text: (completedTransactions[i]['items']
+                                          as List)
+                                      .map((item) {
+                                    if (item is Map<String, dynamic> &&
+                                        item.containsKey('name') &&
+                                        item.containsKey('quantity')) {
+                                      return '${item['name']} (${item['quantity']})';
+                                    }
+                                    return '';
+                                  }).join(', '),
+                                ),
+                            ],
+                          ),
+                        ),
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              const TextSpan(
+                                text: "Total Price: ",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              TextSpan(
+                                text: '${completedTransactions[i]['total']}',
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),

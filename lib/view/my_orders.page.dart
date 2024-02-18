@@ -394,35 +394,94 @@ class TransactionDetailsModal extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  children: [
-                    const Icon(Icons.perm_identity_outlined),
-                    Text(' : ${transaction.name}'),
-                  ],
-                ),
-                Row(
-                  children: [
-                    const Icon(Icons.phone_rounded),
-                    Text(' : ${transaction.contactNumber}'),
-                  ],
-                ),
-                Row(
-                  children: [
-                    const Icon(Icons.house_outlined),
-                    Text(' : ${transaction.houseLotBlk}'),
-                  ],
-                ),
-                Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.location_on_outlined),
                     Expanded(
-                      child: Text(
-                        ' : ${transaction.deliveryLocation}',
+                      child: Text.rich(
+                        TextSpan(
+                          children: [
+                            WidgetSpan(
+                              child: const Icon(Icons.perm_identity_outlined),
+                            ),
+                            TextSpan(
+                              text: ' : ${transaction.name}',
+                            ),
+                          ],
+                        ),
                         textAlign: TextAlign.start,
                       ),
                     ),
                   ],
                 ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text.rich(
+                        TextSpan(
+                          children: [
+                            WidgetSpan(
+                              child: const Icon(Icons.phone_rounded),
+                            ),
+                            TextSpan(
+                              text: ' : ${transaction.contactNumber}',
+                            ),
+                          ],
+                        ),
+                        textAlign: TextAlign.start,
+                      ),
+                    ),
+                  ],
+                ),
+
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text.rich(
+                        TextSpan(
+                          children: [
+                            WidgetSpan(
+                              child: const Icon(Icons.location_on_outlined),
+                            ),
+                            TextSpan(
+                              text: ' : ${transaction.deliveryLocation}',
+                            ),
+                          ],
+                        ),
+                        textAlign: TextAlign.start,
+                      ),
+                    ),
+                  ],
+                ),
+
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text.rich(
+                        TextSpan(
+                          children: [
+                            WidgetSpan(
+                              child: const Icon(Icons.house_outlined),
+                            ),
+                            TextSpan(
+                              text: ' : ${transaction.houseLotBlk}',
+                            ),
+                          ],
+                        ),
+                        textAlign: TextAlign.start,
+                      ),
+                    ),
+                  ],
+                ),
+
+                // Row(
+                //   children: [
+                //     const Icon(Icons.house_outlined),
+                //     Text(' : ${transaction.houseLotBlk}'),
+                //   ],
+                // ),
                 Row(
                   children: [
                     const Icon(Icons.payment_outlined),
@@ -432,7 +491,7 @@ class TransactionDetailsModal extends StatelessWidget {
                 Row(
                   children: [
                     const Text(
-                      'To be Assembled: ',
+                      'Assemble Option: ',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Text(
@@ -452,27 +511,27 @@ class TransactionDetailsModal extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    const Text(
-                      'Items: ',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(width: 5),
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (transaction.items != null)
-                            Text(
-                              transaction.items!.map((item) {
-                                if (item is Map<String, dynamic> &&
-                                    item.containsKey('name') &&
-                                    item.containsKey('quantity')) {
-                                  return '${item['name']} (${item['quantity']})';
-                                }
-                                return '';
-                              }).join(', '),
+                      child: Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: 'Items: ',
+                              style: TextStyle(fontWeight: FontWeight.bold),
                             ),
-                        ],
+                            if (transaction.items != null)
+                              TextSpan(
+                                text: transaction.items!.map((item) {
+                                  if (item is Map<String, dynamic> &&
+                                      item.containsKey('name') &&
+                                      item.containsKey('quantity')) {
+                                    return '${item['name']} (${item['quantity']})';
+                                  }
+                                  return '';
+                                }).join(', '),
+                              ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
