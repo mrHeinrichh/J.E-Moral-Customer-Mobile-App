@@ -276,7 +276,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                 ),
                               ),
                               TextSpan(
-                                text: '${completedTransactions[i]['total']}',
+                                text: '₱${completedTransactions[i]['total']}',
                               ),
                             ],
                           ),
