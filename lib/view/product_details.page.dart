@@ -220,9 +220,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         context: context,
                         builder: (BuildContext context) {
                           return AlertDialog(
-                            title: Text('Error'),
+                            title: Text('Invalid Quantity'),
                             content: Text(
-                                'The quantity exceeds the available stock.'),
+                                'The chosen quantity exceeds the available stock for this product.'),
                             actions: [
                               TextButton(
                                 onPressed: () {

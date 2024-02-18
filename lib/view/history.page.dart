@@ -220,23 +220,26 @@ class _HistoryPageState extends State<HistoryPage> {
                             ],
                           ),
                         ),
-                        Row(
-                          children: [
-                            Text(
-                              'Delivery Date/Time: ',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: 'Delivery Date/Time: ',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            Text(
-                              completedTransactions[i]['deliveryTime'] != null
-                                  ? DateFormat('MMM d, y - h:mm a').format(
-                                      DateTime.parse(completedTransactions[i]
-                                          ['deliveryTime']),
-                                    )
-                                  : 'null',
-                            ),
-                          ],
+                              TextSpan(
+                                text: completedTransactions[i]['updatedAt'] !=
+                                        null
+                                    ? DateFormat('MMM d, y - h:mm a').format(
+                                        DateTime.parse(completedTransactions[i]
+                                            ['updatedAt']),
+                                      )
+                                    : 'null',
+                              ),
+                            ],
+                          ),
                         ),
                         Text.rich(
                           TextSpan(
