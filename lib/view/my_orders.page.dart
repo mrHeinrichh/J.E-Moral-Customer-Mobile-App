@@ -1,6 +1,7 @@
 import 'package:customer_app/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'package:provider/provider.dart';
 import 'user_provider.dart';
@@ -63,13 +64,12 @@ class ZoomableImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Image Proof',
           style: TextStyle(color: Colors.black),
         ),
         backgroundColor: Colors.white,
-        iconTheme:
-            IconThemeData(color: Colors.black), // Set back icon color to black
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: Container(
         color: Colors.white,
@@ -104,7 +104,6 @@ class _MyOrderPageState extends State<MyOrderPage> {
   Future<void> fetchTransactions(String userId) async {
     final apiUrl = 'https://lpg-api-06n8.onrender.com/api/v1/transactions';
 
-    // Use the query parameter to filter by 'to' and '__t' fields
     final filterQuery = '{"to": "$userId", "__t": "Delivery"}';
     final searchUrl = '$apiUrl/?filter=$filterQuery';
 
@@ -162,12 +161,8 @@ class _MyOrderPageState extends State<MyOrderPage> {
                   ))
               .toList();
         });
-      } else {
-        // Handle unexpected data format or other API errors
-      }
-    } else {
-      // Handle HTTP error
-    }
+      } else {}
+    } else {}
   }
 
   Future<void> deleteTransaction(String transactionId) async {
@@ -201,7 +196,6 @@ class _MyOrderPageState extends State<MyOrderPage> {
           IconButton(
             icon: Icon(Icons.refresh),
             onPressed: () {
-              // Add logic to refresh the page here
               final userProvider =
                   Provider.of<UserProvider>(context, listen: false);
               final userId = userProvider.userId;
@@ -213,7 +207,7 @@ class _MyOrderPageState extends State<MyOrderPage> {
           ),
         ],
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pushReplacementNamed(context, dashboardRoute);
           },
@@ -259,16 +253,16 @@ class _TransactionCardState extends State<TransactionCard> {
   Color getTrackOrderButtonColor() {
     return widget.transaction.status.toString() == "On Going" ||
             widget.transaction.status.toString() == "Completed"
-        ? Color(0xFF232937)
-        : Color(0xFFAFB7C9);
+        ? const Color(0xFF232937)
+        : const Color(0xFFAFB7C9);
   }
 
   Color getCancelOrderButtonColor() {
     return widget.transaction.status.toString() == "On Going" ||
             widget.transaction.status.toString() == "Approved" ||
             widget.transaction.status.toString() == "Completed"
-        ? Color(0xFFAFB7C9)
-        : Color(0xFF232937);
+        ? const Color(0xFFAFB7C9)
+        : const Color(0xFF232937);
   }
 
   String getTrackOrderButtonText() {
@@ -312,7 +306,8 @@ class _TransactionCardState extends State<TransactionCard> {
                         ),
                       ),
                       const Spacer(),
-                      Text("${widget.transaction.total}"),
+                      Text(
+                          "₱${NumberFormat.decimalPattern().format(widget.transaction.total)}"),
                     ],
                   ),
                   Text("Status: ${widget.transaction.status}"),
@@ -321,28 +316,29 @@ class _TransactionCardState extends State<TransactionCard> {
                         widget.transaction.cancelReason.isNotEmpty,
                     child: Text(
                       "Cancel Reason: ${widget.transaction.cancelReason}",
-                      style: TextStyle(
-                          fontSize: 16), // Adjust the font size as needed
+                      style: const TextStyle(fontSize: 16),
                     ),
                   ),
                   CustomButton(
                     backgroundColor: getTrackOrderButtonColor(),
-                    onPressed: getTrackOrderButtonColor() == Color(0xFFAFB7C9)
-                        ? () {} // Provide an empty function for disabled state
-                        : () {
-                            Navigator.pushNamed(
-                              context,
-                              authenticationPage,
-                              arguments: widget.transaction,
-                            );
-                          },
+                    onPressed:
+                        getTrackOrderButtonColor() == const Color(0xFFAFB7C9)
+                            ? () {}
+                            : () {
+                                Navigator.pushNamed(
+                                  context,
+                                  authenticationPage,
+                                  arguments: widget.transaction,
+                                );
+                              },
                     text: getTrackOrderButtonText(),
                   ),
                   CustomButton(
                     backgroundColor: getCancelOrderButtonColor(),
-                    onPressed: getCancelOrderButtonColor() == Color(0xFFAFB7C9)
-                        ? () {}
-                        : widget.onDeleteTransaction,
+                    onPressed:
+                        getCancelOrderButtonColor() == const Color(0xFFAFB7C9)
+                            ? () {}
+                            : widget.onDeleteTransaction,
                     text: 'Archive Order',
                   ),
                 ],
@@ -364,30 +360,30 @@ class TransactionDetailsModal extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Container(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
+            const Text(
               'Transaction Number',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
             Text(
-              '${transaction.id}',
+              transaction.id,
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 5),
-            Divider(),
-            SizedBox(height: 5),
+            const SizedBox(height: 5),
+            const Divider(),
+            const SizedBox(height: 5),
             Row(
               children: [
-                Text(
+                const Text(
                   'Transaction Status',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
@@ -399,71 +395,68 @@ class TransactionDetailsModal extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.perm_identity_outlined),
+                    const Icon(Icons.perm_identity_outlined),
                     Text(' : ${transaction.name}'),
                   ],
                 ),
                 Row(
                   children: [
-                    Icon(Icons.phone_rounded),
+                    const Icon(Icons.phone_rounded),
                     Text(' : ${transaction.contactNumber}'),
                   ],
                 ),
                 Row(
                   children: [
-                    Icon(Icons.house_outlined),
+                    const Icon(Icons.house_outlined),
                     Text(' : ${transaction.houseLotBlk}'),
                   ],
                 ),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.location_on_outlined),
+                    const Icon(Icons.location_on_outlined),
                     Expanded(
                       child: Text(
                         ' : ${transaction.deliveryLocation}',
-                        textAlign:
-                            TextAlign.start, // Align text to start (left)
+                        textAlign: TextAlign.start,
                       ),
                     ),
                   ],
                 ),
-
-                // SizedBox(height: 10),
                 Row(
                   children: [
-                    Icon(Icons.payment_outlined),
+                    const Icon(Icons.payment_outlined),
                     Text(' : ${transaction.paymentMethod}'),
                   ],
                 ),
                 Row(
                   children: [
-                    Text(
-                      'Assemble Option',
+                    const Text(
+                      'To be Assembled: ',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    Text(' : ${transaction.assembly}'),
-                  ],
-                ),
-
-                Row(
-                  children: [
                     Text(
-                      'Delivery Date/Time',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      transaction.paymentMethod.isNotEmpty ? 'Yes' : 'No',
                     ),
-                    Text(' : ${transaction.deliveryDate}'),
                   ],
                 ),
                 Row(
                   children: [
-                    Text(
+                    const Text(
+                      'Delivery Date/Time: ',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text(DateFormat('MMM d, y - h:mm a ')
+                        .format(DateTime.parse(transaction.deliveryDate))),
+                  ],
+                ),
+                Row(
+                  children: [
+                    const Text(
                       'Items: ',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(
-                        width:
-                            5), // Add some space between "Items:" and the items list
+                    const SizedBox(width: 5),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -476,36 +469,35 @@ class TransactionDetailsModal extends StatelessWidget {
                                     item.containsKey('quantity')) {
                                   return '${item['name']} (${item['quantity']})';
                                 }
-                                return ''; // Return an empty string if 'name' or 'quantity' is not available
-                              }).join(', '), // Join item texts with commas
+                                return '';
+                              }).join(', '),
                             ),
                         ],
                       ),
                     ),
                   ],
                 ),
-
                 Row(
                   children: [
-                    Text('Total Price ₱',
+                    const Text('Total Price: ',
                         style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 15)),
-                    Text('${transaction.total}'),
+                    Text(
+                      '₱${NumberFormat.decimalPattern().format(transaction.total)}',
+                    ),
                   ],
                 ),
-
-                Divider(),
+                const Divider(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Column(
                       children: [
-                        Text(
-                          'Pick Up Image',
+                        const Text(
+                          'Pick-up Image',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        if (transaction.pickupImages != null &&
-                            transaction.pickupImages!.isNotEmpty)
+                        if (transaction.pickupImages != "")
                           GestureDetector(
                             onTap: () {
                               Navigator.push(
@@ -527,17 +519,47 @@ class TransactionDetailsModal extends StatelessWidget {
                             ),
                           )
                         else
-                          Text('N/A'),
+                          const Text(''),
                       ],
                     ),
                     Column(
                       children: [
-                        Text(
-                          'Cancellation Image',
+                        const Text(
+                          'Drop-off Image',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        if (transaction.cancellationImages != null &&
-                            transaction.cancellationImages!.isNotEmpty)
+                        if (transaction.completionImages != "")
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ZoomableImage(
+                                    imageUrl: transaction.completionImages!,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: ClipOval(
+                              child: Image.network(
+                                transaction.completionImages!,
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.fitHeight,
+                              ),
+                            ),
+                          )
+                        else
+                          const Text(''),
+                      ],
+                    ),
+                    if (transaction.cancellationImages != "")
+                      Column(
+                        children: [
+                          const Text(
+                            'Cancellation Image',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
                           GestureDetector(
                             onTap: () {
                               Navigator.push(
@@ -558,43 +580,8 @@ class TransactionDetailsModal extends StatelessWidget {
                               ),
                             ),
                           )
-                        else
-                          Text('N/A'),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Text(
-                          'Dropoff Image',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        if (transaction.completionImages != null &&
-                            transaction.completionImages!.isNotEmpty)
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ZoomableImage(
-                                    imageUrl: transaction.completionImages!,
-                                  ),
-                                ),
-                              );
-                            },
-                            child: ClipOval(
-                              child: Image.network(
-                                transaction.completionImages!,
-                                width: 100,
-                                height: 100,
-                                fit: BoxFit
-                                    .fitHeight, // Make the image cover the circular area
-                              ),
-                            ),
-                          )
-                        else
-                          Text('N/A'),
-                      ],
-                    ),
+                        ],
+                      ),
                   ],
                 ),
               ],
