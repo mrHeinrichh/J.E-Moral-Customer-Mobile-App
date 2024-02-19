@@ -305,6 +305,75 @@ class _FeedbackPageState extends State<FeedbackPage> {
   }
 
   Future<void> submitFeedback(Transaction transaction) async {
+    // List<String> feedbackValues = getFeedbackValues();
+
+    // Validate ratings
+    if (rating == 0.0 ||
+        rating1 == 0.0 ||
+        rating2 == 0.0 ||
+        rating3 == 0.0 ||
+        rating4 == 0.0) {
+      // Show error message for missing ratings
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Error"),
+            content: Text("Please provide ratings for all categories."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
+    if (userInterfaceController.text.trim().isEmpty ||
+        userInterfaceController.text.length < 5 ||
+        easeofNavigationController.text.trim().isEmpty ||
+        easeofNavigationController.text.length < 5 ||
+        orderTimeController.text.trim().isEmpty ||
+        orderTimeController.text.length < 5 ||
+        riderandDeliveryserviceController.text.trim().isEmpty ||
+        riderandDeliveryserviceController.text.length < 5 ||
+        announcementsController.text.trim().isEmpty ||
+        announcementsController.text.length < 5) {
+      // Show error message for missing or insufficient explanations
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Error"),
+            content: Text(
+                "Please provide explanations for all categories and ensure each explanation is at least 5 characters long."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
+    // Map<String, dynamic> feedbackData = {
+    //   "hasFeedback": 'true',
+    //   "feedback":
+    //       getFeedbackValues().join(', '), // Join the array into a string
+    //   "_id": transaction.id,
+    //   "__t": "Delivery"
+    // };
+
     List<String> feedbackValues = getFeedbackValues();
 
     Map<String, dynamic> feedbackData = {

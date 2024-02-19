@@ -104,7 +104,8 @@ class _MyOrderPageState extends State<MyOrderPage> {
   Future<void> fetchTransactions(String userId) async {
     final apiUrl = 'https://lpg-api-06n8.onrender.com/api/v1/transactions';
 
-    final filterQuery = '{"to": "$userId", "__t": "Delivery"}';
+    final filterQuery =
+        '{"to": "$userId", "__t": "Delivery", "hasFeedback": false}';
     final searchUrl = '$apiUrl/?filter=$filterQuery';
 
     final response = await http.get(Uri.parse(searchUrl));
@@ -433,7 +434,6 @@ class TransactionDetailsModal extends StatelessWidget {
                     ),
                   ],
                 ),
-
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -454,7 +454,6 @@ class TransactionDetailsModal extends StatelessWidget {
                     ),
                   ],
                 ),
-
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -475,13 +474,6 @@ class TransactionDetailsModal extends StatelessWidget {
                     ),
                   ],
                 ),
-
-                // Row(
-                //   children: [
-                //     const Icon(Icons.house_outlined),
-                //     Text(' : ${transaction.houseLotBlk}'),
-                //   ],
-                // ),
                 Row(
                   children: [
                     const Icon(Icons.payment_outlined),
