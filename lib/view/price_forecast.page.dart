@@ -21,7 +21,7 @@ class ResponseCard extends StatelessWidget {
       child: Card(
         margin: EdgeInsets.symmetric(vertical: 10),
         child: ListTile(
-          title: Text(priceData.item),
+          // title: Text(priceData.item),
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
