@@ -26,6 +26,7 @@ class ResponseCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Price: \₱${priceData.price.toString()}'),
+              Text('Reason: \₱${priceData.reason.toString()}'),
               Text('Changed at: ${_formatDate(priceData.createdAt)}'),
             ],
           ),
@@ -293,6 +294,8 @@ class Item {
 class PriceData {
   final String id;
   final String item;
+  final String reason;
+
   final double price;
   final String type;
   final bool deleted;
@@ -304,6 +307,7 @@ class PriceData {
   PriceData({
     required this.id,
     required this.item,
+    required this.reason,
     required this.price,
     required this.type,
     required this.deleted,
@@ -316,6 +320,7 @@ class PriceData {
     return PriceData(
       id: json['_id'],
       item: json['item'],
+      reason: json['reason'],
       price: json['price'].toDouble(),
       type: json['type'],
       deleted: json['deleted'],
