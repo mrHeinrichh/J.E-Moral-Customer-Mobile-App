@@ -8,11 +8,12 @@ class SignupButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      margin: const EdgeInsets.symmetric(vertical: 4.0),
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white, // Background color
+          backgroundColor: Colors.white,
+          elevation: 4,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30),
           ),
@@ -22,9 +23,44 @@ class SignupButton extends StatelessWidget {
           alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(vertical: 16),
           child: const Text(
-            "Signup",
+            "Create an Account",
             style: TextStyle(
-              color: Colors.black,
+              color: Color(0xFF050404),
+              fontSize: 18,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class SignupBackButton extends StatelessWidget {
+  final VoidCallback onPressed;
+
+  SignupBackButton({required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4.0),
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.white,
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+        ),
+        child: Container(
+          width: double.infinity,
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: const Text(
+            "Back",
+            style: TextStyle(
+              color: Color(0xFF050404),
               fontSize: 18,
             ),
           ),

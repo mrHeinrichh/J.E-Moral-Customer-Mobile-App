@@ -48,8 +48,7 @@ class CustomWhiteButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor:
-            const Color.fromARGB(255, 255, 255, 255), // Background color
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30),
         ),
@@ -188,6 +187,41 @@ class OkButton extends StatelessWidget {
           style: const TextStyle(
             color: Colors.black,
             fontSize: 16,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class GoBackButton extends StatelessWidget {
+  final VoidCallback onPressed;
+
+  GoBackButton({required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4.0),
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.white,
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+        ),
+        child: Container(
+          width: double.infinity,
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: const Text(
+            'Back',
+            style: TextStyle(
+              color: Color(0xFF050404),
+              fontSize: 18,
+            ),
           ),
         ),
       ),

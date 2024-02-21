@@ -1,3 +1,4 @@
+import 'package:customer_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -95,27 +96,24 @@ class _LoginPageState extends State<LoginPage> {
                   children: <Widget>[
                     const SizedBox(height: 60.0),
                     Image.network(
-                      'https://raw.githubusercontent.com/mrHeinrichh/J.E-Moral-cdn/main/assets/png/logo-main.png',
+                      // 'https://raw.githubusercontent.com/mrHeinrichh/J.E-Moral-cdn/main/assets/png/logo-main.png',
+                      "https://res.cloudinary.com/dzcjbziwt/image/upload/v1708533697/images/hefwwla0ozppgz5itlkt.png",
                       width: 550.0,
                       height: null,
                     ),
                     const SizedBox(height: 50.0),
-                    TextField(
+                    LoginTextField(
                       controller: emailController,
-                      decoration: InputDecoration(
-                        labelText: "Email Address",
-                        hintText: "Enter your Email Address",
-                      ),
+                      labelText: "Email Address",
+                      hintText: "Enter your Email Address",
                     ),
-                    TextField(
+                    LoginTextField(
                       controller: passwordController,
                       obscureText: true,
-                      decoration: InputDecoration(
-                        labelText: "Password",
-                        hintText: "Enter your Password",
-                      ),
+                      labelText: "Password",
+                      hintText: "Enter your Password",
                     ),
-                    SizedBox(height: 30.0),
+                    const SizedBox(height: 30.0),
                     Column(
                       children: [
                         LoginButton(
@@ -127,20 +125,28 @@ class _LoginPageState extends State<LoginPage> {
                             );
 
                             print('Login Result: $loginResult');
-
                             if (loginResult.containsKey('error')) {
                               showDialog(
                                 context: context,
                                 builder: (context) {
                                   return AlertDialog(
-                                    title: Text('Login Failed'),
+                                    title: Text(
+                                      'Login Failed',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
                                     content: Text(loginResult['error']),
                                     actions: [
                                       TextButton(
                                         onPressed: () {
                                           Navigator.of(context).pop();
                                         },
-                                        child: Text('OK'),
+                                        child: Text(
+                                          'OK',
+                                          style: TextStyle(
+                                            color: Color(0xFF050404),
+                                          ),
+                                        ),
                                       ),
                                     ],
                                   );
@@ -151,12 +157,11 @@ class _LoginPageState extends State<LoginPage> {
                             }
                           },
                         ),
-                        SizedBox(height: 16),
-                        CustomWhiteButton(
+                        const SizedBox(height: 5),
+                        GoBackButton(
                           onPressed: () {
                             Navigator.pushNamed(context, onboardingRoute);
                           },
-                          text: "Back",
                         ),
                       ],
                     )
@@ -167,9 +172,11 @@ class _LoginPageState extends State<LoginPage> {
           ),
           if (Provider.of<UserProvider>(context).isLoading)
             Container(
-              color: Colors.black.withOpacity(0.5),
-              child: Center(
-                child: CircularProgressIndicator(),
+              color: const Color(0xFF050404).withOpacity(0.5),
+              child: const Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
               ),
             ),
         ],
