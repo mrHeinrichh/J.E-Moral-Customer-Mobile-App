@@ -36,16 +36,15 @@ class PrivacyPolicyDialog extends StatelessWidget {
                 ),
                 textAlign: TextAlign.justify,
               ),
-
               Text(
-                "\n•To full access the service of the system, we will collect your personal information, including your name, email address, personal image, and any other personal information you provide to us.",
+                "\n•To fully access the service of the system, we will collect your personal and receiver's information, including your name, email address, personal image, and any other personal information you provide to us.",
                 style: TextStyle(
                   fontSize: 15.0,
                 ),
                 textAlign: TextAlign.justify,
               ),
               Text(
-                "\n•Administrator/s only have the right to edit your personal information as a retailer, only by having your personal consent.",
+                "\n•Administrator only has the right to edit your personal information, only by having your personal consent.",
                 style: TextStyle(
                   fontSize: 15.0,
                 ),
@@ -60,7 +59,7 @@ class PrivacyPolicyDialog extends StatelessWidget {
                 textAlign: TextAlign.justify,
               ),
               Text(
-                "\n•The shop grants you a non-exclusive, non-transferable, revocable license to use the application for your personal, non-commercial use as a Retailer. You may not use the application for any illegal or unauthorized purpose. You may not reproduce, distribute, modify, create derivative works of, or publicly display the applicaton without the prior written consent of the shop.",
+                "\n•The system grants you an exclusive, non-transferable access of the application for your personal and non-commercial use as a customer. You may not use the application for any illegal or unauthorized purpose. You may not reproduce, distribute, modify, create derivative works of, or publicly display the applicaton without the prior written consent of the shop.",
                 style: TextStyle(
                   fontSize: 15.0,
                 ),
@@ -74,21 +73,35 @@ class PrivacyPolicyDialog extends StatelessWidget {
                 textAlign: TextAlign.justify,
               ),
               Text(
-                "\n•You may place orders for LPG products, parts, and accessories through the application. You agree to pay the prices listed for the products you order. You may pay for your orders using the payment methods available through the application.",
+                "\n•You may place orders for LPG products, parts, and accessories through the application and agree to pay the prices listed for the products you order. You agree to pay for your orders only using the payment methods available through the application.",
                 style: TextStyle(
                   fontSize: 15.0,
                 ),
                 textAlign: TextAlign.justify,
               ),
               Text(
-                "\n•The shop will ship your orders to the address you provide. You agree to pay the shipping costs for your orders.",
+                "\n•You can only avail discount in the total price of your transaction by uploading your PWD/Senior Citizen ID subjected to approval by the administrator.",
                 style: TextStyle(
                   fontSize: 15.0,
                 ),
                 textAlign: TextAlign.justify,
               ),
               Text(
-                "\n•The shop warrants that the products you purchase through the application will be free of defects and hazards in materials and workmanship. In case of a complaint, feel free to contact us. Your complaint is subject for investigation for the shop may offer a replacement or refund.",
+                "\n•Delivery time of products is followed on the operation hours of the shop, daily from 7:00 a.m. to 7:00 p.m. and only within the vicinity of Taguig City.",
+                style: TextStyle(
+                  fontSize: 15.0,
+                ),
+                textAlign: TextAlign.justify,
+              ),
+              Text(
+                "\n•Our shop's delivery drivers ship your orders to the address you provide with exclusion of delivery fee. Make sure to pickup the orders ontime (10-15 minutes grace period) for the delivery driver has the capability to reject your order provided with a valid reason on hand.",
+                style: TextStyle(
+                  fontSize: 15.0,
+                ),
+                textAlign: TextAlign.justify,
+              ),
+              Text(
+                "\n•The shop warrants that the products you purchase through the application will be free of defects and hazards in materials and workmanship. In case of a complaint, feel free to contact us. Your complaint is always subject for investigation for the shop may offer a replacement or refund.",
                 style: TextStyle(
                   fontSize: 15.0,
                 ),
@@ -102,17 +115,25 @@ class PrivacyPolicyDialog extends StatelessWidget {
                 textAlign: TextAlign.justify,
               ),
               Text(
-                "\n•In case of personal information and privacy threats. You can withdraw your consent to our use of your personal information at any time.",
+                "\n•In case of personal information and privacy threats. You can withdraw your consent to our use of your personal information at any time by informing the administrator using the chat section.",
                 style: TextStyle(
                   fontSize: 15.0,
                 ),
                 textAlign: TextAlign.justify,
               ),
               Text(
-                "\nThe shop may update these terms from time to time. These terms constitute the entire agreement between you and the shop with respect to the use of the application and supersede all prior or contemporaneous communications, representations, or agreements, whether oral or written.",
+                "\n•The shop may update these terms from time to time. These terms constitute the entire agreement between you and the shop with respect to the use of the application and supersede all prior or contemporaneous communications, representations, or agreements, whether oral or written.",
                 style: TextStyle(
-                  fontWeight: FontWeight.bold,
+                  // fontWeight: FontWeight.bold,
                   fontSize: 15.0,
+                ),
+                textAlign: TextAlign.justify,
+              ),
+              Text(
+                "\nThe store owner has the right to impose penalties to any unlawful and disobedience in proper usage of the application.",
+                style: TextStyle(
+                  fontSize: 15.0,
+                  fontWeight: FontWeight.bold,
                 ),
                 textAlign: TextAlign.justify,
               ),
