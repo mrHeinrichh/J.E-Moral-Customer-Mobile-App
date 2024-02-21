@@ -28,7 +28,18 @@ class ProductDetailsPage extends StatefulWidget {
 }
 
 class _ProductDetailsPageState extends State<ProductDetailsPage> {
-  int stock = 1; // Initial stock
+  int stock = 0; // Initial stock
+
+  @override
+  void initState() {
+    super.initState();
+    // Set stock based on the available stock of the product
+    if (int.parse(widget.stock) <= 0) {
+      stock = 0;
+    } else {
+      stock = 1;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -146,7 +157,11 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           height: 30,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            border: Border.all(color: Colors.grey, width: 0.50),
+                            border: Border.all(
+                              color:
+                                  stock > 1 ? Colors.grey : Colors.transparent,
+                              width: 0.50,
+                            ),
                           ),
                           child: IconButton(
                             icon: const Icon(Icons.remove, size: 15),
@@ -171,7 +186,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: Colors.grey,
+                              color: stock < int.parse(widget.stock)
+                                  ? Colors.grey
+                                  : Colors.transparent,
                               width: 0.50,
                             ),
                           ),
@@ -182,7 +199,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                             ),
                             onPressed: () {
                               setState(() {
-                                stock++;
+                                if (stock < int.parse(widget.stock)) {
+                                  stock++;
+                                }
                               });
                             },
                           ),
@@ -201,41 +220,34 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   ),
                 ),
                 CustomizedButton(
-                  onPressed: () {
-                    // Check if the desired quantity exceeds the available stock
-                    if (stock <= int.parse(widget.stock)) {
-                      cartProvider.addToCart(
-                        CartItem(
-                          id: widget.productName.hashCode,
-                          name: widget.productName,
-                          customerPrice: double.parse(widget.productPrice),
-                          stock: stock,
-                          imageUrl: widget.productImageUrl,
-                        ),
-                      );
-                      Navigator.pushNamed(context, cartRoute);
-                    } else {
-                      // Show an error message or perform any other action when the quantity exceeds the available stock
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Text('Invalid Quantity'),
-                            content: Text(
-                                'The chosen quantity exceeds the available stock for this product.'),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: Text('OK'),
+                  onPressed: stock > 0
+                      ? () {
+                          // Check if stock is greater than 0 before adding to cart
+                          if (stock > 0) {
+                            cartProvider.addToCart(
+                              CartItem(
+                                id: widget.productName.hashCode,
+                                name: widget.productName,
+                                customerPrice:
+                                    double.parse(widget.productPrice),
+                                stock: stock,
+                                imageUrl: widget.productImageUrl,
                               ),
-                            ],
+                            );
+                            Navigator.pushNamed(context, cartRoute);
+                          }
+                        }
+                      : () {
+                          // Show a SnackBar message when stock is 0 and button is clicked
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Product is out of stock.'),
+                              duration: Duration(seconds: 2),
+                              backgroundColor:
+                                  Colors.red, // Set background color to red
+                            ),
                           );
-                        },
-                      );
-                    }
-                  },
+                        }, // Show SnackBar when button is disabled due to stock being 0
                   text: 'Add to Cart',
                   height: 50,
                   width: 220,
