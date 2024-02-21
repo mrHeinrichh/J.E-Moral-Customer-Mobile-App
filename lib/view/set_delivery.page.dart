@@ -51,7 +51,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
     for (var cartItem in cartItems) {
       if (cartItem.isSelected) {
         itemsList.add({
-          "productId":
+          "_id":
               cartItem.id, // Use the name as a placeholder for the product ID
           "name": cartItem.name,
           "customerPrice": cartItem.customerPrice,
