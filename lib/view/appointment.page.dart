@@ -98,104 +98,101 @@ class _AppointmentPageState extends State<AppointmentPage> {
     String? userId = Provider.of<UserProvider>(context, listen: false).userId;
 
     if (userId != null && selectedDate != null) {
-      TimeOfDay selectedTime = TimeOfDay.fromDateTime(selectedDate!);
+      final apiUrl = 'https://lpg-api-06n8.onrender.com/api/v1/users/$userId';
 
-      if (selectedTime.hour >= 7 && selectedTime.hour < 19) {
-        final apiUrl = 'https://lpg-api-06n8.onrender.com/api/v1/users/$userId';
+      String formattedDateTime =
+          DateFormat('yyyy-MM-dd HH:mm').format(selectedDate!);
 
-        String formattedDateTime =
-            DateFormat('yyyy-MM-dd HH:mm').format(selectedDate!);
+      final patchData = {
+        "appointmentDate": formattedDateTime,
+        "appointmentStatus": "Pending",
+        "__t": "Customer"
+      };
 
-        final patchData = {
-          "appointmentDate": formattedDateTime,
-          "appointmentStatus": "Pending",
-          "__t": "Customer"
-        };
-
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Confirm Appointment'),
-              content: Text.rich(
-                TextSpan(
-                  children: [
-                    const TextSpan(
-                      text: "Selected Date and Time: \n",
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Confirm Appointment'),
+            content: Text.rich(
+              TextSpan(
+                children: [
+                  const TextSpan(
+                    text: "Selected Date and Time: \n",
+                  ),
+                  TextSpan(
+                    text: selectedDate != null
+                        ? DateFormat('MMM d, y - h:mm a').format(selectedDate!)
+                        : "You haven't picked date and time yet.",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
                     ),
-                    TextSpan(
-                      text: DateFormat('MMM d, y - h:mm a')
-                          .format(DateTime.parse(formattedDateTime)),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                textAlign: TextAlign.center,
+                  ),
+                ],
               ),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('Cancel'),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    try {
-                      final response = await http.patch(
-                        Uri.parse(apiUrl),
-                        headers: {
-                          'Content-Type': 'application/json',
-                        },
-                        body: jsonEncode(patchData),
-                      );
+              textAlign: TextAlign.center,
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  try {
+                    final response = await http.patch(
+                      Uri.parse(apiUrl),
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: jsonEncode(patchData),
+                    );
 
-                      print(response.body);
+                    print(response.body);
 
-                      if (response.statusCode == 200) {
-                        print('Appointment updated successfully');
+                    if (response.statusCode == 200) {
+                      print('Appointment updated successfully');
 
-                        dateController.clear();
+                      dateController.clear();
 
-                        showCustomOverlay(context, 'Appointment confirmed!');
+                      showCustomOverlay(context, 'Appointment confirmed!');
 
-                        Navigator.pushNamed(context, dashboardRoute);
-                      } else {
-                        print(
-                            'Failed to update appointment. Status code: ${response.statusCode}');
-                      }
-                    } catch (e) {
-                      print('Error updating appointment: $e');
+                      Navigator.pushNamed(context, dashboardRoute);
+                    } else {
+                      print(
+                          'Failed to update appointment. Status code: ${response.statusCode}');
                     }
-                  },
-                  child: const Text('Confirm'),
-                ),
-              ],
-            );
-          },
-        );
-      } else {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: const Text('Invalid Time'),
-              content: const Text(
-                  'Please select a time between store hours 7:00 AM and 7:00 PM.'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-      }
+                  } catch (e) {
+                    print('Error updating appointment: $e');
+                  }
+                },
+                child: const Text('Confirm'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Invalid Time'),
+            content: const Text(
+                'Please select a time between store hours 7:00 AM and 7:00 PM.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
