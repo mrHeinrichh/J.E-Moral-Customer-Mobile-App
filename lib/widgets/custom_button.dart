@@ -83,7 +83,7 @@ class CustomizedButton extends StatelessWidget {
     required this.height,
     required this.width,
     required this.fontz,
-    this.enabled = true, // Provide a default value of true
+    this.enabled = true,
   });
 
   @override
@@ -94,11 +94,104 @@ class CustomizedButton extends StatelessWidget {
         height: height,
         width: width,
         child: ElevatedButton(
-          onPressed: enabled ? onPressed : null, // Use null if not enabled
+          onPressed: enabled ? onPressed : null,
           style: ElevatedButton.styleFrom(
-            backgroundColor: enabled
-                ? const Color(0xFF232937)
-                : Colors.grey, // Use grey color if not enabled
+            backgroundColor: enabled ? const Color(0xFF232937) : Colors.grey,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+          ),
+          child: Container(
+            width: double.infinity,
+            alignment: Alignment.center,
+            child: Text(
+              text,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: fontz,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class AppointmentButton extends StatelessWidget {
+  final VoidCallback onPressed;
+  final String text;
+  final double height;
+  final double width;
+  final double fontz;
+
+  AppointmentButton({
+    required this.onPressed,
+    required this.text,
+    required this.height,
+    required this.width,
+    required this.fontz,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: SizedBox(
+        height: height,
+        width: width,
+        child: ElevatedButton(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF050404).withOpacity(0.8),
+            // backgroundColor: const Color(0xFFE73C37).withOpacity(0.9),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+          ),
+          child: Container(
+            width: double.infinity,
+            alignment: Alignment.center,
+            child: Text(
+              text,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: fontz,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class AddtoCart extends StatelessWidget {
+  final VoidCallback onPressed;
+  final String text;
+  final double height;
+  final double width;
+  final double fontz;
+
+  AddtoCart({
+    required this.onPressed,
+    required this.text,
+    required this.height,
+    required this.width,
+    required this.fontz,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: SizedBox(
+        height: height,
+        width: width,
+        child: ElevatedButton(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF050404).withOpacity(0.6),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(30),
             ),

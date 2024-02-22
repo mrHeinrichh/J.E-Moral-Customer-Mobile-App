@@ -50,11 +50,18 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFFd41111).withOpacity(0.4),
         title: Text(
           titleText,
-          style: const TextStyle(color: Color(0xFF232937), fontSize: 24),
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFF050404).withOpacity(0.8),
+          ),
         ),
+        centerTitle: true,
+        iconTheme:
+            IconThemeData(color: const Color(0xFF050404).withOpacity(0.8)),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -65,18 +72,31 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               padding: const EdgeInsets.all(20.0),
               child: Column(
                 children: [
-                  Image.network(
-                    widget.productImageUrl,
+                  Container(
                     width: 320,
                     height: 320,
-                    fit: BoxFit.cover,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: const Color(0xFF050404),
+                        width: 1,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.network(
+                        widget.productImageUrl,
+                        width: 320,
+                        height: 320,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 10),
                   Text(
                     "${widget.productName}",
                     style: Theme.of(context).textTheme.headlineSmall!.copyWith(
                           fontWeight: FontWeight.bold,
-                          // decoration: TextDecoration.underline,
                         ),
                   ),
                   const SizedBox(height: 10),
@@ -133,6 +153,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       bottomNavigationBar: SizedBox(
         height: 170,
         child: BottomAppBar(
+          color: const Color(0xFFd41111).withOpacity(0.4),
           child: Padding(
             padding: const EdgeInsets.all(5.0),
             child: Column(
@@ -142,11 +163,17 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   children: [
                     Row(
                       children: [
-                        const Text("Stock Available:"),
+                        Text(
+                          "Stock Available:",
+                          style: TextStyle(
+                            color: const Color(0xFF050404).withOpacity(0.8),
+                          ),
+                        ),
                         Text(
                           " ${widget.stock}",
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.bold,
+                            color: const Color(0xFF050404).withOpacity(0.8),
                           ),
                         ),
                       ],
@@ -155,13 +182,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       children: [
                         Container(
                           height: 30,
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             shape: BoxShape.circle,
-                            border: Border.all(
-                              color:
-                                  stock > 1 ? Colors.grey : Colors.transparent,
-                              width: 0.50,
-                            ),
                           ),
                           child: IconButton(
                             icon: const Icon(Icons.remove, size: 15),
@@ -172,25 +194,21 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                 }
                               });
                             },
+                            color: const Color(0xFF050404).withOpacity(0.8),
                           ),
                         ),
                         Text(
                           "$stock",
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 18,
-                            color: Color(0xFF232937),
+                            color: const Color(0xFF050404).withOpacity(0.8),
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                         Container(
                           height: 30,
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             shape: BoxShape.circle,
-                            border: Border.all(
-                              color: stock < int.parse(widget.stock)
-                                  ? Colors.grey
-                                  : Colors.transparent,
-                              width: 0.50,
-                            ),
                           ),
                           child: IconButton(
                             icon: const Icon(
@@ -204,6 +222,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                 }
                               });
                             },
+                            color: const Color(0xFF050404).withOpacity(0.8),
                           ),
                         ),
                       ],
@@ -213,16 +232,15 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 const SizedBox(height: 5),
                 Text(
                   "Price: ₱${((double.tryParse(widget.productPrice) ?? 0) * stock).toStringAsFixed(2)}",
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
-                    color: Color(0xFF232937),
+                    color: const Color(0xFF050404).withOpacity(0.8),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                CustomizedButton(
+                AddtoCart(
                   onPressed: stock > 0
                       ? () {
-                          // Check if stock is greater than 0 before adding to cart
                           if (stock > 0) {
                             cartProvider.addToCart(
                               CartItem(
@@ -238,16 +256,14 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           }
                         }
                       : () {
-                          // Show a SnackBar message when stock is 0 and button is clicked
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
+                            const SnackBar(
                               content: Text('Product is out of stock.'),
                               duration: Duration(seconds: 2),
-                              backgroundColor:
-                                  Colors.red, // Set background color to red
+                              backgroundColor: Colors.red,
                             ),
                           );
-                        }, // Show SnackBar when button is disabled due to stock being 0
+                        },
                   text: 'Add to Cart',
                   height: 50,
                   width: 220,

@@ -44,30 +44,30 @@ class _PrivacyPolicyDialogState extends State<PrivacyPolicyDialog> {
             ),
             textAlign: TextAlign.center,
           ),
-          Text(
-            "(Updated as of March 2024)",
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 5),
-          Text(
-            "*Please Read Carefully!*",
-            style: TextStyle(
-              fontSize: 12,
-            ),
-            textAlign: TextAlign.center,
-          ),
         ],
       ),
       content: SizedBox(
-        height: 400,
         child: SingleChildScrollView(
           controller: _scrollController,
           child: Column(
             children: [
+              const Text(
+                "(Updated as of March 2024)",
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 5),
+              const Text(
+                "*Please Read Carefully!*",
+                style: TextStyle(
+                  fontSize: 12,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
               // Icon(
               //   Icons.handshake,
               //   color: const Color(0xFFd41111).withOpacity(0.8),

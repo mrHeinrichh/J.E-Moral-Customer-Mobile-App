@@ -48,18 +48,18 @@ class _CartPageState extends State<CartPage> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
-        iconTheme: const IconThemeData(
-          color: Colors.black,
+        backgroundColor: const Color(0xFFd41111).withOpacity(0.4),
+        title: Text(
+          "Cart",
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFF050404).withOpacity(0.8),
+          ),
         ),
-        // title: const Padding(
-        //   padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
-        //   child: Text(
-        //     'Cart',
-        //     style: TextStyle(color: Color(0xFF232937), fontSize: 24),
-        //   ),
-        // ),
-        title: const Text('Cart'),
+        centerTitle: true,
+        iconTheme:
+            IconThemeData(color: const Color(0xFF050404).withOpacity(0.8)),
       ),
       body: Consumer2<CartProvider, UserProvider>(
         builder: (context, cartProvider, userProvider, child) {
@@ -81,7 +81,7 @@ class _CartPageState extends State<CartPage> {
             future: userData,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
+                return Center(child: CircularProgressIndicator());
               } else if (snapshot.hasError) {
                 return Center(child: Text('Error: ${snapshot.error}'));
               } else {
@@ -90,14 +90,10 @@ class _CartPageState extends State<CartPage> {
 
                 return Column(
                   children: [
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.fromLTRB(0, 20, 5, 5),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          SizedBox(height: 20),
-                        ],
+                      child: SizedBox(
+                        height: 20,
                       ),
                     ),
                     Expanded(

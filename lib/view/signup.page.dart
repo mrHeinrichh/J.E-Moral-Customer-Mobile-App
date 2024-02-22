@@ -349,57 +349,60 @@ class _SignupPageState extends State<SignupPage> {
                             },
                           ),
                           const SizedBox(height: 10),
-                          Row(
-                            children: <Widget>[
-                              Theme(
-                                data: ThemeData(
-                                  unselectedWidgetColor: Colors.white,
-                                  checkboxTheme: CheckboxThemeData(
-                                    fillColor: MaterialStateProperty
-                                        .resolveWith<Color>(
-                                      (Set<MaterialState> states) {
-                                        if (states
-                                            .contains(MaterialState.selected)) {
-                                          return const Color(0xFF050404)
-                                              .withOpacity(0.8);
-                                        }
-                                        return Colors.white;
-                                      },
+                          Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Theme(
+                                  data: ThemeData(
+                                    unselectedWidgetColor: Colors.white,
+                                    checkboxTheme: CheckboxThemeData(
+                                      fillColor: MaterialStateProperty
+                                          .resolveWith<Color>(
+                                        (Set<MaterialState> states) {
+                                          if (states.contains(
+                                              MaterialState.selected)) {
+                                            return const Color(0xFF050404)
+                                                .withOpacity(0.8);
+                                          }
+                                          return Colors.white;
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                  child: Checkbox(
+                                    value: isCheckboxChecked,
+                                    onChanged: (bool? newValue) {
+                                      setState(() {
+                                        isCheckboxChecked = newValue ?? false;
+                                        checkboxError = null;
+                                      });
+                                    },
+                                  ),
+                                ),
+                                Flexible(
+                                  fit: FlexFit.loose,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return PrivacyPolicyDialog();
+                                        },
+                                      );
+                                    },
+                                    child: const Text(
+                                      "I Accept and Agree to these Terms and Conditions",
+                                      style: TextStyle(
+                                        fontSize: 14.0,
+                                        color: Color(0xFF050404),
+                                        decoration: TextDecoration.underline,
+                                      ),
                                     ),
                                   ),
                                 ),
-                                child: Checkbox(
-                                  value: isCheckboxChecked,
-                                  onChanged: (bool? newValue) {
-                                    setState(() {
-                                      isCheckboxChecked = newValue ?? false;
-                                      checkboxError = null;
-                                    });
-                                  },
-                                ),
-                              ),
-                              Flexible(
-                                fit: FlexFit.loose,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return PrivacyPolicyDialog();
-                                      },
-                                    );
-                                  },
-                                  child: const Text(
-                                    "I Accept and Agree to these Terms and Conditions",
-                                    style: TextStyle(
-                                      fontSize: 14.0,
-                                      color: Color(0xFF050404),
-                                      decoration: TextDecoration.underline,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                           if (checkboxError != null)
                             Text(
@@ -449,7 +452,7 @@ class _SignupPageState extends State<SignupPage> {
                                     }
                                   }
                                 } catch (e) {
-                                  // print("Error: $e"); //No Email or Number Fetched
+                                  //
                                 } finally {
                                   setState(() {
                                     isLoading = false;

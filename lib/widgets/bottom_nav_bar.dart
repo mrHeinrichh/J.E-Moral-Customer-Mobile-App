@@ -8,13 +8,17 @@ class BottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 80,
+    return SizedBox(
+      height: 60,
       child: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.white,
         currentIndex: currentIndex,
         onTap: onTap,
-        unselectedItemColor: const Color(0xFFB3B3B3),
-        selectedItemColor: const Color(0xFF232937),
+        // unselectedItemColor: const Color(0xFF050404).withOpacity(0.8),
+        unselectedItemColor: const Color(0xFF312C28).withOpacity(0.5),
+        // selectedItemColor: const Color(0xFF050404),
+        selectedItemColor: const Color(0xFFE73C37).withOpacity(0.9),
         iconSize: 30,
         selectedLabelStyle: const TextStyle(
           fontSize: 0,
@@ -22,34 +26,34 @@ class BottomNavBar extends StatelessWidget {
         unselectedLabelStyle: const TextStyle(
           fontSize: 0,
         ),
-        items: [
-          const BottomNavigationBarItem(
+        items: const [
+          BottomNavigationBarItem(
             icon: Icon(
-              Icons.quiz_outlined,
+              Icons.quiz_rounded,
             ),
             label: '',
           ),
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
             icon: Icon(
-              Icons.history,
+              Icons.pending_actions_rounded,
             ),
             label: '',
           ),
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
             icon: Icon(
               Icons.home,
             ),
             label: '',
           ),
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
             icon: Icon(
               Icons.person,
             ),
             label: '',
           ),
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
             icon: Icon(
-              Icons.chat,
+              Icons.wechat_rounded,
             ),
             label: '',
           ),
