@@ -79,7 +79,7 @@ class CartProvider extends ChangeNotifier {
 }
 
 class CartItem {
-  int id;
+  String id;
   String name;
   String description;
   String category;

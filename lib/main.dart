@@ -94,6 +94,7 @@ class MyApp extends StatelessWidget {
           return OrderDetails(transaction: sampleTransaction);
         },
         productDetailsPage: (context) {
+          const id = "Placeholder ID";
           const productName = "Placeholder Name";
           const productPrice = "Placeholder Price";
           const showProductPrice = "Placeholder Price";
@@ -105,6 +106,7 @@ class MyApp extends StatelessWidget {
 
           return ProductDetailsPage(
             productName: productName,
+            id: id,
             productPrice: productPrice,
             showProductPrice: showProductPrice,
             productImageUrl: productImageUrl,

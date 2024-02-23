@@ -145,10 +145,11 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
       "cancelReason": "",
       "pickedUp": "false",
       "cancelled": "false",
+      "priceType": "Customer",
       "completed": "false",
       "type": "Delivery",
       "status": "Pending",
-      "discountIdImage": discountIdImage,
+      "discountIdImage": discountIdImage ?? null,
     };
     print('isSeniorCheckboxVisible: $isSeniorCheckboxVisible');
     print('_image: $_image');

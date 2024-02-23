@@ -55,6 +55,7 @@ dependencies:
   photo_view: ^0.14.0
   fl_chart: ^0.66.2
   k_chart: ^0.7.1
+  loading_animation_widget: ^1.2.0+4
 
 dev_dependencies:
   flutter_test:

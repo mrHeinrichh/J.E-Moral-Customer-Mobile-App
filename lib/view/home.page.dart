@@ -416,6 +416,8 @@ class _HomePageState extends State<HomePage> {
                                                   availableStock: product[
                                                           'availableStock'] ??
                                                       'Stock Not Available',
+                                                  id: product['_id'] ??
+                                                      'ID Not Available',
                                                 ),
                                               ),
                                             );

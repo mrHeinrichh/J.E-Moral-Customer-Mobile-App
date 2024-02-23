@@ -13,6 +13,7 @@ class ProductDetailsPage extends StatefulWidget {
   String weight;
   String stock;
   String availableStock;
+  String id;
 
   ProductDetailsPage({
     required this.productName,
@@ -24,6 +25,7 @@ class ProductDetailsPage extends StatefulWidget {
     required this.weight,
     required this.stock,
     required this.availableStock,
+    required this.id,
   });
 
   @override
@@ -255,7 +257,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           if (stock > 0) {
                             cartProvider.addToCart(
                               cartItem: CartItem(
-                                id: widget.productName.hashCode,
+                                id: widget.id,
                                 name: widget.productName,
                                 description: widget.description,
                                 category: widget.category,
