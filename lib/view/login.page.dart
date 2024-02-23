@@ -27,7 +27,6 @@ class _LoginPageState extends State<LoginPage> {
     print('Email: $email, Password: $password');
 
     try {
-      // Show loading indicator
       Provider.of<UserProvider>(context, listen: false).setLoading(true);
 
       final response = await http.post(
@@ -43,7 +42,6 @@ class _LoginPageState extends State<LoginPage> {
         }),
       );
 
-      // Hide loading indicator
       Provider.of<UserProvider>(context, listen: false).setLoading(false);
 
       if (response.statusCode == 200) {
@@ -54,11 +52,8 @@ class _LoginPageState extends State<LoginPage> {
         if (data['status'] == 'success') {
           final List<dynamic>? userData = data['data'];
           if (userData != null && userData.isNotEmpty) {
-            // Accessing the correct nested values
             String userId = userData[0]['_id'] ?? '';
-            print('User ID: $userId');
 
-            // Set the user ID in the app state
             Provider.of<UserProvider>(context, listen: false).setUserId(userId);
 
             return data;
@@ -73,7 +68,6 @@ class _LoginPageState extends State<LoginPage> {
         return {'error': 'Login failed'};
       }
     } catch (error, stackTrace) {
-      // Hide loading indicator on error
       Provider.of<UserProvider>(context, listen: false).setLoading(false);
 
       print('Error: $error');
@@ -85,6 +79,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFe7e0e0),
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -96,7 +91,6 @@ class _LoginPageState extends State<LoginPage> {
                   children: <Widget>[
                     const SizedBox(height: 60.0),
                     Image.network(
-                      // 'https://raw.githubusercontent.com/mrHeinrichh/J.E-Moral-cdn/main/assets/png/logo-main.png',
                       "https://res.cloudinary.com/dzcjbziwt/image/upload/v1708533697/images/hefwwla0ozppgz5itlkt.png",
                       width: 550.0,
                       height: null,
@@ -124,7 +118,6 @@ class _LoginPageState extends State<LoginPage> {
                               context,
                             );
 
-                            print('Login Result: $loginResult');
                             if (loginResult.containsKey('error')) {
                               showDialog(
                                 context: context,

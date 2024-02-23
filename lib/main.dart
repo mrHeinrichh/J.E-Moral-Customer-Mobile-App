@@ -96,19 +96,23 @@ class MyApp extends StatelessWidget {
         productDetailsPage: (context) {
           const productName = "Placeholder Name";
           const productPrice = "Placeholder Price";
+          const showProductPrice = "Placeholder Price";
           const productImageUrl = "Placeholder Image URL";
           const description = "Placeholder Description";
           const weight = "Placeholder Weight";
           const stock = "Placeholder Stock";
+          const availableStock = "Placeholder Stock";
 
           return ProductDetailsPage(
             productName: productName,
             productPrice: productPrice,
+            showProductPrice: showProductPrice,
             productImageUrl: productImageUrl,
             category: "Placeholder Category Name",
             description: description,
             weight: weight,
             stock: stock,
+            availableStock: availableStock,
           );
         },
       },

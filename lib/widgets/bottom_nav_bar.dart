@@ -15,10 +15,8 @@ class BottomNavBar extends StatelessWidget {
         backgroundColor: Colors.white,
         currentIndex: currentIndex,
         onTap: onTap,
-        // unselectedItemColor: const Color(0xFF050404).withOpacity(0.8),
-        unselectedItemColor: const Color(0xFF312C28).withOpacity(0.5),
-        // selectedItemColor: const Color(0xFF050404),
-        selectedItemColor: const Color(0xFFE73C37).withOpacity(0.9),
+        unselectedItemColor: const Color(0xFF050404).withOpacity(0.3),
+        selectedItemColor: const Color(0xFF050404).withOpacity(0.8),
         iconSize: 30,
         selectedLabelStyle: const TextStyle(
           fontSize: 0,
@@ -26,38 +24,33 @@ class BottomNavBar extends StatelessWidget {
         unselectedLabelStyle: const TextStyle(
           fontSize: 0,
         ),
-        items: const [
-          BottomNavigationBarItem(
+        items: List.generate(5, (index) {
+          IconData iconData = Icons.quiz_rounded;
+          switch (index) {
+            case 0:
+              iconData = Icons.quiz_rounded;
+              break;
+            case 1:
+              iconData = Icons.pending_actions_rounded;
+              break;
+            case 2:
+              iconData = Icons.home;
+              break;
+            case 3:
+              iconData = Icons.person;
+              break;
+            case 4:
+              iconData = Icons.wechat_rounded;
+              break;
+          }
+          return BottomNavigationBarItem(
             icon: Icon(
-              Icons.quiz_rounded,
+              iconData,
+              size: currentIndex == index ? 35 : 30,
             ),
             label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.pending_actions_rounded,
-            ),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.home,
-            ),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.person,
-            ),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.wechat_rounded,
-            ),
-            label: '',
-          ),
-        ],
+          );
+        }),
       ),
     );
   }

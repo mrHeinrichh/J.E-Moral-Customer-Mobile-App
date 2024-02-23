@@ -7,6 +7,7 @@ class OnBoardingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFe7e0e0),
       body: SingleChildScrollView(
         child: Center(
           child: Padding(
@@ -16,7 +17,6 @@ class OnBoardingPage extends StatelessWidget {
               children: <Widget>[
                 const SizedBox(height: 60.0),
                 Image.network(
-                  // 'https://raw.githubusercontent.com/mrHeinrichh/J.E-Moral-cdn/main/assets/png/logo-main.png',
                   "https://res.cloudinary.com/dzcjbziwt/image/upload/v1708533697/images/hefwwla0ozppgz5itlkt.png",
                   width: 550.0,
                   height: null,

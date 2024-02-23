@@ -144,7 +144,6 @@ class AppointmentButton extends StatelessWidget {
           onPressed: onPressed,
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF050404).withOpacity(0.8),
-            // backgroundColor: const Color(0xFFE73C37).withOpacity(0.9),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(30),
             ),
@@ -166,14 +165,14 @@ class AppointmentButton extends StatelessWidget {
   }
 }
 
-class AddtoCart extends StatelessWidget {
+class CartButton extends StatelessWidget {
   final VoidCallback onPressed;
   final String text;
   final double height;
   final double width;
   final double fontz;
 
-  AddtoCart({
+  CartButton({
     required this.onPressed,
     required this.text,
     required this.height,
@@ -191,7 +190,7 @@ class AddtoCart extends StatelessWidget {
         child: ElevatedButton(
           onPressed: onPressed,
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF050404).withOpacity(0.6),
+            backgroundColor: const Color(0xFF050404).withOpacity(0.8),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(30),
             ),
