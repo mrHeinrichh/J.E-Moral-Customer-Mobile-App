@@ -311,12 +311,15 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 if (!initialSectionShown)
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: sampleData.length,
-                      itemBuilder: (context, categoryIndex) {
-                        // ... Your existing category and product UI
-                      },
+                  Visibility(
+                    visible: initialSectionShown,
+                    child: Expanded(
+                      child: ListView.builder(
+                        itemCount: sampleData.length,
+                        itemBuilder: (context, categoryIndex) {
+                          // ... Your existing category and product UI
+                        },
+                      ),
                     ),
                   ),
                 Expanded(
