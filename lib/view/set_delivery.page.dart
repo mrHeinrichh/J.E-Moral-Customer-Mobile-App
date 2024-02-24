@@ -55,8 +55,12 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
               cartItem.id, // Use the name as a placeholder for the product ID
           "name": cartItem.name,
           "customerPrice": cartItem.customerPrice,
-
+          "stock": cartItem.availableStock,
           "quantity": cartItem.stock,
+          "totalPrice": cartItem.customerPrice * cartItem.stock,
+          "category": cartItem.category,
+          "imageUrl": cartItem.imageUrl,
+          "description": cartItem.description,
         });
       }
     }

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:customer_app/widgets/checkout_cart.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -15,6 +14,7 @@ class CartPage extends StatefulWidget {
 
 class _CartPageState extends State<CartPage> {
   late Future<Map<String, dynamic>> userData;
+  bool isDiscountApplied = false;
 
   @override
   void initState() {
@@ -31,42 +31,43 @@ class _CartPageState extends State<CartPage> {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> userData = json.decode(response.body);
+        print('User ID: $userId');
+        print('Response Body: $userData');
         return userData;
       } else {
+        print('Failed to load user data. Status code: ${response.statusCode}');
         throw Exception('Failed to load user data');
       }
     } catch (error) {
-      rethrow;
+      print('Error: $error');
+      throw error;
     }
   }
 
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: const Color(0xFFd41111).withOpacity(0.8),
-        title: const Text(
-          "Cart",
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        centerTitle: true,
+        backgroundColor: Colors.white,
         iconTheme: const IconThemeData(
-          color: Colors.white,
+          color: Colors.black,
         ),
+        // title: const Padding(
+        //   padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
+        //   child: Text(
+        //     'Cart',
+        //     style: TextStyle(color: Color(0xFF232937), fontSize: 24),
+        //   ),
+        // ),
+        title: const Text('Cart'),
       ),
-      backgroundColor: const Color(0xFFe7e0e0),
       body: Consumer2<CartProvider, UserProvider>(
         builder: (context, cartProvider, userProvider, child) {
           String? userId = userProvider.userId;
-
+          print('User ID: $userId');
           List<CartItem> cartItems = cartProvider.cartItems;
 
-          double calculateTotalPrice() {
+          double _calculateTotalPrice() {
             double totalPrice = 0.0;
             for (var cartItem in cartItems) {
               if (cartItem.isSelected) {
@@ -91,69 +92,51 @@ class _CartPageState extends State<CartPage> {
                   children: [
                     const Padding(
                       padding: EdgeInsets.fromLTRB(0, 20, 5, 5),
-                      child: SizedBox(
-                        height: 20,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          SizedBox(height: 20),
+                        ],
                       ),
                     ),
                     Expanded(
-                      child: ListView.builder(
+                      child: ListView.separated(
                         itemCount: cartItems.length,
+                        separatorBuilder: (context, index) => Divider(),
                         itemBuilder: (context, index) {
                           return CartItemWidget(cartItem: cartItems[index]);
                         },
                       ),
                     ),
-                    Container(
-                      color: Colors.white,
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Selected Item${cartItems.where((item) => item.isSelected).length > 1 ? 's' : ''}: (${cartItems.where((item) => item.isSelected).length})",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: const Color(0xFF050404).withOpacity(0.8),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text("Price:"),
+                              Text(
+                                "₱${_calculateTotalPrice()}",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
                               ),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  "Price:",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: const Color(0xFF050404)
-                                        .withOpacity(0.8),
-                                  ),
-                                ),
-                                Text(
-                                  calculateTotalPrice() % 1 == 0
-                                      ? '₱${calculateTotalPrice().toInt().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match match) => '${match[1]},')}'
-                                      : '₱${calculateTotalPrice().toStringAsFixed(2).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match match) => '${match[1]},')}',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                    color: const Color(0xFFd41111)
-                                        .withOpacity(0.8),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            CartButton(
-                              onPressed: () {
-                                Navigator.pushNamed(context, setDeliveryPage);
-                              },
-                              text: 'Checkout',
-                              height: 60,
-                              width: double.infinity,
-                              fontz: 20,
-                            ),
-                          ],
-                        ),
+                            ],
+                          ),
+                          CustomizedButton(
+                            onPressed: () {
+                              Navigator.pushNamed(context, setDeliveryPage);
+                            },
+                            text: 'Checkout',
+                            height: 60,
+                            width: 200,
+                            fontz: 20,
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -162,6 +145,99 @@ class _CartPageState extends State<CartPage> {
             },
           );
         },
+      ),
+    );
+  }
+}
+
+class CartItemWidget extends StatelessWidget {
+  final CartItem cartItem;
+
+  const CartItemWidget({required this.cartItem});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      child: ListTile(
+        contentPadding: const EdgeInsets.all(20),
+        subtitle: IntrinsicHeight(
+          child: Row(
+            children: [
+              Checkbox(
+                value: cartItem.isSelected,
+                onChanged: (value) {
+                  Provider.of<CartProvider>(context, listen: false)
+                      .toggleSelection(cartItem);
+                },
+              ),
+              const SizedBox(width: 10), // Add some spacing
+
+              Image.network(
+                cartItem.imageUrl,
+                width: 90,
+                height: 90,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return const Icon(Icons.error);
+                },
+              ),
+              const SizedBox(width: 10), // Add some spacing
+
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      cartItem.name,
+                      style: const TextStyle(fontSize: 18),
+                    ),
+                    const SizedBox(height: 5), // Add some vertical spacing
+                    Text(
+                      '₱${cartItem.customerPrice * cartItem.stock}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    const SizedBox(height: 5), // Add some vertical spacing
+
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.remove),
+                          onPressed: () {
+                            Provider.of<CartProvider>(context, listen: false)
+                                .decrementStock(cartItem);
+                          },
+                        ),
+                        Text('${cartItem.stock}'),
+                        IconButton(
+                          icon: const Icon(Icons.add),
+                          onPressed: () {
+                            Provider.of<CartProvider>(context, listen: false)
+                                .incrementStock(cartItem);
+                          },
+                        ),
+                        const Spacer(), // Use Spacer to push the following IconButton to the right
+                        IconButton(
+                          icon: const Icon(
+                            Icons.delete,
+                            color: Colors.red,
+                          ),
+                          onPressed: () {
+                            Provider.of<CartProvider>(context, listen: false)
+                                .removeFromCart(cartItem);
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
