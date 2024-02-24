@@ -221,34 +221,53 @@ class _HomePageState extends State<HomePage> {
                     itemBuilder:
                         (BuildContext context, int index, int realIndex) {
                       if (index == 0) {
-                        // Initial section to be shown first
-                        return Container(
-                          child: Column(
-                            children: [
-                              const Text(
-                                'Fueling Your Life\nwith Clean Energy',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 30,
-                                  color: Color(0xFF232937),
-                                ),
+                        return SizedBox(
+                          child: Center(
+                            child: Card(
+                              elevation: 4,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
                               ),
-                              const Text('Applying for a Delivery Driver?'),
-                              CustomizedButton(
-                                onPressed: () {
-                                  Navigator.pushNamed(
-                                      context, appointmentRoute);
-                                },
-                                text: 'Book an Appointment',
-                                height: 30,
-                                width: 310,
-                                fontz: 10,
+                              color: Colors.white,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Fueling Your Life with Clean Energy',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 26,
+                                      color: const Color(0xFF050404)
+                                          .withOpacity(0.8),
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  Text(
+                                    'Applying for a Delivery Driver?',
+                                    style: TextStyle(
+                                      color: const Color(0xFF050404)
+                                          .withOpacity(0.8),
+                                      fontSize: 12,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 5),
+                                  AppointmentButton(
+                                    onPressed: () {
+                                      Navigator.pushNamed(
+                                          context, appointmentRoute);
+                                    },
+                                    text: 'Book an Appointment',
+                                    height: 30,
+                                    width: 210,
+                                    fontz: 12,
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
                         );
                       } else {
-                        // Display announcements in the carousel
                         final announcement = announcements[index - 1];
 
                         return InkWell(
@@ -258,13 +277,19 @@ class _HomePageState extends State<HomePage> {
                               fullscreenImageUrl = announcement['image'];
                             });
                           },
-                          child: Container(
-                            width: MediaQuery.of(context).size.width,
-                            margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: NetworkImage(announcement['image']),
-                                fit: BoxFit.cover,
+                          child: Card(
+                            elevation: 4,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: Container(
+                              width: MediaQuery.of(context).size.width,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                                image: DecorationImage(
+                                  image: NetworkImage(announcement['image']),
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
                           ),
@@ -272,12 +297,11 @@ class _HomePageState extends State<HomePage> {
                       }
                     },
                     options: CarouselOptions(
-                      height: 180,
+                      height: 190,
                       enableInfiniteScroll: true,
                       autoPlay: true,
                       enlargeCenterPage: true,
                       onPageChanged: (index, _) {
-                        // Set a flag to track whether the initial section is shown
                         setState(() {
                           initialSectionShown = true;
                         });
@@ -359,15 +383,15 @@ class _HomePageState extends State<HomePage> {
                                     child: Column(
                                       children: [
                                         Card(
-                                          child: Column(
-                                            children: [
-                                              Image.network(
-                                                product['imageUrl'],
-                                                width: 100,
-                                                height: 100,
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ],
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(
+                                                8.0), // You can adjust the value as needed
+                                            child: Image.network(
+                                              product['imageUrl'],
+                                              width: 100,
+                                              height: 100,
+                                              fit: BoxFit.cover,
+                                            ),
                                           ),
                                         ),
                                         ListTile(
