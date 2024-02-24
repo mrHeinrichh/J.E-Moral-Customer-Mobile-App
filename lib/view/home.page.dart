@@ -6,6 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:photo_view/photo_view.dart';
 
 class HomePage extends StatefulWidget {
@@ -404,7 +405,7 @@ class _HomePageState extends State<HomePage> {
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                           subtitle: Text(
-                                            '\₱${product['price']}',
+                                            '\₱${NumberFormat("#,##0.00", "en_US").format(double.parse(product['price']))}',
                                             style: const TextStyle(
                                               fontSize: 13,
                                               color: Color(0xFFE98500),

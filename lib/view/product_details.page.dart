@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:customer_app/routes/app_routes.dart';
 import 'package:customer_app/widgets/custom_button.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'cart_provider.dart';
 
@@ -197,13 +198,18 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   ],
                 ),
                 const SizedBox(height: 5),
-                Text(
-                  "Price: ₱${((double.tryParse(widget.productPrice) ?? 0) * stock).toStringAsFixed(2)}",
-                  style: const TextStyle(
-                    fontSize: 18,
-                    color: Color(0xFF232937),
-                    fontWeight: FontWeight.bold,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Price: ₱${NumberFormat("#,##0.00", "en_US").format((double.tryParse(widget.productPrice) ?? 0) * stock)}",
+                      style: const TextStyle(
+                        fontSize: 18,
+                        color: Color(0xFF232937),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
                 CustomizedButton(
                   onPressed: () {
