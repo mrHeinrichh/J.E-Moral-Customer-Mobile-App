@@ -105,8 +105,8 @@ class MyApp extends StatelessWidget {
           const availableStock = "Placeholder Stock";
 
           return ProductDetailsPage(
-            productName: productName,
             id: id,
+            productName: productName,
             productPrice: productPrice,
             showProductPrice: showProductPrice,
             productImageUrl: productImageUrl,

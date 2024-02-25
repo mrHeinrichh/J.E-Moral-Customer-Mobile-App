@@ -482,7 +482,7 @@ class _SignupPageState extends State<SignupPage> {
           if (isLoading)
             Center(
               child: LoadingAnimationWidget.flickr(
-                leftDotColor: const Color(0xFF050404).withOpacity(0.9),
+                leftDotColor: const Color(0xFF050404).withOpacity(0.8),
                 rightDotColor: const Color(0xFFd41111).withOpacity(0.8),
                 size: 40,
               ),
