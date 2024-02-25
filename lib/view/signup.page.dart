@@ -13,6 +13,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:http_parser/http_parser.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class SignupPage extends StatefulWidget {
   @override
@@ -198,7 +199,7 @@ class _SignupPageState extends State<SignupPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFe7e0e0),
+      backgroundColor: Colors.white,
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -214,18 +215,19 @@ class _SignupPageState extends State<SignupPage> {
                       const SizedBox(height: 50.0),
                       Column(
                         children: <Widget>[
-                          const Text(
+                          Text(
                             "Sign Up",
                             style: TextStyle(
                               fontSize: 30.0,
                               fontWeight: FontWeight.bold,
+                              color: const Color(0xFF050404).withOpacity(0.9),
                             ),
                           ),
                           Text(
                             "Create an account, It's free",
                             style: TextStyle(
                               fontSize: 15.0,
-                              color: Colors.grey[700],
+                              color: const Color(0xFF050404).withOpacity(0.9),
                             ),
                           ),
                           const SizedBox(height: 5),
@@ -245,7 +247,7 @@ class _SignupPageState extends State<SignupPage> {
                                             ? FileImage(snapshot.data!)
                                             : null,
                                         backgroundColor: const Color(0xFF050404)
-                                            .withOpacity(0.8),
+                                            .withOpacity(0.9),
                                         child: snapshot.data == null
                                             ? const Icon(
                                                 Icons.person,
@@ -364,7 +366,7 @@ class _SignupPageState extends State<SignupPage> {
                                           if (states.contains(
                                               MaterialState.selected)) {
                                             return const Color(0xFF050404)
-                                                .withOpacity(0.8);
+                                                .withOpacity(0.9);
                                           }
                                           return Colors.white;
                                         },
@@ -392,11 +394,12 @@ class _SignupPageState extends State<SignupPage> {
                                         },
                                       );
                                     },
-                                    child: const Text(
+                                    child: Text(
                                       "I Accept and Agree to these Terms and Conditions",
                                       style: TextStyle(
                                         fontSize: 14.0,
-                                        color: Color(0xFF050404),
+                                        color: const Color(0xFF050404)
+                                            .withOpacity(0.9),
                                         decoration: TextDecoration.underline,
                                       ),
                                     ),
@@ -477,12 +480,11 @@ class _SignupPageState extends State<SignupPage> {
             ),
           ),
           if (isLoading)
-            Container(
-              color: const Color(0xFF050404).withOpacity(0.5),
-              child: const Center(
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
+            Center(
+              child: LoadingAnimationWidget.flickr(
+                leftDotColor: const Color(0xFF050404).withOpacity(0.9),
+                rightDotColor: const Color(0xFFd41111).withOpacity(0.8),
+                size: 40,
               ),
             ),
         ],

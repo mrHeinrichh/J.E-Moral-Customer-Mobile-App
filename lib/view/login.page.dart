@@ -7,6 +7,7 @@ import 'package:customer_app/widgets/custom_button.dart';
 import 'package:provider/provider.dart';
 import 'package:customer_app/view/user_provider.dart';
 import 'package:customer_app/widgets/login_button.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -79,7 +80,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFe7e0e0),
+      backgroundColor: Colors.white,
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -164,12 +165,11 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
           if (Provider.of<UserProvider>(context).isLoading)
-            Container(
-              color: const Color(0xFF050404).withOpacity(0.5),
-              child: const Center(
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
+            Center(
+              child: LoadingAnimationWidget.flickr(
+                leftDotColor: const Color(0xFF050404).withOpacity(0.9),
+                rightDotColor: const Color(0xFFd41111).withOpacity(0.8),
+                size: 40,
               ),
             ),
         ],

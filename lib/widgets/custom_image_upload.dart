@@ -121,7 +121,7 @@ class SignupImageUploadValidator extends StatelessWidget {
             child: Text(
               buttonText,
               style: TextStyle(
-                color: const Color(0xFF050404).withOpacity(0.8),
+                color: const Color(0xFF050404).withOpacity(0.9),
                 fontSize: 15.0,
                 decoration: TextDecoration.underline,
               ),

@@ -22,10 +22,10 @@ class SignupButton extends StatelessWidget {
           width: double.infinity,
           alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(vertical: 16),
-          child: const Text(
+          child: Text(
             "Create an Account",
             style: TextStyle(
-              color: Color(0xFF050404),
+              color: const Color(0xFF050404).withOpacity(0.9),
               fontSize: 18,
             ),
           ),

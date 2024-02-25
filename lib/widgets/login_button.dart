@@ -12,7 +12,7 @@ class LoginButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF050404),
+          backgroundColor: const Color(0xFF050404).withOpacity(0.9),
           elevation: 4,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30),
@@ -48,7 +48,7 @@ class SignupCreateButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF050404),
+          backgroundColor: const Color(0xFF050404).withOpacity(0.9),
           elevation: 4,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30),
