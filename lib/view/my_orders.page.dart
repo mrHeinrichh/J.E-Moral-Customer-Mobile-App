@@ -103,6 +103,15 @@ class _MyOrderPageState extends State<MyOrderPage> {
     }
   }
 
+  void reloadTransactions() {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final userId = userProvider.userId;
+
+    if (userId != null) {
+      fetchTransactions(userId);
+    }
+  }
+
   Future<void> fetchTransactions(String userId) async {
     final apiUrl = 'https://lpg-api-06n8.onrender.com/api/v1/transactions';
 
@@ -244,9 +253,13 @@ class _MyOrderPageState extends State<MyOrderPage> {
                 onTap: () {},
                 child: TransactionCard(
                   transaction: visibleTransactions[i],
-                  onDeleteTransaction: () =>
-                      deleteTransaction(visibleTransactions[i].id),
-                  orderNumber: visibleTransactions.length - i, // Changed here
+                  onDeleteTransaction: () {
+                    deleteTransaction(visibleTransactions[i].id);
+                    reloadTransactions(); // Call the reloadTransactions callback
+                  },
+                  reloadTransactions:
+                      reloadTransactions, // Pass the reloadTransactions callback
+                  orderNumber: visibleTransactions.length - i,
                 ),
               ),
           ],
@@ -259,11 +272,15 @@ class _MyOrderPageState extends State<MyOrderPage> {
 class TransactionCard extends StatefulWidget {
   final Transaction transaction;
   final VoidCallback onDeleteTransaction;
+  final VoidCallback reloadTransactions; // Add this line
+
   final int orderNumber;
 
   TransactionCard({
     required this.transaction,
     required this.onDeleteTransaction,
+    required this.reloadTransactions, // Add this line
+
     required this.orderNumber,
   });
 
@@ -395,8 +412,39 @@ class _TransactionCardState extends State<TransactionCard> {
                     onPressed:
                         getCancelOrderButtonColor() == const Color(0xFFAFB7C9)
                             ? () {}
-                            : widget.onDeleteTransaction,
-                    text: 'Archive Order',
+                            : () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text("Confirmation"),
+                                      content: Text(
+                                          "Are you sure you want to cancel this order? Action cannot be undone."),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context)
+                                                .pop(); // Close the dialog
+                                          },
+                                          child: Text("No"),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            // Call the onDeleteTransaction callback to archive the order
+                                            widget.onDeleteTransaction();
+                                            Navigator.of(context)
+                                                .pop(); // Close the dialog
+                                            widget
+                                                .reloadTransactions(); // Reload transactions
+                                          },
+                                          child: Text("Cancel Order"),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                    text: 'Cancel Order',
                   ),
                 ],
               ),
