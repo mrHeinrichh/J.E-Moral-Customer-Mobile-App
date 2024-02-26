@@ -340,7 +340,6 @@ class _SignupPageState extends State<SignupPage> {
                           ),
                           SignupTextField(
                             controller: passwordController,
-                            obscureText: true,
                             labelText: 'Password',
                             hintText: 'Enter your Password',
                             validator: (value) {

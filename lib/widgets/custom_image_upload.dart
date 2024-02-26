@@ -181,16 +181,25 @@ class ImageUploader extends StatelessWidget {
             );
           },
           child: Align(
-            alignment: Alignment.center,
-            child: Text(
-              buttonText,
-              style: const TextStyle(
-                color: Colors.blue,
-                fontSize: 15.0,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
+              alignment: Alignment.center,
+              child: Container(
+                decoration: const BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: Color(0xFF050404),
+                      width: 0.5,
+                    ),
+                  ),
+                ),
+                child: Text(
+                  buttonText,
+                  style: TextStyle(
+                    color: const Color(0xFF050404).withOpacity(0.9),
+                    fontSize: 15.0,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              )),
         ),
         const Divider(),
       ],

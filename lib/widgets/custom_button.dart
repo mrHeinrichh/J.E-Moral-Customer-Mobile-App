@@ -229,8 +229,46 @@ class ProfileButton extends StatelessWidget {
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         primary: text == 'Logout'
-            ? Colors.red.withOpacity(0.9)
-            : const Color(0xFF232937),
+            ? const Color(0xFFd41111).withOpacity(0.8)
+            : const Color(0xFF050404).withOpacity(0.9),
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+      ),
+      child: Container(
+        width: double.infinity,
+        alignment: Alignment.center,
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: Text(
+          text,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class StatusButton extends StatelessWidget {
+  final VoidCallback onPressed;
+  final String text;
+
+  StatusButton({
+    required this.onPressed,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        primary: text == ' View Appointment '
+            ? const Color(0xFF050404).withOpacity(0.5)
+            : const Color(0xFF050404).withOpacity(0.9),
         elevation: 4,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),

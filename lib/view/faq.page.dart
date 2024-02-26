@@ -87,7 +87,7 @@ class _FaqPageState extends State<FaqPage> {
         children: [
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.only(top: 20, left: 15, right: 15),
               child: RefreshIndicator(
                 onRefresh: refreshData,
                 child: ListView.builder(

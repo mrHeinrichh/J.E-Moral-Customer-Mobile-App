@@ -154,10 +154,86 @@ class _SignupTextFieldState extends State<SignupTextField> {
         suffixIcon: widget.obscureText
             ? IconButton(
                 icon: Icon(
-                  _obscureText ? Icons.visibility_outlined : Icons.visibility,
+                  // _obscureText ? Icons.visibility_outlined : Icons.visibility,
+                  _obscureText ? Icons.visibility_off : Icons.visibility,
                   color: _obscureText
                       ? const Color(0xFF050404).withOpacity(0.8)
                       : const Color(0xFF050404).withOpacity(0.8),
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscureText = !_obscureText;
+                  });
+                },
+              )
+            : null,
+      ),
+      validator: widget.validator,
+    );
+  }
+}
+
+class EditTextField extends StatefulWidget {
+  final TextEditingController controller;
+  final String labelText;
+  final String hintText;
+  final bool obscureText;
+  final TextInputType? keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
+  final String? Function(String?)? validator;
+
+  const EditTextField({
+    Key? key,
+    required this.controller,
+    required this.labelText,
+    required this.hintText,
+    this.obscureText = false,
+    this.keyboardType,
+    this.inputFormatters,
+    this.validator,
+  }) : super(key: key);
+
+  @override
+  _EditTextFieldState createState() => _EditTextFieldState();
+}
+
+class _EditTextFieldState extends State<EditTextField> {
+  late bool _obscureText;
+
+  @override
+  void initState() {
+    super.initState();
+    _obscureText = widget.obscureText;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: widget.controller,
+      obscureText: _obscureText,
+      cursorColor: const Color(0xFF050404),
+      keyboardType: widget.keyboardType,
+      inputFormatters: widget.inputFormatters,
+      decoration: InputDecoration(
+        labelText: widget.labelText,
+        hintText: widget.hintText,
+        hintStyle: TextStyle(
+          color: const Color(0xFF050404).withOpacity(0.6),
+        ),
+        labelStyle: TextStyle(
+          color: const Color(0xFF050404).withOpacity(0.7),
+        ),
+        enabledBorder: const UnderlineInputBorder(
+          borderSide: BorderSide(color: Color(0xFF050404)),
+        ),
+        focusedBorder: const UnderlineInputBorder(
+          borderSide: BorderSide(color: Color(0xFF050404)),
+        ),
+        suffixIcon: widget.obscureText
+            ? IconButton(
+                icon: Icon(
+                  _obscureText ? Icons.visibility_off : Icons.visibility,
+                  color: const Color(0xFF050404),
                 ),
                 onPressed: () {
                   setState(() {
