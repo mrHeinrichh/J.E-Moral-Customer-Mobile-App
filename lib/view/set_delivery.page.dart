@@ -1020,11 +1020,33 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
               // Button onPressed handler
               CustomizedButton(
                 onPressed: () {
-                  clearFieldErrors();
-                  displayFieldErrors();
+                  if (isWithinDeliveryHours()) {
+                    clearFieldErrors();
+                    displayFieldErrors();
 
-                  if (areThereNoErrors()) {
-                    confirmDialog();
+                    if (areThereNoErrors()) {
+                      confirmDialog();
+                    }
+                  } else {
+                    // Show a dialog when it's not within delivery hours
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: Text('Delivery Hours Notice'),
+                          content: Text(
+                              'Sorry, your order cannot proceed. Our delivery hours is from 7AM to 7PM daily.'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text('OK'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
                   }
                 },
                 text: 'Deliver Now',
