@@ -47,6 +47,18 @@ class _AppointmentPageState extends State<AppointmentPage> {
       initialDate: DateTime.now().add(const Duration(days: 1)),
       firstDate: DateTime.now(),
       lastDate: DateTime(DateTime.now().year + 1),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: ColorScheme.light(
+              primary: const Color(0xFF050404).withOpacity(0.8),
+              onPrimary: Colors.white,
+            ),
+            backgroundColor: Colors.white,
+          ),
+          child: child!,
+        );
+      },
     );
 
     if (pickedDate != null) {
@@ -209,24 +221,45 @@ class _AppointmentPageState extends State<AppointmentPage> {
     print('UserId in build method: $userId');
 
     return Scaffold(
+      // appBar: AppBar(
+      //   elevation: 0,
+      //   backgroundColor: Colors.white,
+      //   iconTheme: const IconThemeData(
+      //     color: Colors.black,
+      //   ),
+      //   title: const Padding(
+      //     padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+      //     child: Text(
+      //       'Applying for Delivery Driver',
+      //       style: TextStyle(
+      //         color: Color(0xFF232937),
+      //         fontSize: 20,
+      //         fontWeight: FontWeight.bold,
+      //       ),
+      //     ),
+      //   ),
+      // ),
       appBar: AppBar(
-        elevation: 0,
         backgroundColor: Colors.white,
-        iconTheme: const IconThemeData(
-          color: Colors.black,
+        elevation: 1,
+        title: Text(
+          'Applying for Delivery Driver',
+          style: TextStyle(
+            color: const Color(0xFF050404).withOpacity(0.9),
+            fontSize: 19,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        title: const Padding(
-          padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-          child: Text(
-            'Applying for Delivery Driver',
-            style: TextStyle(
-              color: Color(0xFF232937),
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+        centerTitle: true,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(
+            color: Colors.black,
+            height: 0.2,
           ),
         ),
       ),
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -238,34 +271,42 @@ class _AppointmentPageState extends State<AppointmentPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      'Greetings user! We appreciate clicking this section and showing your interest in applying as delivery driver. Few reminders, your submission of requirements do not actually mean that you are already accepted. You are still subject to interview based on your appointment date. To expect fast transaction once your application is accepted, prepare the following requirements below: ',
-                      style: TextStyle(fontSize: 17),
+                      'Greetings User!',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    SizedBox(height: 20),
+                    SizedBox(height: 10),
+                    Text(
+                      'We appreciate clicking this section and showing your interest in applying as delivery driver. Few reminders, your submission of requirements do not actually mean that you are already accepted. You are still subject to interview based on your appointment date. To expect fast transaction once your application is accepted, prepare the following requirements below: ',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    SizedBox(height: 5),
                     Text(
                       '- Biodata',
-                      style: TextStyle(fontSize: 17),
+                      style: TextStyle(fontSize: 16),
                     ),
                     Text(
                       '- Drivers License (1 or 2 - Professional)',
-                      style: TextStyle(fontSize: 17),
+                      style: TextStyle(fontSize: 16),
                     ),
                     Text(
                       '- Barangay/Police/NBI Clearance(if available)',
-                      style: TextStyle(fontSize: 17),
+                      style: TextStyle(fontSize: 16),
                     ),
                     Text(
                       '- Fire Safety Certification',
-                      style: TextStyle(fontSize: 17),
+                      style: TextStyle(fontSize: 16),
                     ),
                     Text(
                       '- Verified Gcash Account',
-                      style: TextStyle(fontSize: 17),
+                      style: TextStyle(fontSize: 16),
                     ),
                     SizedBox(height: 20),
                     Text(
                       'Note: You are required to undergo seminar once hired. Other details will be provided during the interview.',
-                      style: TextStyle(fontSize: 17),
+                      style: TextStyle(fontSize: 16),
                     ),
                   ],
                 ),
@@ -317,11 +358,11 @@ void showCustomOverlay(BuildContext context, String message) {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Colors.grey.shade300,
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.5),
+                color: const Color(0xFF050404).withOpacity(0.5),
                 blurRadius: 6,
                 offset: const Offset(0, 3),
               ),
@@ -330,7 +371,10 @@ void showCustomOverlay(BuildContext context, String message) {
           child: Text(
             message,
             style: const TextStyle(
-                color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
+              color: Colors.black,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
             textAlign: TextAlign.center,
           ),
         ),

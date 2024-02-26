@@ -1,5 +1,3 @@
-import 'package:customer_app/routes/app_routes.dart';
-import 'package:customer_app/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -64,30 +62,32 @@ class _FaqPageState extends State<FaqPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
         backgroundColor: Colors.white,
-        title: const Text(
+        elevation: 1,
+        title: Text(
           'Frequently Asked Questions',
-          style: TextStyle(color: Color(0xFF232937), fontSize: 24),
+          style: TextStyle(
+            color: const Color(0xFF050404).withOpacity(0.9),
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
         ),
+        centerTitle: true,
         automaticallyImplyLeading: false,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(
+            color: Colors.black,
+            height: 0.2,
+          ),
+        ),
       ),
+      backgroundColor: Colors.white,
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: CustomButton(
-              backgroundColor: Color(0xFF232937),
-              onPressed: () {
-                Navigator.pushNamed(context, forecastPage);
-              },
-              text: 'View Updated Prices',
-            ),
-          ),
-          Divider(),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: RefreshIndicator(
                 onRefresh: refreshData,
                 child: ListView.builder(

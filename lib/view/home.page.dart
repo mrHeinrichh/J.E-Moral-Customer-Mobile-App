@@ -1,8 +1,8 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:customer_app/routes/app_routes.dart';
 import 'package:customer_app/view/product_details.page.dart';
-import 'package:customer_app/widgets/custom_button.dart';
 import 'package:customer_app/widgets/fullscreen_image.dart';
+import 'package:customer_app/widgets/home_page_cart.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -261,53 +261,9 @@ class _HomePageState extends State<HomePage> {
                           itemBuilder:
                               (BuildContext context, int index, int realIndex) {
                             if (index == 0) {
-                              return SizedBox(
-                                child: Center(
-                                  child: Card(
-                                    elevation: 1,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(15),
-                                    ),
-                                    color: Colors.white,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          'Fueling Your Life with Clean Energy',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 26,
-                                            color: const Color(0xFF050404)
-                                                .withOpacity(0.8),
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                        Text(
-                                          'Applying for a Delivery Driver?',
-                                          style: TextStyle(
-                                            color: const Color(0xFF050404)
-                                                .withOpacity(0.8),
-                                            fontSize: 12,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                        const SizedBox(height: 5),
-                                        AppointmentButton(
-                                          onPressed: () {
-                                            Navigator.pushNamed(
-                                                context, appointmentRoute);
-                                          },
-                                          text: 'Book an Appointment',
-                                          height: 30,
-                                          width: 210,
-                                          fontz: 12,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              );
+                              return ApplyRiderCard();
+                            } else if (index == 1) {
+                              return PriceForecastCard();
                             } else {
                               final announcement = announcements[index - 1];
 
@@ -590,6 +546,8 @@ class _HomePageState extends State<HomePage> {
                                                       color: const Color(
                                                               0xFFd41111)
                                                           .withOpacity(0.8),
+                                                      fontWeight:
+                                                          FontWeight.bold,
                                                     ),
                                                   ),
                                                 ),

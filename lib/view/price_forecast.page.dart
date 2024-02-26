@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class ForecastPage extends StatefulWidget {
   @override
@@ -17,17 +18,54 @@ class ResponseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
       child: Card(
-        margin: EdgeInsets.symmetric(vertical: 10),
+        margin: const EdgeInsets.symmetric(vertical: 5),
         child: ListTile(
           // title: Text(priceData.item),
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Price: \₱${priceData.price.toString()}'),
-              Text('Reason: \₱${priceData.reason.toString()}'),
-              Text('Changed at: ${_formatDate(priceData.createdAt)}'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Price: ",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                      "₱${NumberFormat.decimalPattern().format(double.parse((priceData.price ?? 0).toStringAsFixed(2)))}"),
+                ],
+              ),
+              Text.rich(
+                TextSpan(
+                  children: [
+                    const TextSpan(
+                      text: "Reason: ",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextSpan(
+                      text: priceData.reason.toString(),
+                    ),
+                  ],
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Updated at: ",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(_formatDate(priceData.createdAt)),
+                ],
+              ),
             ],
           ),
         ),
@@ -36,27 +74,25 @@ class ResponseCard extends StatelessWidget {
   }
 
   String _formatDate(DateTime date) {
-    // Customize the date format according to your needs
-    return DateFormat.yMMMd().add_Hm().format(date);
+    return DateFormat.yMMMMd().format(date);
   }
 }
 
 Widget buildLineChart(
     List<PriceData> priceData, DateTime startDate, DateTime endDate) {
   List<FlSpot> spots = priceData.map((data) {
-    // Calculate days since the start date
     double x = data.createdAt.difference(startDate).inDays.toDouble();
     return FlSpot(x, data.price);
   }).toList();
 
   return LineChart(
     LineChartData(
-      gridData: FlGridData(show: true),
-      titlesData: FlTitlesData(
+      gridData: const FlGridData(show: true),
+      titlesData: const FlTitlesData(
         show: true,
       ),
       borderData: FlBorderData(show: true),
-      minX: startDate.day.toDouble(), // Start from 0 days
+      minX: startDate.day.toDouble(),
       maxX: endDate.difference(startDate).inDays.toDouble(),
       minY: priceData.map((data) => data.price).reduce((a, b) => a < b ? a : b),
       maxY: priceData.map((data) => data.price).reduce((a, b) => a > b ? a : b),
@@ -65,7 +101,7 @@ Widget buildLineChart(
           spots: spots,
           isCurved: false,
           color: Colors.blue,
-          dotData: FlDotData(show: true),
+          dotData: const FlDotData(show: true),
           belowBarData: BarAreaData(show: true),
         ),
       ],
@@ -110,9 +146,21 @@ class _ForecastPageState extends State<ForecastPage> {
   Future<void> _selectStartDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: DateTime(DateTime.now().year, DateTime.now().month, 1),
       firstDate: DateTime(2022),
       lastDate: DateTime(2101),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: ColorScheme.light(
+              primary: const Color(0xFF050404).withOpacity(0.8),
+              onPrimary: Colors.white,
+            ),
+            backgroundColor: Colors.white,
+          ),
+          child: child!,
+        );
+      },
     );
 
     if (picked != null && picked != startDate) {
@@ -123,11 +171,27 @@ class _ForecastPageState extends State<ForecastPage> {
   }
 
   Future<void> _selectEndDate(BuildContext context) async {
+    DateTime currentDate = DateTime.now();
+    DateTime lastDayOfMonth =
+        DateTime(currentDate.year, currentDate.month + 1, 0);
+
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: lastDayOfMonth,
       firstDate: DateTime(2022),
       lastDate: DateTime(2101),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: ColorScheme.light(
+              primary: const Color(0xFF050404).withOpacity(0.8),
+              onPrimary: Colors.white,
+            ),
+            backgroundColor: Colors.white,
+          ),
+          child: child!,
+        );
+      },
     );
 
     if (picked != null && picked != endDate) {
@@ -168,110 +232,240 @@ class _ForecastPageState extends State<ForecastPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
         backgroundColor: Colors.white,
-        title: const Text(
-          'Price Forecast Page',
-          style: TextStyle(color: Color(0xFF232937), fontSize: 24),
+        elevation: 1,
+        title: Text(
+          'Price Forecasting',
+          style: TextStyle(
+            color: const Color(0xFF050404).withOpacity(0.9),
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(
+            color: Colors.black,
+            height: 0.2,
+          ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            FutureBuilder<List<Item>?>(
-              future: fetchItems(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
-                } else if (snapshot.hasError || snapshot.data == null) {
-                  return Text(
-                      'Error: ${snapshot.error ?? "Unable to fetch data"}');
-                } else {
-                  List<Item> items = snapshot.data!;
-                  List<DropdownMenuItem<Item>> dropdownItems = items
-                      .map(
-                        (item) => DropdownMenuItem<Item>(
-                          value: item,
-                          child: Text(item.name ?? ''),
-                        ),
-                      )
-                      .toList();
+      backgroundColor: Colors.white,
+      body: FutureBuilder<List<Item>?>(
+        future: fetchItems(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: LoadingAnimationWidget.flickr(
+                leftDotColor: const Color(0xFF050404).withOpacity(0.8),
+                rightDotColor: const Color(0xFFd41111).withOpacity(0.8),
+                size: 40,
+              ),
+            );
+          } else if (snapshot.hasError || snapshot.data == null) {
+            return Text('Error: ${snapshot.error ?? "Unable to fetch data"}');
+          } else {
+            List<Item> items = snapshot.data!;
+            List<DropdownMenuItem<Item>> dropdownItems = items
+                .map(
+                  (item) => DropdownMenuItem<Item>(
+                    value: item,
+                    child: Text(item.name ?? ''),
+                  ),
+                )
+                .toList();
 
-                  if (startDate != null && endDate != null) {
-                    dropdownItems.add(
-                      DropdownMenuItem<Item>(
-                        value: Item(id: 'custom_date', name: 'Custom Date'),
-                        child: Text(
-                          'Start: ${startDate?.toLocal()} - End: ${endDate?.toLocal()}',
-                        ),
-                      ),
-                    );
-                  }
-
-                  return Padding(
-                    padding: const EdgeInsets.all(50.0),
+            if (startDate != null && endDate != null) {
+              dropdownItems.add(
+                DropdownMenuItem<Item>(
+                  value: Item(id: 'custom_date', name: 'Custom Date'),
+                  child: Text(
+                    'Start: ${startDate?.toLocal()} - End: ${endDate?.toLocal()}',
+                  ),
+                ),
+              );
+            }
+            return SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 50,
+                      vertical: 30,
+                    ),
                     child: Column(
                       children: [
-                        Container(
-                          width: 300,
-                          child: DropdownButton<Item>(
-                            isExpanded: true,
-                            items: dropdownItems,
-                            onChanged: (selectedItem) {
-                              setState(() {
-                                selectedDropdownItem = selectedItem;
-                              });
-
-                              if (selectedItem != null &&
-                                  selectedItem.id == 'custom_date') {
-                                _selectStartDate(context);
-                              } else if (selectedItem != null) {
-                                fetchData();
-                              }
-                            },
-                            hint: Text(
-                                selectedDropdownItem?.name ?? 'Select an item'),
+                        Text(
+                          'Select the Date:',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: const Color(0xFF050404).withOpacity(0.8),
                           ),
                         ),
-                        SizedBox(height: 20),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             ElevatedButton(
                               onPressed: () => _selectStartDate(context),
-                              child: Text('Select Start Date'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: startDate != null
+                                    ? Colors.white
+                                    : const Color(0xFF050404).withOpacity(0.8),
+                                elevation: 4,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                              ),
+                              child: Container(
+                                width: 70,
+                                alignment: Alignment.center,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                child: Text(
+                                  'Start Date',
+                                  style: TextStyle(
+                                    color: startDate != null
+                                        ? const Color(0xFF050404)
+                                        : Colors.white,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
                             ),
                             ElevatedButton(
                               onPressed: () => _selectEndDate(context),
-                              child: Text('Select End Date'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: endDate != null
+                                    ? Colors.white
+                                    : const Color(0xFF050404).withOpacity(0.8),
+                                elevation: 4,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                              ),
+                              child: Container(
+                                width: 70,
+                                alignment: Alignment.center,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                child: Text(
+                                  'End Date',
+                                  style: TextStyle(
+                                    color: endDate != null
+                                        ? const Color(0xFF050404)
+                                        : Colors.white,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
                             ),
                           ],
                         ),
-                        SizedBox(height: 20),
-                        Text(
-                          'Start Date: ${startDate?.toLocal().toString() ?? 'Not selected'}',
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text(
+                              "Start Date: ",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              startDate != null
+                                  ? DateFormat('MMMM d, y').format(startDate!)
+                                  : 'Not selected',
+                            ),
+                          ],
                         ),
-                        Text(
-                          'End Date: ${endDate?.toLocal().toString() ?? 'Not selected'}',
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text(
+                              "End Date: ",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              endDate != null
+                                  ? DateFormat('MMMM d, y').format(endDate!)
+                                  : 'Not selected',
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        Container(
+                          width: 300,
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: const Color(0xFF050404).withOpacity(0.8),
+                              width: 1,
+                            ),
+                          ),
+                          child: GestureDetector(
+                            onTap: startDate != null && endDate != null
+                                ? null
+                                : () {
+                                    showCustomOverlay(context,
+                                        'Select the Start and End Date First!');
+                                  },
+                            child: DropdownButton<Item>(
+                              isExpanded: true,
+                              underline: const SizedBox(),
+                              icon: const Icon(Icons.arrow_drop_down),
+                              iconSize: 32,
+                              elevation: 8,
+                              alignment: Alignment.center,
+                              items: dropdownItems,
+                              onChanged: startDate != null && endDate != null
+                                  ? (selectedItem) {
+                                      setState(() {
+                                        selectedDropdownItem = selectedItem;
+                                      });
+
+                                      if (selectedItem != null &&
+                                          selectedItem.id == 'custom_date') {
+                                        _selectStartDate(context);
+                                      } else if (selectedItem != null) {
+                                        fetchData();
+                                      }
+                                    }
+                                  : null,
+                              hint: Text(
+                                selectedDropdownItem?.name ??
+                                    'Select the Product:',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color:
+                                      const Color(0xFF050404).withOpacity(0.8),
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
-                  );
-                }
-              },
-            ),
-            if (priceData.isNotEmpty)
-              Container(
-                // Wrap your LineChart with a Container
-                height: 300, // Set a fixed height or adjust based on your needs
-                child: buildLineChart(priceData, startDate!, endDate!),
-              )
-            else
-              Text('No data available'),
-            ...priceData.map((data) => ResponseCard(priceData: data)).toList(),
-          ],
-        ),
+                  ),
+                  if (priceData.isNotEmpty)
+                    SizedBox(
+                      height: 300,
+                      child: buildLineChart(priceData, startDate!, endDate!),
+                    )
+                  else
+                    const Text('No data available.'),
+                  ...priceData
+                      .map((data) => ResponseCard(priceData: data))
+                      .toList(),
+                ],
+              ),
+            );
+          }
+        },
       ),
     );
   }
@@ -329,4 +523,46 @@ class PriceData {
       v: json['__v'],
     );
   }
+}
+
+void showCustomOverlay(BuildContext context, String message) {
+  final overlay = OverlayEntry(
+    builder: (context) => Positioned(
+      top: MediaQuery.of(context).size.height * 0.5,
+      left: 20,
+      right: 20,
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade300,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF050404).withOpacity(0.5),
+                blurRadius: 6,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Text(
+            message,
+            style: const TextStyle(
+              color: Colors.black,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
+    ),
+  );
+
+  Overlay.of(context)!.insert(overlay);
+
+  Future.delayed(const Duration(seconds: 2), () {
+    overlay.remove();
+  });
 }
