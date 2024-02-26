@@ -1,3 +1,5 @@
+//my_orders.page.dart
+
 import 'package:customer_app/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -106,7 +108,10 @@ class _MyOrderPageState extends State<MyOrderPage> {
 
     final filterQuery =
         '{"to": "$userId", "__t": "Delivery", "hasFeedback": false}';
-    final searchUrl = '$apiUrl/?filter=$filterQuery';
+
+    // Add a limit parameter to the search URL
+    final searchUrl =
+        '$apiUrl/?filter=$filterQuery&limit=300'; // Adjust the limit value as needed
 
     final response = await http.get(Uri.parse(searchUrl));
 
@@ -115,6 +120,13 @@ class _MyOrderPageState extends State<MyOrderPage> {
       print(response.body);
       if (data != null && data['status'] == 'success') {
         final List<dynamic> transactionsData = data['data'] ?? [];
+
+        transactionsData.sort((a, b) {
+          // Convert updatedAt strings to DateTime and compare
+          DateTime dateTimeA = DateTime.parse(a['updatedAt']);
+          DateTime dateTimeB = DateTime.parse(b['updatedAt']);
+          return dateTimeB.compareTo(dateTimeA);
+        });
 
         setState(() {
           visibleTransactions = transactionsData
@@ -183,15 +195,24 @@ class _MyOrderPageState extends State<MyOrderPage> {
     } else {}
   }
 
+  Future<void> refreshData(userId) async {
+    await fetchTransactions(userId);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
-        title: const Text(
+        title: Text(
           'My Orders',
-          style: TextStyle(color: Color(0xFF232937), fontSize: 24),
+          // style: TextStyle(color: Color(0xFF232937), fontSize: 24),
+          style: TextStyle(
+            color: const Color(0xFF050404).withOpacity(0.9),
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         actions: [
           IconButton(
@@ -225,7 +246,7 @@ class _MyOrderPageState extends State<MyOrderPage> {
                   transaction: visibleTransactions[i],
                   onDeleteTransaction: () =>
                       deleteTransaction(visibleTransactions[i].id),
-                  orderNumber: i + 1,
+                  orderNumber: visibleTransactions.length - i, // Changed here
                 ),
               ),
           ],
@@ -308,16 +329,51 @@ class _TransactionCardState extends State<TransactionCard> {
                       ),
                       const Spacer(),
                       Text(
-                          "₱${NumberFormat.decimalPattern().format(widget.transaction.total)}"),
+                        "₱${NumberFormat.decimalPattern().format(widget.transaction.total)}",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
-                  Text("Status: ${widget.transaction.status}"),
+                  RichText(
+                    text: TextSpan(
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black), // Default text style
+                      children: [
+                        TextSpan(
+                          text: "Status: ",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold), // Bold style
+                        ),
+                        TextSpan(
+                          text: "${widget.transaction.status}", // Regular style
+                        ),
+                      ],
+                    ),
+                  ),
                   Visibility(
                     visible: widget.transaction.cancelReason != null &&
                         widget.transaction.cancelReason.isNotEmpty,
-                    child: Text(
-                      "Cancel Reason: ${widget.transaction.cancelReason}",
-                      style: const TextStyle(fontSize: 16),
+                    child: RichText(
+                      text: TextSpan(
+                        style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black), // Default text style
+                        children: [
+                          TextSpan(
+                            text: "Cancel Reason: ",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold), // Bold style
+                          ),
+                          TextSpan(
+                            text:
+                                "${widget.transaction.cancelReason}", // Regular style
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   CustomButton(
@@ -493,16 +549,6 @@ class TransactionDetailsModal extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    const Text(
-                      'Delivery Date/Time: ',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    Text(DateFormat('MMM d, y - h:mm a ')
-                        .format(DateTime.parse(transaction.deliveryDate))),
-                  ],
-                ),
-                Row(
-                  children: [
                     Expanded(
                       child: Text.rich(
                         TextSpan(
@@ -536,6 +582,16 @@ class TransactionDetailsModal extends StatelessWidget {
                     Text(
                       '₱${NumberFormat.decimalPattern().format(transaction.total)}',
                     ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    const Text(
+                      'Delivery Date/Time: ',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text(DateFormat('MMM d, y - h:mm a ')
+                        .format(DateTime.parse(transaction.deliveryDate))),
                   ],
                 ),
                 const Divider(),

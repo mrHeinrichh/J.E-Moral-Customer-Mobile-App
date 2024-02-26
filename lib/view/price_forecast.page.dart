@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:intl/intl.dart';
 
 class ForecastPage extends StatefulWidget {
   @override
@@ -12,6 +13,7 @@ class ForecastPage extends StatefulWidget {
 
 class ResponseCard extends StatelessWidget {
   final PriceData priceData;
+  final DateFormat dateTimeFormatter = DateFormat('MMMM d, y, hh:mm a');
 
   ResponseCard({required this.priceData});
 
@@ -63,7 +65,7 @@ class ResponseCard extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Text(_formatDate(priceData.createdAt)),
+                  Text(dateTimeFormatter.format(priceData.updatedAt)),
                 ],
               ),
             ],
@@ -217,8 +219,14 @@ class _ForecastPageState extends State<ForecastPage> {
             responseData.containsKey('data') &&
             responseData['data'] is List) {
           List<dynamic> data = responseData['data'];
+          List<PriceData> fetchedData =
+              data.map((item) => PriceData.fromJson(item)).toList();
+
+          // Sort fetchedData based on updatedAt in descending order
+          fetchedData.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+
           setState(() {
-            priceData = data.map((item) => PriceData.fromJson(item)).toList();
+            priceData = fetchedData;
           });
         }
       } else {
