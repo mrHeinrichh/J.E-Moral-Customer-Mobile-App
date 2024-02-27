@@ -517,6 +517,7 @@ class _HomePageState extends State<HomePage> {
                                             child: Column(
                                               children: [
                                                 Card(
+                                                  color: Colors.white,
                                                   child: ClipRRect(
                                                     borderRadius:
                                                         BorderRadius.circular(

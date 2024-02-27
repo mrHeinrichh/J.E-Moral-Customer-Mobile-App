@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:customer_app/widgets/custom_button.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'cart_provider.dart';
 
@@ -84,19 +85,19 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                // decoration: BoxDecoration(
-                //   border: Border.all(
-                //     color: const Color(0xFF050404),
-                //     width: 1,
-                //   ),
-                //   borderRadius: BorderRadius.circular(12),
-                // ),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: const Color(0xFF050404),
+                    width: 0.1,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: Image.network(
                     widget.productImageUrl,
                     width: double.infinity,
-                    height: 320,
+                    height: 300,
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -170,8 +171,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         ),
       ),
       bottomNavigationBar: SizedBox(
-        // height: 170,
-        height: 165,
+        height: 175,
         child: Container(
           decoration: BoxDecoration(
             color: Colors.white,
@@ -187,7 +187,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             child: Padding(
               padding: const EdgeInsets.all(5),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -270,64 +270,65 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 5),
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "Total Price: ",
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: const Color(0xFF050404).withOpacity(0.8),
-                            fontWeight: FontWeight.bold,
-                          ),
+                  const SizedBox(height: 15),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Total Price: ",
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: const Color(0xFF050404).withOpacity(0.8),
+                          fontWeight: FontWeight.bold,
                         ),
-                        TextSpan(
-                          text: totalPrice % 1 == 0
-                              ? '₱${totalPrice.toInt().toString()}'
-                              : '₱${totalPrice.toStringAsFixed(2).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match match) => '${match[1]},')}',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: const Color(0xFFd41111).withOpacity(0.8),
-                            fontWeight: FontWeight.bold,
-                          ),
+                      ),
+                      Text(
+                        totalPrice % 1 == 0
+                            ? '₱${totalPrice.toInt().toString()}'
+                            : '₱${totalPrice.toStringAsFixed(2).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match match) => '${match[1]},')}',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: const Color(0xFFd41111).withOpacity(0.8),
+                          fontWeight: FontWeight.bold,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  CartButton(
-                    onPressed: stock > 0
-                        ? () {
-                            if (stock > 0) {
-                              cartProvider.addToCart(
-                                cartItem: CartItem(
-                                  id: widget.id,
-                                  name: widget.productName,
-                                  description: widget.description,
-                                  category: widget.category,
-                                  customerPrice:
-                                      double.parse(widget.productPrice),
-                                  stock: stock,
-                                  imageUrl: widget.productImageUrl,
-                                  availableStock: int.parse(widget.stock),
-                                ),
-                                context: context,
-                              );
+                  Center(
+                    child: CartButton(
+                      onPressed: stock > 0
+                          ? () {
+                              if (stock > 0) {
+                                cartProvider.addToCart(
+                                  cartItem: CartItem(
+                                    id: widget.id,
+                                    name: widget.productName,
+                                    description: widget.description,
+                                    category: widget.category,
+                                    customerPrice:
+                                        double.parse(widget.productPrice),
+                                    stock: stock,
+                                    imageUrl: widget.productImageUrl,
+                                    availableStock: int.parse(widget.stock),
+                                  ),
+                                  context: context,
+                                );
+                              }
                             }
-                          }
-                        : () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Product is out of stock.'),
-                                duration: Duration(seconds: 2),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                          },
-                    text: 'Add to Cart',
-                    height: 50,
-                    width: 220,
-                    fontz: 20,
+                          : () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Product is out of stock.'),
+                                  duration: Duration(seconds: 2),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            },
+                      text: 'Add to Cart',
+                      height: 50,
+                      width: 220,
+                      fontz: 20,
+                    ),
                   ),
                 ],
               ),

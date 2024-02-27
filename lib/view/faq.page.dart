@@ -87,37 +87,42 @@ class _FaqPageState extends State<FaqPage> {
         children: [
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(top: 20, left: 15, right: 15),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: RefreshIndicator(
                 onRefresh: refreshData,
                 child: ListView.builder(
                   itemCount: faqs.length,
                   itemBuilder: (context, index) {
                     final faq = faqs[index];
-                    return GestureDetector(
-                      onTap: () {
-                        _showCustomerDetailsModal(faq);
-                      },
-                      child: Card(
-                        elevation: 3,
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
+                    return Column(
+                      children: [
+                        const SizedBox(height: 5),
+                        GestureDetector(
+                          onTap: () {
+                            _showCustomerDetailsModal(faq);
+                          },
+                          child: Card(
+                            elevation: 3,
+                            child: Padding(
+                              padding: const EdgeInsets.all(20.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Expanded(
-                                    child: Text("${faq['question']}",
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.bold)),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text("${faq['question']}",
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     );
                   },
                 ),
