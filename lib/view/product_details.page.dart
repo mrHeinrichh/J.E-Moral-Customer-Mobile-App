@@ -111,36 +111,56 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 ),
               ),
               const SizedBox(height: 10),
-              Text(
-                "Description:",
-                style: Theme.of(context).textTheme.labelLarge!.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Description:",
+                    style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        "Price: ",
+                        style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
+                      Text(
+                        "₱${widget.showProductPrice}",
+                        style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFFd41111).withOpacity(0.8),
+                            ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
+              const SizedBox(height: 5),
               Text(
                 widget.description,
-                style: Theme.of(context).textTheme.titleMedium!,
-                textAlign: TextAlign.start,
+                style: const TextStyle(
+                  fontSize: 14,
+                ),
               ),
               const SizedBox(height: 10),
               if (widget.category != "Accessories")
                 Row(
                   children: [
-                    Expanded(
-                      flex: 2,
-                      child: Text(
-                        "Weight:",
-                        style: Theme.of(context)
-                            .textTheme
-                            .labelMedium!
-                            .copyWith(fontWeight: FontWeight.bold),
-                      ),
+                    Text(
+                      "Weight: ",
+                      style: Theme.of(context)
+                          .textTheme
+                          .labelMedium!
+                          .copyWith(fontWeight: FontWeight.bold),
                     ),
-                    Expanded(
-                      flex: 4,
-                      child: Text(
-                        "${widget.weight} kg.",
-                        style: Theme.of(context).textTheme.titleMedium!,
+                    Text(
+                      "${widget.weight} kg.",
+                      style: const TextStyle(
+                        fontSize: 14,
                       ),
                     ),
                   ],
@@ -255,7 +275,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     TextSpan(
                       children: [
                         TextSpan(
-                          text: "Price: ",
+                          text: "Total Price: ",
                           style: TextStyle(
                             fontSize: 18,
                             color: const Color(0xFF050404).withOpacity(0.8),

@@ -48,8 +48,10 @@ class CartProvider extends ChangeNotifier {
   }
 
   void incrementStock(CartItem item) {
-    item.stock++;
-    notifyListeners();
+    if (item.stock < item.availableStock) {
+      item.stock++;
+      notifyListeners();
+    }
   }
 
   void clearCart() {

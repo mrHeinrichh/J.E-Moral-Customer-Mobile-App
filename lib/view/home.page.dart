@@ -2,7 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:customer_app/routes/app_routes.dart';
 import 'package:customer_app/view/product_details.page.dart';
 import 'package:customer_app/widgets/fullscreen_image.dart';
-import 'package:customer_app/widgets/home_page_cart.dart';
+import 'package:customer_app/widgets/home_page_card.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';

@@ -153,7 +153,7 @@ class _CartPageState extends State<CartPage> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      "Price:",
+                                      "Total Price:",
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,

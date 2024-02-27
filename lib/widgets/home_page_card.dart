@@ -108,7 +108,7 @@ class PriceForecastCard extends StatelessWidget {
                   onPressed: () {
                     Navigator.pushNamed(context, forecastPage);
                   },
-                  text: 'View Updated Prices',
+                  text: 'View Price Updates',
                   height: 30,
                   width: 210,
                   fontz: 12,
