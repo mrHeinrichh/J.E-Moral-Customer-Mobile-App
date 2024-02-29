@@ -161,7 +161,7 @@ class _MyOrderPageState extends State<MyOrderPage> {
     } else {}
   }
 
-  Future<void> deleteTransaction(String transactionId) async {
+  Future<void> cancelTransaction(String transactionId) async {
     final response = await http.patch(
       Uri.parse(
           'https://lpg-api-06n8.onrender.com/api/v1/transactions/$transactionId'),
@@ -175,10 +175,6 @@ class _MyOrderPageState extends State<MyOrderPage> {
       print(response.body);
       setState(() {});
     } else {}
-  }
-
-  Future<void> refreshData(userId) async {
-    await fetchTransactions(userId);
   }
 
   @override
@@ -236,7 +232,7 @@ class _MyOrderPageState extends State<MyOrderPage> {
                   child: TransactionCard(
                     transaction: visibleTransactions[i],
                     onDeleteTransaction: () {
-                      deleteTransaction(visibleTransactions[i].id);
+                      cancelTransaction(visibleTransactions[i].id);
                       reloadTransactions();
                     },
                     reloadTransactions: reloadTransactions,
@@ -372,7 +368,6 @@ class _TransactionCardState extends State<TransactionCard> {
                                       onPressed: () {
                                         removeTransaction(
                                             widget.transaction.id);
-                                        Navigator.of(context).pop();
                                       },
                                       style: TextButton.styleFrom(
                                         primary: const Color(0xFFd41111)
@@ -518,8 +513,10 @@ class _TransactionCardState extends State<TransactionCard> {
 
     if (response.statusCode == 200) {
       print(response.body);
-      setState(() {});
-    }
+
+      widget.reloadTransactions();
+      Navigator.of(context).pop();
+    } else {}
   }
 }
 

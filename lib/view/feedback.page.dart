@@ -14,6 +14,8 @@ class FeedbackPage extends StatefulWidget {
 }
 
 class _FeedbackPageState extends State<FeedbackPage> {
+  final formKey = GlobalKey<FormState>();
+
   double rating = 0.0;
   double rating1 = 0.0;
   double rating2 = 0.0;
@@ -37,253 +39,371 @@ class _FeedbackPageState extends State<FeedbackPage> {
     print(transaction.id);
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: true,
-        elevation: 0,
         backgroundColor: Colors.white,
-        title: const Padding(
-          padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-          child: Text(
-            'Feedback',
-            style: TextStyle(color: Color(0xFF232937), fontSize: 24),
+        elevation: 1,
+        title: Text(
+          'Feedback',
+          style: TextStyle(
+            color: const Color(0xFF050404).withOpacity(0.9),
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        iconTheme: IconThemeData(
+          color: const Color(0xFF050404).withOpacity(0.8),
+        ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(
+            color: Colors.black,
+            height: 0.2,
           ),
         ),
       ),
+      backgroundColor: Colors.white,
       body: Padding(
-        padding: EdgeInsets.all(20.0),
-        child: ListView(
-          children: [
-            const Text(
-              'Application Responsiveness',
-              style: TextStyle(
-                color: Color(0xFF232937),
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+        padding: const EdgeInsets.all(20),
+        child: SingleChildScrollView(
+          child: Form(
+            key: formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                const Text(
+                  'Application Responsiveness',
+                  style: TextStyle(
+                    color: Color(0xFF050404),
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                const Text(
+                  'How satisfied are you with the speed and responsiveness of our mobile/web application when browsing and making purchases?',
+                  style: TextStyle(
+                    color: Color(0xFF050404),
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                RatingBar.builder(
+                  initialRating: rating,
+                  minRating: 1,
+                  direction: Axis.horizontal,
+                  allowHalfRating: false,
+                  itemCount: 5,
+                  itemSize: 35,
+                  itemBuilder: (context, _) => const Icon(
+                    Icons.star,
+                    color: Colors.amber,
+                  ),
+                  onRatingUpdate: (newRating) {
+                    setState(() {
+                      rating = newRating;
+                    });
+                  },
+                ),
+                const SizedBox(height: 5),
+                const Text(
+                  'Explain why you give such rating?',
+                  style: TextStyle(
+                    color: Color(0xFF050404),
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                FeedbackTextField(
+                  controller: userInterfaceController,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return "Please provide an explanation for your rating.";
+                    } else if (value.length < 5) {
+                      return "Please provide a more detailed explanation.";
+                    } else {
+                      return null;
+                    }
+                  },
+                ),
+                const SizedBox(height: 15),
+                const Text(
+                  'Order Acceptance',
+                  style: TextStyle(
+                    color: Color(0xFF050404),
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                const Text(
+                  'How satisfied are you with the approval and speed of your transaction in the system?',
+                  style: TextStyle(
+                    color: Color(0xFF050404),
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                RatingBar.builder(
+                  initialRating: rating1,
+                  minRating: 1,
+                  direction: Axis.horizontal,
+                  allowHalfRating: false,
+                  itemCount: 5,
+                  itemSize: 35,
+                  itemBuilder: (context, _) => const Icon(
+                    Icons.star,
+                    color: Colors.amber,
+                  ),
+                  onRatingUpdate: (newRating) {
+                    setState(() {
+                      rating1 = newRating;
+                    });
+                  },
+                ),
+                const SizedBox(height: 5),
+                const Text(
+                  'Explain why you give such rating?',
+                  style: TextStyle(
+                    color: Color(0xFF050404),
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                FeedbackTextField(
+                  controller: easeofNavigationController,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return "Please provide an explanation for your rating.";
+                    } else if (value.length < 5) {
+                      return "Please provide a more detailed explanation.";
+                    } else {
+                      return null;
+                    }
+                  },
+                ),
+                const SizedBox(height: 15),
+                const Text(
+                  'Rider Performance',
+                  style: TextStyle(
+                    color: Color(0xFF050404),
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                const Text(
+                  'How satisfied are you with the communication skills and punctuality of the delivery rider in delivering your LPG order?',
+                  style: TextStyle(
+                    color: Color(0xFF050404),
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                RatingBar.builder(
+                  initialRating: rating2,
+                  minRating: 1,
+                  direction: Axis.horizontal,
+                  allowHalfRating: false,
+                  itemCount: 5,
+                  itemSize: 35,
+                  itemBuilder: (context, _) => const Icon(
+                    Icons.star,
+                    color: Colors.amber,
+                  ),
+                  onRatingUpdate: (newRating) {
+                    setState(() {
+                      rating2 = newRating;
+                    });
+                  },
+                ),
+                const SizedBox(height: 5),
+                const Text(
+                  'Explain why you give such rating?',
+                  style: TextStyle(
+                    color: Color(0xFF050404),
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                FeedbackTextField(
+                  controller: orderTimeController,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return "Please provide an explanation for your rating.";
+                    } else if (value.length < 5) {
+                      return "Please provide a more detailed explanation.";
+                    } else {
+                      return null;
+                    }
+                  },
+                ),
+                const SizedBox(height: 15),
+                const Text(
+                  'Overall Satisfaction',
+                  style: TextStyle(
+                    color: Color(0xFF050404),
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                const Text(
+                  'On a scale of 1 to 5, how would you describe your overall experience using our mobile/web application to purchase LPG products?',
+                  style: TextStyle(
+                    color: Color(0xFF050404),
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                RatingBar.builder(
+                  initialRating: rating3,
+                  minRating: 1,
+                  direction: Axis.horizontal,
+                  allowHalfRating: false,
+                  itemCount: 5,
+                  itemSize: 35,
+                  itemBuilder: (context, _) => const Icon(
+                    Icons.star,
+                    color: Colors.amber,
+                  ),
+                  onRatingUpdate: (newRating) {
+                    setState(() {
+                      rating3 = newRating;
+                    });
+                  },
+                ),
+                const SizedBox(height: 5),
+                const Text(
+                  'Explain why you give such rating?',
+                  style: TextStyle(
+                    color: Color(0xFF050404),
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                FeedbackTextField(
+                  controller: riderandDeliveryserviceController,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return "Please provide an explanation for your rating.";
+                    } else if (value.length < 5) {
+                      return "Please provide a more detailed explanation.";
+                    } else {
+                      return null;
+                    }
+                  },
+                ),
+                const SizedBox(height: 15),
+                const Text(
+                  'Recommendation',
+                  style: TextStyle(
+                    color: Color(0xFF050404),
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                const Text(
+                  'Overall, how likely are you to recommend our mobile/web application to others based on your experience using it for LPG purchases?',
+                  style: TextStyle(
+                    color: Color(0xFF050404),
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                RatingBar.builder(
+                  initialRating: rating4,
+                  minRating: 1,
+                  direction: Axis.horizontal,
+                  allowHalfRating: false,
+                  itemCount: 5,
+                  itemSize: 35,
+                  itemBuilder: (context, _) => const Icon(
+                    Icons.star,
+                    color: Colors.amber,
+                  ),
+                  onRatingUpdate: (newRating) {
+                    setState(() {
+                      rating4 = newRating;
+                    });
+                  },
+                ),
+                const SizedBox(height: 5),
+                const Text(
+                  'Explain why you give such rating?',
+                  style: TextStyle(
+                    color: Color(0xFF050404),
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                FeedbackTextField(
+                  controller: announcementsController,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return "Please provide an explanation for your rating.";
+                    } else if (value.length < 5) {
+                      return "Please provide a more detailed explanation.";
+                    } else {
+                      return null;
+                    }
+                  },
+                ),
+                const SizedBox(height: 15),
+                CustomizedButton(
+                  onPressed: () {
+                    if (formKey.currentState!.validate()) {
+                      if (rating == 0.0 ||
+                          rating1 == 0.0 ||
+                          rating2 == 0.0 ||
+                          rating3 == 0.0 ||
+                          rating4 == 0.0) {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Center(
+                                child: Text(
+                                  'Rating Error',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              content: const Text(
+                                "Please ensure that you have selected and provided ratings for all categories.",
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  style: TextButton.styleFrom(
+                                    primary: const Color(0xFF050404)
+                                        .withOpacity(0.8),
+                                  ),
+                                  child: const Text("OK"),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      } else {
+                        submitFeedback(transaction);
+                        print('Submitted Rating: $rating');
+                      }
+                    }
+                  },
+                  text: 'Submit',
+                  height: 50,
+                  width: 340,
+                  fontz: 18,
+                ),
+              ],
             ),
-            const Text(
-              'How satisfied are you with the speed and responsiveness of our mobile/web application when browsing and making purchases?',
-              style: TextStyle(
-                color: Color(0xFF232937),
-                fontSize: 15,
-              ),
-            ),
-            RatingBar.builder(
-              initialRating: rating,
-              minRating: 1,
-              direction: Axis.horizontal,
-              allowHalfRating: false,
-              itemCount: 5,
-              itemSize: 30,
-              itemBuilder: (context, _) => Icon(
-                Icons.star,
-                color: Colors.amber,
-              ),
-              onRatingUpdate: (newRating) {
-                setState(() {
-                  rating = newRating;
-                });
-              },
-            ),
-            const Text(
-              'Explain why you give such rating?',
-              style: TextStyle(
-                color: Color(0xFF232937),
-                fontSize: 15,
-              ),
-            ),
-            FeedbackTextField(
-              labelText: '',
-              hintText: '',
-              controller: userInterfaceController,
-            ),
-            const Text(
-              'Order Acceptance',
-              style: TextStyle(
-                color: Color(0xFF232937),
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const Text(
-              'How satisfied are you with the approval and speed of your transaction in the system?',
-              style: TextStyle(
-                color: Color(0xFF232937),
-                fontSize: 15,
-              ),
-            ),
-            RatingBar.builder(
-              initialRating: rating1,
-              minRating: 1,
-              direction: Axis.horizontal,
-              allowHalfRating: false,
-              itemCount: 5,
-              itemSize: 30,
-              itemBuilder: (context, _) => Icon(
-                Icons.star,
-                color: Colors.amber,
-              ),
-              onRatingUpdate: (newRating) {
-                setState(() {
-                  rating1 = newRating;
-                });
-              },
-            ),
-            const Text(
-              'Explain why you give such rating?',
-              style: TextStyle(
-                color: Color(0xFF232937),
-                fontSize: 15,
-              ),
-            ),
-            FeedbackTextField(
-              labelText: '',
-              hintText: '',
-              controller: easeofNavigationController,
-            ),
-            const Text(
-              'Rider Performance',
-              style: TextStyle(
-                color: Color(0xFF232937),
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const Text(
-              'How satisfied are you with the communication skills and punctuality of the delivery rider in delivering your LPG order?',
-              style: TextStyle(
-                color: Color(0xFF232937),
-                fontSize: 15,
-              ),
-            ),
-            RatingBar.builder(
-              initialRating: rating2,
-              minRating: 1,
-              direction: Axis.horizontal,
-              allowHalfRating: false,
-              itemCount: 5,
-              itemSize: 30,
-              itemBuilder: (context, _) => Icon(
-                Icons.star,
-                color: Colors.amber,
-              ),
-              onRatingUpdate: (newRating) {
-                setState(() {
-                  rating2 = newRating;
-                });
-              },
-            ),
-            const Text(
-              'Explain why you give such rating?',
-              style: TextStyle(
-                color: Color(0xFF232937),
-                fontSize: 15,
-              ),
-            ),
-            FeedbackTextField(
-              labelText: '',
-              hintText: '',
-              controller: orderTimeController,
-            ),
-            const Text(
-              'Overall Satisfaction',
-              style: TextStyle(
-                color: Color(0xFF232937),
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const Text(
-              'On a scale of 1 to 5, how would you describe your overall experience using our mobile/web application to purchase LPG products?',
-              style: TextStyle(
-                color: Color(0xFF232937),
-                fontSize: 15,
-              ),
-            ),
-            RatingBar.builder(
-              initialRating: rating3,
-              minRating: 1,
-              direction: Axis.horizontal,
-              allowHalfRating: false,
-              itemCount: 5,
-              itemSize: 30,
-              itemBuilder: (context, _) => Icon(
-                Icons.star,
-                color: Colors.amber,
-              ),
-              onRatingUpdate: (newRating) {
-                setState(() {
-                  rating3 = newRating;
-                });
-              },
-            ),
-            const Text(
-              'Explain why you give such rating?',
-              style: TextStyle(
-                color: Color(0xFF232937),
-                fontSize: 15,
-              ),
-            ),
-            FeedbackTextField(
-              labelText: '',
-              hintText: '',
-              controller: riderandDeliveryserviceController,
-            ),
-            const Text(
-              'Recommendation',
-              style: TextStyle(
-                color: Color(0xFF232937),
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const Text(
-              'Overall, how likely are you to recommend our mobile/web application to others based on your experience using it for LPG purchases?',
-              style: TextStyle(
-                color: Color(0xFF232937),
-                fontSize: 15,
-              ),
-            ),
-            RatingBar.builder(
-              initialRating: rating4,
-              minRating: 1,
-              direction: Axis.horizontal,
-              allowHalfRating: false,
-              itemCount: 5,
-              itemSize: 30,
-              itemBuilder: (context, _) => Icon(
-                Icons.star,
-                color: Colors.amber,
-              ),
-              onRatingUpdate: (newRating) {
-                setState(() {
-                  rating4 = newRating;
-                });
-              },
-            ),
-            const Text(
-              'Explain why you give such rating?',
-              style: TextStyle(
-                color: Color(0xFF232937),
-                fontSize: 15,
-              ),
-            ),
-            FeedbackTextField(
-              labelText: '',
-              hintText: '',
-              controller: announcementsController,
-            ),
-            CustomizedButton(
-              onPressed: () {
-                submitFeedback(transaction);
-                // Navigator.pushNamed(context, dashboardRoute);
-                print('Submitted Rating: $rating');
-              },
-              text: 'Submit',
-              height: 50,
-              width: 340,
-              fontz: 18,
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -305,103 +425,9 @@ class _FeedbackPageState extends State<FeedbackPage> {
   }
 
   Future<void> submitFeedback(Transaction transaction) async {
-    // List<String> feedbackValues = getFeedbackValues();
-
-    // Validate ratings
-    if (rating == 0.0 ||
-        rating1 == 0.0 ||
-        rating2 == 0.0 ||
-        rating3 == 0.0 ||
-        rating4 == 0.0) {
-      // Show error message for missing ratings
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Center(
-              child: Text(
-                'Error',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            content: const Text("Please provide ratings for all categories."),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                style: TextButton.styleFrom(
-                  primary: const Color(0xFF050404).withOpacity(0.8),
-                ),
-                child: const Text("OK"),
-              ),
-            ],
-          );
-        },
-      );
-      return;
-    }
-
-    if (userInterfaceController.text.trim().isEmpty ||
-        userInterfaceController.text.length < 5 ||
-        easeofNavigationController.text.trim().isEmpty ||
-        easeofNavigationController.text.length < 5 ||
-        orderTimeController.text.trim().isEmpty ||
-        orderTimeController.text.length < 5 ||
-        riderandDeliveryserviceController.text.trim().isEmpty ||
-        riderandDeliveryserviceController.text.length < 5 ||
-        announcementsController.text.trim().isEmpty ||
-        announcementsController.text.length < 5) {
-      // Show error message for missing or insufficient explanations
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Center(
-              child: Text(
-                'Error',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            content: const Text(
-                "Please provide explanations for all categories and ensure each explanation is at least 5 characters long."),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                style: TextButton.styleFrom(
-                  primary: const Color(0xFF050404).withOpacity(0.9),
-                ),
-                child: const Text("OK"),
-              ),
-            ],
-          );
-        },
-      );
-      return;
-    }
-
-    // Map<String, dynamic> feedbackData = {
-    //   "hasFeedback": 'true',
-    //   "feedback":
-    //       getFeedbackValues().join(', '), // Join the array into a string
-    //   "_id": transaction.id,
-    //   "__t": "Delivery"
-    // };
-
-    List<String> feedbackValues = getFeedbackValues();
-
     Map<String, dynamic> feedbackData = {
       "hasFeedback": 'true',
-      "feedback":
-          getFeedbackValues().join(', '), // Join the array into a string
+      "feedback": getFeedbackValues().join(', '),
       "_id": transaction.id,
       "__t": "Delivery"
     };

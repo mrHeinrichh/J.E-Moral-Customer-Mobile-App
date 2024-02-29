@@ -8,7 +8,6 @@ import 'package:customer_app/view/dashboard.page.dart';
 import 'package:customer_app/view/faq.page.dart';
 import 'package:customer_app/view/feedback.page.dart';
 import 'package:customer_app/view/history.page.dart';
-import 'package:customer_app/view/history_details.page.dart';
 import 'package:customer_app/view/login.page.dart';
 import 'package:customer_app/view/maps.page.dart';
 import 'package:customer_app/view/my_orders.page.dart';
@@ -30,7 +29,7 @@ void main() {
         ChangeNotifierProvider(
             create: (context) => CartProviderView.CartProvider()),
         ChangeNotifierProvider(
-            create: (context) => UserProvider()), // Add UserProvider
+            create: (context) => UserProvider()),
         ChangeNotifierProvider(create: (context) => MessageProvider()),
       ],
       child: MyApp(),
@@ -53,7 +52,6 @@ class MyApp extends StatelessWidget {
         cartRoute: (context) => CartView.CartPage(),
         faqRoute: (context) => FaqPage(),
         historyRoute: (context) => HistoryPage(),
-        historyDetails: (context) => HistoryDetails(),
         setDeliveryPage: (context) => SetDeliveryPage(),
         myOrdersPage: (context) => MyOrderPage(),
         trackingPage: (context) => TrackingPage(),

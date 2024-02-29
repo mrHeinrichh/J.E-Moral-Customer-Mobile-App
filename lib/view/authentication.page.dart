@@ -50,7 +50,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
       backgroundColor: Colors.white,
       body: RefreshIndicator(
         color: const Color(0xFF050404),
-        strokeWidth: 2.5,
+          strokeWidth: 2.5,
         onRefresh: () async {
           _key.currentState?.forceRebuild();
         },

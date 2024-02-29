@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:customer_app/view/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
@@ -11,7 +12,7 @@ class ChatPage extends StatefulWidget {
 }
 
 class MessageProvider extends ChangeNotifier {
-  List<Map<String, dynamic>> _messages = [];
+  final List<Map<String, dynamic>> _messages = [];
 
   List<Map<String, dynamic>> get messages => _messages;
   void addMessages(List<Map<String, dynamic>> newMessages) {
@@ -34,11 +35,9 @@ class _ChatPageState extends State<ChatPage> {
   final TextEditingController _textController = TextEditingController();
   late IO.Socket socket;
   final ScrollController _scrollController = ScrollController();
-  bool _isLoading = false;
-  int _currentPage = 1;
-  int _totalMessagesLoaded = 0;
-
-  String? _selectedCustomerId;
+  final bool _isLoading = false;
+  final int _currentPage = 1;
+  final int _totalMessagesLoaded = 0;
 
   @override
   void initState() {
@@ -46,14 +45,10 @@ class _ChatPageState extends State<ChatPage> {
     initializeSocketIO();
     print('initState: Socket.IO initialized');
 
-    // Use the user ID from UserProvider
     String? userId = Provider.of<UserProvider>(context, listen: false).userId;
 
-    // Assuming you have the customer ID available
-    String customerId =
-        "65c73688e4f434d230d289e8"; // Set the appropriate customer ID
+    String customerId = "65c73688e4f434d230d289e8";
 
-    // Call fetchMessagesForCustomer to load initial messages
     fetchAndAddMessages(userId, customerId);
   }
 
@@ -79,7 +74,7 @@ class _ChatPageState extends State<ChatPage> {
       print('Incoming message: $data');
       _scrollController.animateTo(
         _scrollController.position.maxScrollExtent,
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
     });
@@ -107,7 +102,6 @@ class _ChatPageState extends State<ChatPage> {
         List<Map<String, dynamic>> messages =
             List<Map<String, dynamic>>.from(data['data']);
 
-        // Sort messages by createdAt timestamp in descending order
         messages.sort((a, b) => b['createdAt'].compareTo(a['createdAt']));
 
         return messages;
@@ -129,8 +123,7 @@ class _ChatPageState extends State<ChatPage> {
 
     final Map<String, dynamic> messageData = {
       "from": userId,
-      "to":
-          "65c73688e4f434d230d289e8", // Set the selected customer ID as the 'to' field
+      "to": "65c73688e4f434d230d289e8",
       "content": content,
     };
 
@@ -161,11 +154,26 @@ class _ChatPageState extends State<ChatPage> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        elevation: 0,
         backgroundColor: Colors.white,
-        title: const Text(
+        elevation: 1,
+        title: Text(
           'Customer Support',
-          style: TextStyle(color: Color(0xFF232937), fontSize: 24),
+          style: TextStyle(
+            color: const Color(0xFF050404).withOpacity(0.9),
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        iconTheme: IconThemeData(
+          color: const Color(0xFF050404).withOpacity(0.8),
+        ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(
+            color: Colors.black,
+            height: 0.2,
+          ),
         ),
       ),
       body: Padding(
@@ -202,7 +210,7 @@ class _ChatPageState extends State<ChatPage> {
                                 .userId;
                         final isCurrentUser = message['from'] == userId;
                         return Container(
-                          margin: EdgeInsets.symmetric(vertical: 8.0),
+                          margin: const EdgeInsets.symmetric(vertical: 8),
                           child: Row(
                             mainAxisAlignment: isCurrentUser
                                 ? MainAxisAlignment.end
@@ -212,7 +220,7 @@ class _ChatPageState extends State<ChatPage> {
                                 color:
                                     isCurrentUser ? Colors.blue : Colors.grey,
                                 child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(8),
                                   child: Text(
                                     message["content"] ?? "",
                                     style: TextStyle(
@@ -237,7 +245,7 @@ class _ChatPageState extends State<ChatPage> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.only(
+          borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(20.0),
             topRight: Radius.circular(20.0),
           ),
@@ -250,37 +258,41 @@ class _ChatPageState extends State<ChatPage> {
             ),
           ],
         ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  controller: _textController,
-                  decoration: InputDecoration(
-                    hintText: 'Type your message...',
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Row(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  child: TextField(
+                    controller: _textController,
+                    decoration: const InputDecoration(
+                      hintText: 'Type your message...',
+                    ),
                   ),
                 ),
               ),
-            ),
-            IconButton(
-              icon: Icon(Icons.send),
-              onPressed: () {
-                String messageContent = _textController.text;
-                print('Message content: $messageContent');
-                if (messageContent.isNotEmpty) {
-                  sendMessage(messageContent);
-                  _textController.clear();
-                }
-              },
-            )
-          ],
+              IconButton(
+                icon: const Icon(Icons.send),
+                onPressed: () {
+                  String messageContent = _textController.text;
+                  print('Message content: $messageContent');
+                  if (messageContent.isNotEmpty) {
+                    sendMessage(messageContent);
+                    _textController.clear();
+                  }
+                },
+              )
+            ],
+          ),
         ),
       ),
     );
   }
 
-  FocusNode _focusNode = FocusNode();
+  final FocusNode _focusNode = FocusNode();
 
   @override
   void dispose() {

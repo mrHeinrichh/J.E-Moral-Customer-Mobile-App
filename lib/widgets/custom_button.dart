@@ -18,7 +18,7 @@ class CustomButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         backgroundColor: backgroundColor,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(20),
         ),
       ),
       child: Container(
@@ -29,38 +29,6 @@ class CustomButton extends StatelessWidget {
           text,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 18,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class CustomWhiteButton extends StatelessWidget {
-  final VoidCallback onPressed;
-  final String text;
-
-  CustomWhiteButton({required this.onPressed, required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30),
-        ),
-      ),
-      child: Container(
-        width: double.infinity,
-        alignment: Alignment.center,
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        child: Text(
-          text,
-          style: const TextStyle(
-            color: Color(0xFF232937),
             fontSize: 18,
           ),
         ),
@@ -89,7 +57,7 @@ class CustomizedButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(8),
       child: Container(
         height: height,
         width: width,
@@ -100,7 +68,7 @@ class CustomizedButton extends StatelessWidget {
                 ? const Color(0xFF050404).withOpacity(0.9)
                 : const Color(0xFF050404).withOpacity(0.4),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: BorderRadius.circular(16),
             ),
           ),
           child: Container(
