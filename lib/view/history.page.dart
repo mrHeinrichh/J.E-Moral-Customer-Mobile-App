@@ -32,8 +32,7 @@ class _HistoryPageState extends State<HistoryPage> {
     }
 
     final apiUrl = 'https://lpg-api-06n8.onrender.com/api/v1/transactions';
-    final filterUrl =
-        '$apiUrl/?filter={"to":"$userId", "__t" : "Delivery"}&limit=900'; // Added limit parameter
+    final filterUrl = '$apiUrl/?filter={"to":"$userId", "__t" : "Delivery"}';
 
     final response = await http.get(Uri.parse(filterUrl));
     if (!mounted) {
@@ -48,7 +47,11 @@ class _HistoryPageState extends State<HistoryPage> {
         final List<dynamic> transactionsData = data['data'] ?? [];
 
         setState(() {
-          visibleTransactions = transactionsData.cast<Map<String, dynamic>>();
+          // Clear the existing list before adding new transactions
+          visibleTransactions.clear();
+          // Add new transactions to the list
+          visibleTransactions
+              .addAll(transactionsData.cast<Map<String, dynamic>>());
           // Sort transactions based on 'updatedAt' in descending order
           visibleTransactions.sort((a, b) => DateTime.parse(b['updatedAt'])
               .compareTo(DateTime.parse(a['updatedAt'])));
@@ -101,10 +104,6 @@ class _HistoryPageState extends State<HistoryPage> {
           padding: const EdgeInsets.all(8.0),
           child: ListView(
             children: [
-              // Text("View Current Orders Here!"),
-              SizedBox(
-                height: 0,
-              ),
               CustomButton(
                 backgroundColor: Color(0xFF232937),
                 onPressed: () {
@@ -112,211 +111,328 @@ class _HistoryPageState extends State<HistoryPage> {
                 },
                 text: 'View Pending Orders',
               ),
-              Divider(),
-
               for (int i = 0; i < completedTransactions.length; i++)
-                Card(
-                  elevation: 10, // Increase the elevation
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(15.0), // Add border radius
-                  ),
-                  child: ListTile(
-                    subtitle: Padding(
-                      padding: const EdgeInsets.all(15.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Order #${completedTransactions.length - i}: ${completedTransactions[i]['_id']}',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Divider(
-                            color: Colors.black,
-                          ),
-                          Text.rich(
-                            TextSpan(
+                GestureDetector(
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        // Split comma-separated string into a list of URLs
+                        List<String> pickupImageUrls =
+                            completedTransactions[i]['pickupImages'].split(',');
+                        List<String> dropoffImageUrls = completedTransactions[i]
+                                ['completionImages']
+                            .split(',');
+
+                        return AlertDialog(
+                          content: Container(
+                            padding: EdgeInsets.all(16.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                const TextSpan(
-                                  text: "Receiver Name: ",
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: '${completedTransactions[i]['name']}',
-                                ),
-                              ],
-                            ),
-                          ),
-                          Text.rich(
-                            TextSpan(
-                              children: [
-                                const TextSpan(
-                                  text: "Receiver Contact Number: ",
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text:
-                                      '${completedTransactions[i]['contactNumber']}',
-                                ),
-                              ],
-                            ),
-                          ),
-                          Text.rich(
-                            TextSpan(
-                              children: [
-                                const TextSpan(
-                                  text: "Pin Location: ",
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text:
-                                      '${completedTransactions[i]['deliveryLocation']}',
-                                ),
-                              ],
-                            ),
-                          ),
-                          Text.rich(
-                            TextSpan(
-                              children: [
-                                const TextSpan(
-                                  text: "Receiver House#/Lot/Blk: ",
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text:
-                                      '${completedTransactions[i]['houseLotBlk']}',
-                                ),
-                              ],
-                            ),
-                          ),
-                          Text.rich(
-                            TextSpan(
-                              children: [
-                                const TextSpan(
-                                  text: "Barangay: ",
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text:
-                                      '${completedTransactions[i]['barangay']}',
-                                ),
-                              ],
-                            ),
-                          ),
-                          Text.rich(
-                            TextSpan(
-                              children: [
-                                const TextSpan(
-                                  text: "Payment Method: ",
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text:
-                                      '${completedTransactions[i]['paymentMethod']}',
-                                ),
-                              ],
-                            ),
-                          ),
-                          Text.rich(
-                            TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: 'Assemble Option: ',
+                                Text(
+                                  'Transaction Images',
                                   style: TextStyle(
+                                    fontSize: 18.0,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                TextSpan(
-                                  text: completedTransactions[i]['assembly']
-                                      ? 'Yes'
-                                      : 'No',
+                                SizedBox(height: 16.0),
+                                // Display pickup images
+                                Row(
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        'Pickup Images:',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    SizedBox(width: 10.0),
+                                    for (var imageUrl in pickupImageUrls)
+                                      Expanded(
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return Dialog(
+                                                  child: InteractiveViewer(
+                                                    child: Image.network(
+                                                      imageUrl.trim(),
+                                                      fit: BoxFit.contain,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            );
+                                          },
+                                          child: Image.network(
+                                            imageUrl.trim(),
+                                            width: 120,
+                                            height: 120,
+                                            fit: BoxFit.cover,
+                                            // Add additional styling or decoration here
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                SizedBox(height: 16.0),
+                                // Display dropoff images
+                                Row(
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        'Dropoff Images:',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    SizedBox(width: 10.0),
+                                    for (var imageUrl in dropoffImageUrls)
+                                      Expanded(
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return Dialog(
+                                                  child: InteractiveViewer(
+                                                    child: Image.network(
+                                                      imageUrl.trim(),
+                                                      fit: BoxFit.contain,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            );
+                                          },
+                                          child: Image.network(
+                                            imageUrl.trim(),
+                                            width: 120,
+                                            height: 120,
+                                            fit: BoxFit.cover,
+                                            // Add additional styling or decoration here
+                                          ),
+                                        ),
+                                      ),
+                                  ],
                                 ),
                               ],
                             ),
                           ),
-                          Text.rich(
-                            TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: "Items: ",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
+                        );
+                      },
+                    );
+                  },
+                  child: Card(
+                    elevation: 10, // Increase the elevation
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(15.0), // Add border radius
+                    ),
+                    child: ListTile(
+                      subtitle: Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Order #${completedTransactions.length - i}: ${completedTransactions[i]['_id']}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Divider(
+                              color: Colors.black,
+                            ),
+                            Text.rich(
+                              TextSpan(
+                                children: [
+                                  const TextSpan(
+                                    text: "Receiver Name: ",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
-                                if (completedTransactions[i]['items'] != null)
                                   TextSpan(
-                                    text: (completedTransactions[i]['items']
-                                            as List)
-                                        .map((item) {
-                                      if (item is Map<String, dynamic> &&
-                                          item.containsKey('name') &&
-                                          item.containsKey('quantity')) {
-                                        return '${item['name']} (${item['quantity']})';
-                                      }
-                                      return '';
-                                    }).join(', '),
+                                    text: '${completedTransactions[i]['name']}',
                                   ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                          Text.rich(
-                            TextSpan(
-                              children: [
-                                const TextSpan(
-                                  text: "Total Price: ",
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
+                            Text.rich(
+                              TextSpan(
+                                children: [
+                                  const TextSpan(
+                                    text: "Receiver Contact Number: ",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
-                                TextSpan(
-                                  text: '₱${completedTransactions[i]['total']}',
-                                ),
-                              ],
-                            ),
-                          ),
-                          Divider(
-                            color: Colors.black,
-                          ),
-                          Text.rich(
-                            TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: 'Delivery Date/Time: ',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
+                                  TextSpan(
+                                    text:
+                                        '${completedTransactions[i]['contactNumber']}',
                                   ),
-                                ),
-                                TextSpan(
-                                  text: completedTransactions[i]['updatedAt'] !=
-                                          null
-                                      ? DateFormat('MMM d, y - h:mm a').format(
-                                          DateTime.parse(
-                                              completedTransactions[i]
-                                                  ['updatedAt']),
-                                        )
-                                      : 'null',
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                            Text.rich(
+                              TextSpan(
+                                children: [
+                                  const TextSpan(
+                                    text: "Pin Location: ",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text:
+                                        '${completedTransactions[i]['deliveryLocation']}',
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Text.rich(
+                              TextSpan(
+                                children: [
+                                  const TextSpan(
+                                    text: "Receiver House#/Lot/Blk: ",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text:
+                                        '${completedTransactions[i]['houseLotBlk']}',
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Text.rich(
+                              TextSpan(
+                                children: [
+                                  const TextSpan(
+                                    text: "Barangay: ",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text:
+                                        '${completedTransactions[i]['barangay']}',
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Text.rich(
+                              TextSpan(
+                                children: [
+                                  const TextSpan(
+                                    text: "Payment Method: ",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text:
+                                        '${completedTransactions[i]['paymentMethod']}',
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: 'Assemble Option: ',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: completedTransactions[i]['assembly']
+                                        ? 'Yes'
+                                        : 'No',
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: "Items: ",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  if (completedTransactions[i]['items'] != null)
+                                    TextSpan(
+                                      text: (completedTransactions[i]['items']
+                                              as List)
+                                          .map((item) {
+                                        if (item is Map<String, dynamic> &&
+                                            item.containsKey('name') &&
+                                            item.containsKey('quantity')) {
+                                          return '${item['name']} (${item['quantity']})';
+                                        }
+                                        return '';
+                                      }).join(', '),
+                                    ),
+                                ],
+                              ),
+                            ),
+                            Text.rich(
+                              TextSpan(
+                                children: [
+                                  const TextSpan(
+                                    text: "Total Price: ",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text:
+                                        '₱${completedTransactions[i]['total']}',
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Divider(
+                              color: Colors.black,
+                            ),
+                            Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: 'Delivery Date/Time: ',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: completedTransactions[i]
+                                                ['updatedAt'] !=
+                                            null
+                                        ? DateFormat('MMM d, y - h:mm a')
+                                            .format(
+                                            DateTime.parse(
+                                                completedTransactions[i]
+                                                    ['updatedAt']),
+                                          )
+                                        : 'null',
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    onTap: () {},
                   ),
                 ),
             ],
