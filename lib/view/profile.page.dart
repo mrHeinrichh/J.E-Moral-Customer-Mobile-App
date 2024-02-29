@@ -199,9 +199,8 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> changePassword(String userId, String newPassword) async {
     try {
       final response = await Dio().patch(
-        'https://lpg-api-06n8.onrender.com/api/v1/users/$userId',
+        'https://lpg-api-06n8.onrender.com/api/v1/users/$userId/password',
         data: {
-          '__t': "Customer",
           'password': newPassword,
         },
       );
