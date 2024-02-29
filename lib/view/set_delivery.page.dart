@@ -1,7 +1,10 @@
+import 'dart:async';
 import 'package:customer_app/routes/app_routes.dart';
 import 'package:customer_app/view/cart_provider.dart';
 import 'package:customer_app/view/user_provider.dart';
+import 'package:customer_app/widgets/custom_image_upload.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:customer_app/widgets/custom_button.dart';
@@ -10,6 +13,7 @@ import 'package:customer_app/widgets/location_button.dart';
 import 'package:customer_app/widgets/location_search.dart';
 import 'package:customer_app/widgets/text_field.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'dart:io';
 import 'package:http_parser/http_parser.dart';
@@ -19,53 +23,24 @@ class SetDeliveryPage extends StatefulWidget {
   _SetDeliveryPageState createState() => _SetDeliveryPageState();
 }
 
-DateTime? selectedDateTime;
-File? _image;
-
 class _SetDeliveryPageState extends State<SetDeliveryPage> {
-  String? selectedLocation;
+  final formKey = GlobalKey<FormState>();
+  final imageStreamController = StreamController<File?>.broadcast();
+
   String? selectedPaymentMethod;
-  bool isSeniorCheckboxVisible = false;
-
-  String paymentMethodToString(String? paymentMethod) {
-    switch (paymentMethod) {
-      case 'COD':
-        return 'COD';
-      case 'GCASH':
-        return 'GCASH';
-      default:
-        return '';
-    }
-  }
-
   bool? selectedAssemblyOption;
+
+  DateTime? selectedDateTime;
+  File? _image;
+
+  String? selectedLocation;
+  bool isSeniorCheckboxVisible = false;
 
   List<String> searchResults = [];
   TextEditingController locationController = TextEditingController();
   TextEditingController nameController = TextEditingController();
   TextEditingController contactNumberController = TextEditingController();
   TextEditingController houseNumberController = TextEditingController();
-
-  List<Map<String, dynamic>> convertCartItems(List<CartItem> cartItems) {
-    List<Map<String, dynamic>> itemsList = [];
-    for (var cartItem in cartItems) {
-      if (cartItem.isSelected) {
-        itemsList.add({
-          "_id":
-              cartItem.id, // Use the name as a placeholder for the product ID
-          "name": cartItem.name,
-          "customerPrice": cartItem.customerPrice,
-          "stock": cartItem.availableStock,
-          "quantity": cartItem.stock,
-          "totalPrice": cartItem.customerPrice * cartItem.stock,
-          "category": cartItem.category,
-          "imageUrl": cartItem.imageUrl,
-          "description": cartItem.description,
-        });
-      }
-    }
-    return itemsList;
-  }
 
   Future<void> fetchLocationData(String query) async {
     if (query.isEmpty) {
@@ -104,7 +79,128 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
     }
   }
 
-  Map<String, dynamic>? discountIdImageResponse;
+  Future<void> _takeImage() async {
+    final imagePickedFile =
+        await ImagePicker().pickImage(source: ImageSource.camera);
+
+    if (imagePickedFile != null) {
+      final imageFile = File(imagePickedFile.path);
+      imageStreamController.sink.add(imageFile);
+
+      setState(() {
+        _image = imageFile;
+      });
+    }
+  }
+
+  Future<void> _pickImage() async {
+    final imagePickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+
+    if (imagePickedFile != null) {
+      final imageFile = File(imagePickedFile.path);
+      imageStreamController.sink.add(imageFile);
+
+      setState(() {
+        _image = imageFile;
+      });
+    }
+  }
+
+  Future<Map<String, dynamic>?> uploadImageToServer(File imageFile) async {
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('https://lpg-api-06n8.onrender.com/api/v1/upload/image'),
+      );
+
+      var fileStream = http.ByteStream(Stream.castFrom(imageFile.openRead()));
+      var length = await imageFile.length();
+
+      String fileExtension = imageFile.path.split('.').last.toLowerCase();
+      var contentType = MediaType('image', 'png');
+
+      Map<String, String> imageExtensions = {
+        'png': 'png',
+        'jpg': 'jpeg',
+        'jpeg': 'jpeg',
+        'gif': 'gif',
+      };
+
+      if (imageExtensions.containsKey(fileExtension)) {
+        contentType = MediaType('image', imageExtensions[fileExtension]!);
+      }
+
+      var multipartFile = http.MultipartFile(
+        'image',
+        fileStream,
+        length,
+        filename: 'image.$fileExtension',
+        contentType: contentType,
+      );
+
+      request.files.add(multipartFile);
+
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        final responseBody = await response.stream.bytesToString();
+        print("Image uploaded successfully: $responseBody");
+
+        final parsedResponse = json.decode(responseBody);
+
+        if (parsedResponse.containsKey('data')) {
+          final List<dynamic> data = parsedResponse['data'];
+
+          if (data.isNotEmpty && data[0].containsKey('path')) {
+            final profileImageUrl = data[0]['path'];
+            print("Image URL: $profileImageUrl");
+            return {'url': profileImageUrl};
+          } else {
+            print("Invalid response format: $parsedResponse");
+            return null;
+          }
+        } else {
+          print("Invalid response format: $parsedResponse");
+          return null;
+        }
+      } else {
+        print(
+            "Profile Image upload failed with status code: ${response.statusCode}");
+        final responseBody = await response.stream.bytesToString();
+        print("Response body: $responseBody");
+        return null;
+      }
+    } catch (e) {
+      print("Profile Image upload failed with error: $e");
+      return null;
+    }
+  }
+
+  List<Map<String, dynamic>> convertCartItems(List<CartItem> cartItems) {
+    List<Map<String, dynamic>> itemsList = [];
+    for (var cartItem in cartItems) {
+      if (cartItem.isSelected) {
+        itemsList.add({
+          "_id": cartItem.id,
+          "name": cartItem.name,
+          "category": cartItem.category,
+          "description": cartItem.description,
+          "weight": cartItem.weight,
+          "stock": cartItem.availableStock,
+          "customerPrice": cartItem.customerPrice,
+          // "retailerPrice": cartItem.retailerPrice,
+          "image": cartItem.imageUrl,
+          "type": cartItem.itemType,
+          "quantity": cartItem.stock,
+          //
+          "totalPrice": cartItem.customerPrice * cartItem.stock,
+        });
+      }
+    }
+    return itemsList;
+  }
+
   Future<void> sendTransactionData() async {
     final apiUrl = 'https://lpg-api-06n8.onrender.com/api/v1/transactions';
 
@@ -120,46 +216,58 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
       print('Error: User ID is null or empty.');
       return;
     }
-    if (_image != null) {
-      discountIdImageResponse = await uploadImageToServer(_image!);
-      final String? discountIdImage =
-          discountIdImageResponse?["data"]?[0]?["path"] as String?;
-      // Use discountIdImage as needed...
-    }
-    final String? discountIdImage =
-        discountIdImageResponse?["data"]?[0]?["path"] as String?;
-
-    final Map<String, dynamic> requestData = {
-      "deliveryLocation": locationController.text,
-      "name": nameController.text,
-      "contactNumber": contactNumberController.text,
-      "houseLotBlk": houseNumberController.text,
-      "paymentMethod": paymentMethodToString(selectedPaymentMethod),
-      "assembly": selectedAssemblyOption.toString(),
-      "deliveryDate": selectedDateTime.toString(),
-      "barangay": selectedBarangay,
-      "items": itemsList,
-      "to": userId,
-      "hasFeedback": "false",
-      "feedback": "",
-      "rating": "0",
-      "pickupImages": "",
-      "completionImages": "",
-      "cancellationImages": "",
-      "cancelReason": "",
-      "pickedUp": "false",
-      "cancelled": "false",
-      "priceType": "Customer",
-      "completed": "false",
-      "type": "Delivery",
-      "status": "Pending",
-      "discountIdImage": discountIdImage ?? null,
-    };
-    print('isSeniorCheckboxVisible: $isSeniorCheckboxVisible');
-    print('_image: $_image');
-    print('requestData["discountIdImage"]: ${requestData["discountIdImage"]}');
 
     try {
+      Map<String, dynamic>? discountedUploadResponse;
+
+      if (_image != null) {
+        discountedUploadResponse = await uploadImageToServer(_image!);
+        print(
+            "Upload Response for Discounted Image: $discountedUploadResponse");
+
+        if (discountedUploadResponse != null) {
+          print("Discounted Image URL: ${discountedUploadResponse["url"]}");
+        } else {
+          print("Discounted Image upload failed");
+          return;
+        }
+      }
+
+      final Map<String, dynamic> requestData = {
+        "deliveryLocation": locationController.text,
+        "houseLotBlk": houseNumberController.text,
+        "paymentMethod": selectedPaymentMethod,
+        "status": "Pending",
+        "assembly": selectedAssemblyOption.toString(),
+        "deliveryDate": selectedDateTime.toString(),
+        "barangay": selectedBarangay,
+        // "total": "",
+        "to": userId,
+        "feedback": "",
+        // "statuses": "",
+        "rating": "0",
+        "pickupImages": "",
+        "completionImages": "",
+        "cancellationImages": "",
+        "cancelReason": "",
+        "pickedUp": "false",
+        "cancelled": "false",
+        "hasFeedback": "false",
+        // "long": "",
+        // "lat": "",
+        // "deleted": "false",
+        "name": nameController.text,
+        "contactNumber": contactNumberController.text,
+        "items": itemsList,
+        // "discounted": "false",
+        "completed": "false",
+        "discountIdImage": discountedUploadResponse != null
+            ? discountedUploadResponse["url"]
+            : "",
+        "type": "Delivery",
+        "priceType": "Customer",
+      };
+
       final response = await http.post(
         Uri.parse(apiUrl),
         body: json.encode(requestData),
@@ -170,6 +278,13 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
       if (response.statusCode == 200) {
         print('Transaction successful');
         print('Response: ${response.body}');
+
+        locationController.clear();
+        houseNumberController.clear();
+        nameController.clear();
+        contactNumberController.clear();
+        _image = null;
+
         Navigator.pushNamed(context, myOrdersPage);
       } else {
         print('Transaction failed with status code: ${response.statusCode}');
@@ -178,462 +293,6 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
     } catch (e) {
       print('Error: $e');
     }
-  }
-
-  Future<void> showConfirmationDialog() async {
-    BuildContext currentContext = context;
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Delivery Confirmation'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              RichText(
-                text: TextSpan(
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                  ),
-                  children: [
-                    TextSpan(
-                      text: 'Delivery Location: ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextSpan(
-                      text: locationController.text,
-                    ),
-                  ],
-                ),
-              ),
-              RichText(
-                text: TextSpan(
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                  ),
-                  children: [
-                    TextSpan(
-                      text: 'Receiver Name: ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextSpan(
-                      text: nameController.text,
-                    ),
-                  ],
-                ),
-              ),
-              RichText(
-                text: TextSpan(
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                  ),
-                  children: [
-                    TextSpan(
-                      text: 'Receiver Contact Number: ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextSpan(
-                      text: contactNumberController.text,
-                    ),
-                  ],
-                ),
-              ),
-              RichText(
-                text: TextSpan(
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                  ),
-                  children: [
-                    TextSpan(
-                      text: 'Receiver House #/Lot/Blk: ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextSpan(
-                      text: houseNumberController.text,
-                    ),
-                  ],
-                ),
-              ),
-              RichText(
-                text: TextSpan(
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                  ),
-                  children: [
-                    TextSpan(
-                      text: 'Barangay: ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextSpan(
-                      text: selectedBarangay,
-                    ),
-                  ],
-                ),
-              ),
-              RichText(
-                text: TextSpan(
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                  ),
-                  children: [
-                    TextSpan(
-                      text: 'Scheduled Date and Time: ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextSpan(
-                      text: selectedDateTime.toString(),
-                    ),
-                  ],
-                ),
-              ),
-              RichText(
-                text: TextSpan(
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                  ),
-                  children: [
-                    TextSpan(
-                      text: 'Payment Method: ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextSpan(
-                      text: paymentMethodToString(selectedPaymentMethod),
-                    ),
-                  ],
-                ),
-              ),
-              RichText(
-                text: TextSpan(
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                  ),
-                  children: [
-                    TextSpan(
-                      text: 'Need to be Assembled: ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextSpan(
-                      text: selectedAssemblyOption.toString(),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.of(context).pop();
-                await sendTransactionData();
-                Provider.of<CartProvider>(currentContext, listen: false)
-                    .clearCart();
-                Navigator.pushNamed(currentContext, myOrdersPage);
-              },
-              child: const Text('Confirm'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  bool validateFields() {
-    if (locationController.text.isEmpty ||
-        nameController.text.isEmpty ||
-        contactNumberController.text.isEmpty ||
-        houseNumberController.text.isEmpty ||
-        selectedBarangay == null ||
-        selectedPaymentMethod == null ||
-        selectedAssemblyOption == null) {
-      print("Please fill in all the required fields");
-      return false;
-    }
-
-    return true;
-  }
-
-  List<String> fieldErrors = [];
-
-  void clearFieldErrors() {
-    fieldErrors.clear();
-  }
-
-  void displayFieldErrors() {
-    if (locationController.text.isEmpty) {
-      fieldErrors.add('Location is required.');
-    }
-    if (nameController.text.isEmpty) {
-      fieldErrors.add('Receiver Name is required.');
-    }
-    if (contactNumberController.text.isEmpty) {
-      fieldErrors.add('Contact Number is required.');
-    }
-    if (houseNumberController.text.isEmpty) {
-      fieldErrors.add('House Number is required.');
-    }
-    if (selectedBarangay == null) {
-      fieldErrors.add('Barangay is required.');
-    }
-    if (selectedPaymentMethod == null) {
-      fieldErrors.add('Payment Method is required.');
-    }
-    if (selectedAssemblyOption == null) {
-      fieldErrors.add('Assembly Option is required.');
-    }
-
-    showFieldErrorMessages();
-  }
-
-  void showFieldErrorMessages() {
-    List<String> fieldErrors = [
-      if (locationController.text.isEmpty) 'Location is required.',
-      if (nameController.text.isEmpty) 'Receiver Name is required.',
-      if (contactNumberController.text.isEmpty) 'Contact Number is required.',
-      if (houseNumberController.text.isEmpty) 'House Number is required.',
-      if (selectedBarangay == null) 'Barangay is required.',
-      if (selectedPaymentMethod == null) 'Payment Method is required.',
-      if (selectedAssemblyOption == null) 'Assembly Option is required.',
-    ];
-    if (fieldErrors.isNotEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            fieldErrors.join('\n'),
-            style: TextStyle(color: Colors.white), // Set text color to white
-          ),
-          backgroundColor: Colors.red, // Set the background color to red
-          duration: Duration(seconds: 2),
-        ),
-      );
-    }
-  }
-
-  bool areThereNoErrors() {
-    return fieldErrors.isEmpty;
-  }
-
-  bool deliveryNoticeShown = false;
-
-  Future<void> confirmDialog() async {
-    selectedDateTime = DateTime.now();
-    BuildContext currentContext = context;
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Delivery Confirmation'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              RichText(
-                text: TextSpan(
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                  ),
-                  children: [
-                    TextSpan(
-                      text: 'Delivery Location: ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextSpan(
-                      text: locationController.text,
-                    ),
-                  ],
-                ),
-              ),
-              RichText(
-                text: TextSpan(
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                  ),
-                  children: [
-                    TextSpan(
-                      text: 'Receiver Name: ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextSpan(
-                      text: nameController.text,
-                    ),
-                  ],
-                ),
-              ),
-              RichText(
-                text: TextSpan(
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                  ),
-                  children: [
-                    TextSpan(
-                      text: 'Receiver Contact Number: ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextSpan(
-                      text: contactNumberController.text,
-                    ),
-                  ],
-                ),
-              ),
-              RichText(
-                text: TextSpan(
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                  ),
-                  children: [
-                    TextSpan(
-                      text: 'Receiver House #/Lot/Blk: ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextSpan(
-                      text: houseNumberController.text,
-                    ),
-                  ],
-                ),
-              ),
-              RichText(
-                text: TextSpan(
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                  ),
-                  children: [
-                    TextSpan(
-                      text: 'Barangay: ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextSpan(
-                      text: selectedBarangay,
-                    ),
-                  ],
-                ),
-              ),
-              RichText(
-                text: TextSpan(
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                  ),
-                  children: [
-                    TextSpan(
-                      text: 'Scheduled Date and Time: ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextSpan(
-                      text: selectedDateTime.toString(),
-                    ),
-                  ],
-                ),
-              ),
-              RichText(
-                text: TextSpan(
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                  ),
-                  children: [
-                    TextSpan(
-                      text: 'Payment Method: ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextSpan(
-                      text: paymentMethodToString(selectedPaymentMethod),
-                    ),
-                  ],
-                ),
-              ),
-              RichText(
-                text: TextSpan(
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                  ),
-                  children: [
-                    TextSpan(
-                      text: 'Need to be Assembled: ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextSpan(
-                      text: selectedAssemblyOption.toString(),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.of(context).pop();
-                await sendTransactionData();
-                Provider.of<CartProvider>(currentContext, listen: false)
-                    .clearCart();
-                Navigator.pushNamed(currentContext, myOrdersPage);
-              },
-              child: const Text('Confirm'),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   String? selectedBarangay;
@@ -678,110 +337,58 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
     'Western Bicutan'
   ];
 
-  Future<void> _pickImage() async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      setState(() {
-        _image = File(pickedFile.path);
-      });
-
-      // Call the function to upload the image to the server
-      await uploadImageToServer(_image!);
-    }
-  }
-
-  Future<Map<String, dynamic>?> uploadImageToServer(File imageFile) async {
-    try {
-      var request = http.MultipartRequest(
-        'POST',
-        Uri.parse('https://lpg-api-06n8.onrender.com/api/v1/upload/image'),
-      );
-
-      var fileStream = http.ByteStream(Stream.castFrom(imageFile.openRead()));
-      var length = await imageFile.length();
-
-      String fileExtension = imageFile.path.split('.').last.toLowerCase();
-      var contentType = MediaType('image', 'png');
-
-      Map<String, String> imageExtensions = {
-        'png': 'png',
-        'jpg': 'jpeg',
-        'jpeg': 'jpeg',
-        'gif': 'gif',
-      };
-
-      if (imageExtensions.containsKey(fileExtension)) {
-        contentType = MediaType('image', imageExtensions[fileExtension]!);
-      }
-
-      var multipartFile = http.MultipartFile(
-        'image',
-        fileStream,
-        length,
-        filename: 'image.$fileExtension',
-        contentType: contentType,
-      );
-
-      request.files.add(multipartFile);
-
-      var response = await request.send();
-      if (response.statusCode == 200) {
-        final responseBody = await response.stream.bytesToString();
-        final parsedResponse = json.decode(responseBody);
-        print(parsedResponse);
-        return parsedResponse;
-      } else {
-        print("Image upload failed with status code: ${response.statusCode}");
-        return null;
-      }
-    } catch (e) {
-      print("Image upload failed with error: $e");
-      return null;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
         backgroundColor: Colors.white,
-        title: const Text(
+        elevation: 1,
+        title: Text(
           'Delivery Information',
-          style: TextStyle(color: Color(0xFF232937), fontSize: 24),
+          style: TextStyle(
+            color: const Color(0xFF050404).withOpacity(0.9),
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, dashboardRoute);
-          },
+        centerTitle: true,
+        iconTheme: IconThemeData(
+          color: const Color(0xFF050404).withOpacity(0.8),
+        ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(
+            color: Colors.black,
+            height: 0.2,
+          ),
         ),
       ),
-      body: ListView(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: Column(
-              children: [
-                const Text("Set Delivery Location"),
-                const SizedBox(height: 5),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10.0),
-                    border: Border.all(color: Colors.grey),
-                  ),
-                  child: Column(
-                    children: [
-                      LocationSearchWidget(
-                        locationController: locationController,
-                        onLocationChanged: (query) {
-                          fetchLocationData(query);
-                        },
-                      ),
-                      ListView.builder(
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        child: Form(
+          key: formKey,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 15),
+                    LocationSearchWidget(
+                      controller: locationController,
+                      labelText: 'Delivery Location',
+                      hintText: 'Enter the Delivery Location',
+                      onLocationChanged: (query) {
+                        fetchLocationData(query);
+                      },
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return "Please Enter the Delivery Location";
+                        } else {
+                          return null;
+                        }
+                      },
+                      child: ListView.builder(
                         shrinkWrap: true,
                         itemCount: searchResults.length,
                         itemBuilder: (context, index) {
@@ -797,268 +404,673 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                           );
                         },
                       ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 5),
-                LocationButtonWidget(
-                  onLocationChanged: (String address) {
-                    locationController.text = address;
-                  },
-                ),
-                const SizedBox(height: 10),
-                CustomTextField1(
-                  labelText: 'Receiver Name',
-                  hintText: 'Enter Receiver Name',
-                  controller: nameController,
-                ),
-                CustomTextField1(
-                  labelText: 'Receiver Contact Number',
-                  hintText: 'Enter Receiver Contact Number',
-                  controller: contactNumberController,
-                ),
-                CustomTextField1(
-                  labelText: 'Receiver House #/Lot/Blk',
-                  hintText: 'Enter Receiver House Information',
-                  controller: houseNumberController,
-                ),
-                const SizedBox(height: 5),
-                const Text("Choose Barangay"),
-                const SizedBox(height: 5),
-                SingleChildScrollView(
-                  child: DropdownButtonFormField<String>(
-                    value: selectedBarangay,
-                    items: barangays.map((barangay) {
-                      return DropdownMenuItem<String>(
-                        value: barangay,
-                        child: Text(barangay),
-                      );
-                    }).toList(),
-                    onChanged: (String? value) {
-                      setState(() {
-                        selectedBarangay = value;
-                      });
-                    },
-                    decoration: const InputDecoration(
-                      labelText: 'Select your Barangay',
-                      border: OutlineInputBorder(),
                     ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                const Text("Choose Payment Method"),
-                ListTile(
-                  title: const Text('Cash on Delivery'),
-                  leading: Radio<String>(
-                    value: 'COD',
-                    groupValue: selectedPaymentMethod,
-                    onChanged: (String? value) {
-                      setState(() {
-                        selectedPaymentMethod = value;
-                      });
-                    },
-                  ),
-                ),
-                ListTile(
-                  title: const Text('Gcash Payment'),
-                  leading: Radio<String>(
-                    value: 'GCASH',
-                    groupValue: selectedPaymentMethod,
-                    onChanged: (String? value) {
-                      setState(() {
-                        selectedPaymentMethod = value;
-                      });
-                    },
-                  ),
-                ),
-                const Text("Needs to be assembled?"),
-                ListTile(
-                  title: const Text('Yes'),
-                  leading: Radio<bool>(
-                    value: true,
-                    groupValue: selectedAssemblyOption,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        selectedAssemblyOption = value;
-                      });
-                    },
-                  ),
-                ),
-                ListTile(
-                  title: const Text('No'),
-                  leading: Radio<bool>(
-                    value: false,
-                    groupValue: selectedAssemblyOption,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        selectedAssemblyOption = value;
-                      });
-                    },
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      isSeniorCheckboxVisible = !isSeniorCheckboxVisible;
-                    });
-                  },
-                  child: Center(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const Text(
-                          "Avail Discount for PWD/Senior Citizen",
-                        ),
-                        // const Text(
-                        //   "Click Here to Upload ID Image",
-                        // ),
+                    const SizedBox(height: 10),
+                    LocationButtonWidget(
+                      onLocationChanged: (String address) {
+                        locationController.text = address;
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    CustomTextField(
+                      labelText: 'Receiver Name',
+                      hintText: 'Enter the Receiver Name',
+                      controller: nameController,
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return "Please Enter the Receiver Name";
+                        } else {
+                          return null;
+                        }
+                      },
+                    ),
+                    CustomTextField(
+                      labelText: 'Receiver Mobile Number',
+                      hintText: 'Enter the Receiver Mobile Number',
+                      controller: contactNumberController,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
                       ],
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return "Please Enter the Receiver Mobile Number";
+                        } else if (value.length != 11) {
+                          return "Please Enter the Correct Mobile Number";
+                        } else if (!value.startsWith('09')) {
+                          return "Please Enter the Correct Mobile Number";
+                        } else {
+                          return null;
+                        }
+                      },
                     ),
-                  ),
-                ),
-
-                // Conditionally show the checkbox
-                if (isSeniorCheckboxVisible)
-                  Column(
-                    children: [
-                      _image == null
-                          ? Container(
-                              width: 300,
-                              height: 150,
-                              decoration: BoxDecoration(
-                                color: Colors.grey,
-                                borderRadius: BorderRadius.circular(
-                                    10), // half of width/height for a circle
-                              ),
-                              child: Icon(
-                                Icons.person,
-                                color: Colors.white,
-                                size: 50,
-                              ),
-                            )
-                          : ClipRRect(
-                              borderRadius: BorderRadius.circular(
-                                  8), // adjust the borderRadius as needed
-                              child: Image.file(
-                                _image!,
-                                width: 100,
-                                height: 100,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                      TextButton(
-                        onPressed: _pickImage,
-                        child: const Text(
-                          "Upload your Discount ID Image",
-                          style: TextStyle(
-                            color: Colors.blue,
-                            fontSize: 15.0,
-                          ),
+                    CustomTextField(
+                      labelText: 'Receiver House #/Lot/Blk',
+                      hintText: 'Enter Receiver House Information',
+                      controller: houseNumberController,
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return "Please Enter the Receiver House Information";
+                        } else {
+                          return null;
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 5),
+                    DropdownButtonFormField<String>(
+                      value: selectedBarangay,
+                      items: barangays.map((barangay) {
+                        return DropdownMenuItem<String>(
+                          value: barangay,
+                          child: Text(barangay),
+                        );
+                      }).toList(),
+                      onChanged: (String? value) {
+                        setState(() {
+                          selectedBarangay = value;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Barangay',
+                        labelStyle: TextStyle(
+                          color: const Color(0xFF050404).withOpacity(0.7),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide:
+                              const BorderSide(color: Color(0xFF050404)),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                    ],
-                  ),
-              ],
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CustomizedButton(
-                onPressed: () async {
-                  clearFieldErrors();
-
-                  displayFieldErrors();
-
-                  if (areThereNoErrors()) {
-                    final selectedDate = await showDateTimePicker(context);
-                    if (selectedDate != null) {
-                      // Extract the time from the selected date
-                      final selectedTime = TimeOfDay.fromDateTime(selectedDate);
-
-                      // Define the start and end times for delivery
-                      final startTime = TimeOfDay(hour: 7, minute: 0);
-                      final endTime = TimeOfDay(hour: 19, minute: 0);
-
-                      // Check if the selected time is within the valid range
-                      if (selectedTime.hour >= startTime.hour &&
-                          selectedTime.hour <= endTime.hour) {
-                        setState(() {
-                          selectedDateTime = selectedDate;
-                          showConfirmationDialog();
-                        });
-                      } else {
-                        // Show an error message if the selected time is outside the valid range
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: Text('Invalid Time'),
-                              content: Text(
-                                'Please select a time between 7 AM and 7 PM for delivery.',
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: Text('OK'),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      }
-                    }
-                  }
-                },
-                text: 'Scheduled',
-                height: 50,
-                width: 160,
-                fontz: 20,
-              ),
-              // Button onPressed handler
-              CustomizedButton(
-                onPressed: () {
-                  if (isWithinDeliveryHours()) {
-                    clearFieldErrors();
-                    displayFieldErrors();
-
-                    if (areThereNoErrors()) {
-                      confirmDialog();
-                    }
-                  } else {
-                    // Show a dialog when it's not within delivery hours
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: Text('Delivery Hours Notice'),
-                          content: Text(
-                              'Sorry, your order cannot proceed. Our delivery hours is from 7AM to 7PM daily.'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: Text('OK'),
-                            ),
-                          ],
-                        );
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Please Select the Barangay";
+                        }
+                        return null;
                       },
-                    );
-                  }
-                },
-                text: 'Deliver Now',
-                height: 50,
-                width: 160,
-                fontz: 20,
-                enabled: true, // Enable the button regardless of the time
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: const Color(0xFF050404)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 8),
+                            child: Text(
+                              "Choose Payment Method:",
+                              style: TextStyle(
+                                color: Color(0xFF050404),
+                              ),
+                            ),
+                          ),
+                          FormField<String>(
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please Select a Payment Method';
+                              }
+                              return null;
+                            },
+                            builder: (state) {
+                              return Column(
+                                children: [
+                                  RadioListTile<String>(
+                                    title: const Text('Cash on Delivery'),
+                                    value: 'COD',
+                                    groupValue: selectedPaymentMethod,
+                                    onChanged: (String? value) {
+                                      setState(() {
+                                        selectedPaymentMethod = value!;
+                                      });
+                                      state.didChange(value);
+                                    },
+                                    controlAffinity:
+                                        ListTileControlAffinity.leading,
+                                    activeColor: const Color(0xFF050404),
+                                  ),
+                                  RadioListTile<String>(
+                                    title: const Text('Gcash Payment'),
+                                    value: 'GCash',
+                                    groupValue: selectedPaymentMethod,
+                                    onChanged: (String? value) {
+                                      setState(() {
+                                        selectedPaymentMethod = value!;
+                                      });
+                                      state.didChange(value);
+                                    },
+                                    controlAffinity:
+                                        ListTileControlAffinity.leading,
+                                    activeColor: const Color(0xFF050404),
+                                  ),
+                                  if (state.errorText != null) ...[
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12, vertical: 8),
+                                      child: Text(
+                                        state.errorText!,
+                                        style:
+                                            const TextStyle(color: Colors.red),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5),
+                                  ],
+                                ],
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: const Color(0xFF050404)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 8),
+                            child: Text(
+                              "Needs to be assembled:",
+                              style: TextStyle(
+                                color: Color(0xFF050404),
+                              ),
+                            ),
+                          ),
+                          FormField<bool>(
+                            validator: (value) {
+                              if (value == null) {
+                                return 'Please make a Selection';
+                              }
+                              return null;
+                            },
+                            builder: (state) {
+                              return Column(
+                                children: [
+                                  ListTile(
+                                    leading: Radio<bool>(
+                                      value: true,
+                                      groupValue: selectedAssemblyOption,
+                                      onChanged: (bool? value) {
+                                        setState(() {
+                                          selectedAssemblyOption = value!;
+                                        });
+                                        state.didChange(value);
+                                      },
+                                      activeColor: const Color(0xFF050404),
+                                    ),
+                                    title: const Text('Yes'),
+                                  ),
+                                  ListTile(
+                                    leading: Radio<bool>(
+                                      value: false,
+                                      groupValue: selectedAssemblyOption,
+                                      onChanged: (bool? value) {
+                                        setState(() {
+                                          selectedAssemblyOption = value!;
+                                        });
+                                        state.didChange(value);
+                                      },
+                                      activeColor: const Color(0xFF050404),
+                                    ),
+                                    title: const Text('No'),
+                                  ),
+                                  if (state.errorText != null) ...[
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12, vertical: 8),
+                                      child: Text(
+                                        state.errorText!,
+                                        style:
+                                            const TextStyle(color: Colors.red),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5),
+                                  ],
+                                ],
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          isSeniorCheckboxVisible = !isSeniorCheckboxVisible;
+                        });
+                      },
+                      child: const Text(
+                        "Avail Discount for PWD/Senior Citizen",
+                      ),
+                    ),
+                    if (isSeniorCheckboxVisible)
+                      Column(
+                        children: [
+                          const SizedBox(height: 10),
+                          StreamBuilder<File?>(
+                            stream: imageStreamController.stream,
+                            builder: (context, snapshot) {
+                              return Column(
+                                children: [
+                                  Stack(
+                                    alignment: Alignment.topRight,
+                                    children: [
+                                      Container(
+                                        width: double.infinity,
+                                        height: 200,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF050404)
+                                              .withOpacity(0.4),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        foregroundDecoration: snapshot.data !=
+                                                null
+                                            ? BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                image: DecorationImage(
+                                                  image:
+                                                      FileImage(snapshot.data!),
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              )
+                                            : null,
+                                        child: snapshot.data == null
+                                            ? const Icon(
+                                                Icons.image,
+                                                color: Colors.white,
+                                                size: 50,
+                                              )
+                                            : null,
+                                      ),
+                                      if (snapshot.data != null)
+                                        GestureDetector(
+                                          onTap: () {
+                                            imageStreamController.add(null);
+                                            _image = null;
+                                          },
+                                          child: Container(
+                                            margin: const EdgeInsets.all(8),
+                                            padding: const EdgeInsets.all(4),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFd41111)
+                                                  .withOpacity(0.8),
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: const Icon(
+                                              Icons.close,
+                                              color: Colors.white,
+                                              size: 20,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                  ImageUploader(
+                                    takeImage: _takeImage,
+                                    pickImage: _pickImage,
+                                    buttonText: "Upload your Discount Id Image",
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CustomizedButton(
+                    onPressed: () async {
+                      if (formKey.currentState!.validate()) {
+                        final selectedDate = await showDateTimePicker(context);
+                        if (selectedDate != null) {
+                          final selectedTime =
+                              await showCustomTimePicker(context);
+                          if (selectedTime != null) {
+                            print('Selected Date: $selectedDate');
+                            print('Selected Time: $selectedTime');
+
+                            const startTime = TimeOfDay(hour: 7, minute: 0);
+                            const endTime = TimeOfDay(hour: 19, minute: 0);
+                            if (selectedTime.hour >= startTime.hour &&
+                                selectedTime.hour <= endTime.hour) {
+                              setState(() {
+                                selectedDateTime = DateTime(
+                                  selectedDate.year,
+                                  selectedDate.month,
+                                  selectedDate.day,
+                                  selectedTime.hour,
+                                  selectedTime.minute,
+                                );
+                                print('Selected DateTime: $selectedDateTime');
+                                confirmDialog();
+                              });
+                            } else {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text('Invalid Time'),
+                                    content: Text(
+                                      'Please select a time between 7 AM and 7 PM for delivery.',
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text('OK'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            }
+                          }
+                        }
+                      }
+                    },
+                    text: 'Scheduled',
+                    height: 50,
+                    width: 160,
+                    fontz: 20,
+                  ),
+                  CustomizedButton(
+                    onPressed: () async {
+                      if (formKey.currentState!.validate()) {
+                        final currentTime = DateTime.now();
+                        final startTime = DateTime(currentTime.year,
+                            currentTime.month, currentTime.day, 7);
+                        final endTime = DateTime(currentTime.year,
+                            currentTime.month, currentTime.day, 19);
+
+                        if (currentTime.isAfter(startTime) &&
+                            currentTime.isBefore(endTime)) {
+                          selectedDateTime = DateTime.now();
+                          confirmDialog();
+                        } else {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: const Text('Delivery Hours Notice'),
+                                content: const Text(
+                                    'Sorry, your order cannot be delivered at the moment. Our delivery hours are from 7 AM to 7 PM daily.'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text('OK'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        }
+                      }
+                    },
+                    text: 'Deliver Now',
+                    height: 50,
+                    width: 160,
+                    fontz: 20,
+                    enabled: true,
+                  ),
+                ],
               ),
             ],
           ),
-        ],
+        ),
       ),
+    );
+  }
+
+  Future<DateTime?> showDateTimePicker(BuildContext context) {
+    DateTime initialDate = DateTime.now().add(const Duration(days: 1));
+
+    return showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: initialDate,
+      lastDate: initialDate.add(const Duration(days: 365)),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            primaryColor: const Color(0xFF050404).withOpacity(0.8),
+            colorScheme: ColorScheme.light(
+              primary: const Color(0xFF050404).withOpacity(0.8),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+  }
+
+  Future<TimeOfDay?> showCustomTimePicker(BuildContext context) {
+    TimeOfDay initialTime = const TimeOfDay(hour: 9, minute: 0);
+
+    return showTimePicker(
+      context: context,
+      initialTime: initialTime,
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            primaryColor: const Color(0xFF050404).withOpacity(0.8),
+            colorScheme: ColorScheme.light(
+              primary: const Color(0xFF050404).withOpacity(0.8),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+  }
+
+  Future<void> confirmDialog() async {
+    BuildContext currentContext = context;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Center(
+            child: Text(
+              'Delivery Confirmation',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text.rich(
+                TextSpan(
+                  children: [
+                    const TextSpan(
+                      text: 'Delivery Location: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextSpan(
+                      text: locationController.text,
+                    ),
+                  ],
+                ),
+              ),
+              Text.rich(
+                TextSpan(
+                  children: [
+                    const TextSpan(
+                      text: 'Receiver Name: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextSpan(
+                      text: nameController.text,
+                    ),
+                  ],
+                ),
+              ),
+              Text.rich(
+                TextSpan(
+                  children: [
+                    const TextSpan(
+                      text: 'Receiver Contact Number: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextSpan(
+                      text: contactNumberController.text,
+                    ),
+                  ],
+                ),
+              ),
+              Text.rich(
+                TextSpan(
+                  children: [
+                    const TextSpan(
+                      text: 'Receiver House #/Lot/Blk: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextSpan(
+                      text: houseNumberController.text,
+                    ),
+                  ],
+                ),
+              ),
+              Text.rich(
+                TextSpan(
+                  children: [
+                    const TextSpan(
+                      text: 'Barangay: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextSpan(
+                      text: selectedBarangay,
+                    ),
+                  ],
+                ),
+              ),
+              Text.rich(
+                TextSpan(
+                  children: [
+                    const TextSpan(
+                      text: "Scheduled Date and Time: ",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextSpan(
+                      text: DateFormat('MMMM d, y, h:mm a')
+                          .format(selectedDateTime!),
+                    ),
+                  ],
+                ),
+              ),
+              Text.rich(
+                TextSpan(
+                  children: [
+                    const TextSpan(
+                      text: 'Payment Method: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextSpan(
+                      text: selectedPaymentMethod,
+                    ),
+                  ],
+                ),
+              ),
+              Text.rich(
+                TextSpan(
+                  children: [
+                    const TextSpan(
+                      text: 'Need to be Assembled: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextSpan(
+                      text: selectedAssemblyOption! ? 'Yes' : 'No',
+                    ),
+                  ],
+                ),
+              ),
+              Text.rich(
+                TextSpan(
+                  children: [
+                    const TextSpan(
+                      text: 'Applying for Discount: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextSpan(
+                      text: _image != null ? 'Yes' : 'No',
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              style: TextButton.styleFrom(
+                primary: const Color(0xFF050404).withOpacity(0.7),
+              ),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await sendTransactionData();
+                Provider.of<CartProvider>(currentContext, listen: false)
+                    .clearCart();
+                Navigator.pushNamed(currentContext, myOrdersPage);
+              },
+              style: TextButton.styleFrom(
+                primary: const Color(0xFF050404).withOpacity(0.9),
+              ),
+              child: const Text(
+                'Confirm',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -1098,11 +1110,4 @@ void showAlertDialog(BuildContext context) {
       );
     },
   );
-}
-
-bool isWithinDeliveryHours() {
-  DateTime now = DateTime.now();
-  int currentHour = now.hour;
-
-  return currentHour >= 7 && currentHour < 19;
 }

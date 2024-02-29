@@ -361,6 +361,8 @@ class _HomePageState extends State<HomePage> {
                                                   productImageUrl: product[
                                                           'imageUrl'] ??
                                                       'Image URL Not Available',
+                                                  itemType: product['type'] ??
+                                                      'Category Not Available',
                                                   category: category ??
                                                       'Category Not Available',
                                                   description: product[

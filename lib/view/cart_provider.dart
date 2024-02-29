@@ -85,22 +85,26 @@ class CartItem {
   String name;
   String description;
   String category;
+  int weight;
   double customerPrice;
   String imageUrl;
   bool isSelected;
   int stock;
   int availableStock;
+  String itemType;
 
   CartItem({
     required this.id,
     required this.name,
     required this.description,
     required this.category,
+    required this.weight,
     required this.customerPrice,
     required this.imageUrl,
     this.isSelected = true,
     this.stock = 1,
     required this.availableStock,
+    required this.itemType,
   });
 }
 

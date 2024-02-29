@@ -176,16 +176,18 @@ class _CartPageState extends State<CartPage> {
                                 ),
                                 Center(
                                   child: CartButton(
-                                    onPressed: () {
-                                      Navigator.pushNamed(
-                                          context, setDeliveryPage);
-                                    },
+                                    onPressed: cartItems.isNotEmpty
+                                        ? () {
+                                            Navigator.pushNamed(
+                                                context, setDeliveryPage);
+                                          }
+                                        : null,
                                     text: 'Checkout',
                                     height: 50,
                                     width: 220,
                                     fontz: 20,
                                   ),
-                                )
+                                ),
                               ],
                             ),
                           ],

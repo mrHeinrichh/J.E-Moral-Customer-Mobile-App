@@ -3,12 +3,22 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class LocationSearchWidget extends StatefulWidget {
-  final TextEditingController locationController;
+  final TextEditingController controller;
   final Function(String) onLocationChanged;
+  final String labelText;
+  final String hintText;
+  final double borderRadius;
+  final String? Function(String?)? validator;
+  final Widget? child;
 
   LocationSearchWidget({
-    required this.locationController,
+    required this.controller,
     required this.onLocationChanged,
+    required this.labelText,
+    required this.hintText,
+    this.borderRadius = 10,
+    this.validator,
+    this.child,
   });
 
   @override
@@ -59,14 +69,34 @@ class _LocationSearchWidgetState extends State<LocationSearchWidget> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        TextField(
-          controller: widget.locationController,
-          onChanged: widget.onLocationChanged,
-          decoration: const InputDecoration(
-            hintText: "Type a Location",
-            border: InputBorder.none,
+        TextFormField(
+          controller: widget.controller,
+          cursorColor: const Color(0xFF050404),
+          decoration: InputDecoration(
+            labelText: widget.labelText,
+            hintText: widget.hintText,
+            hintStyle: TextStyle(
+              color: const Color(0xFF050404).withOpacity(0.6),
+            ),
+            labelStyle: TextStyle(
+              color: const Color(0xFF050404).withOpacity(0.7),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderSide: const BorderSide(color: Color(0xFF050404)),
+              borderRadius: BorderRadius.circular(widget.borderRadius),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: const BorderSide(color: Color(0xFF050404)),
+              borderRadius: BorderRadius.circular(widget.borderRadius),
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(widget.borderRadius),
+            ),
           ),
+          onChanged: widget.onLocationChanged,
+          validator: widget.validator,
         ),
+        if (widget.child != null) widget.child!,
         ListView.builder(
           shrinkWrap: true,
           itemCount: searchResults.length,
@@ -75,7 +105,7 @@ class _LocationSearchWidgetState extends State<LocationSearchWidget> {
               title: Text(searchResults[index]),
               onTap: () {
                 setState(() {
-                  widget.locationController.text = searchResults[index];
+                  widget.controller.text = searchResults[index];
                   searchResults = [];
                 });
               },

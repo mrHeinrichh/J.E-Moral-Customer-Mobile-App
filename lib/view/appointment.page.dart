@@ -65,6 +65,18 @@ class _AppointmentPageState extends State<AppointmentPage> {
       final TimeOfDay? pickedTime = await showTimePicker(
         context: context,
         initialTime: TimeOfDay(hour: 11, minute: 0),
+        builder: (BuildContext context, Widget? child) {
+          return Theme(
+            data: ThemeData.light().copyWith(
+              colorScheme: ColorScheme.light(
+                primary: const Color(0xFF050404).withOpacity(0.8),
+                onPrimary: Colors.white,
+              ),
+              backgroundColor: Colors.white,
+            ),
+            child: child!,
+          );
+        },
       );
 
       if (pickedTime != null) {
@@ -125,7 +137,15 @@ class _AppointmentPageState extends State<AppointmentPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('Confirm Appointment'),
+            title: const Center(
+              child: Text(
+                'Confirm Appointment',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
             content: Text.rich(
               TextSpan(
                 children: [
@@ -149,6 +169,9 @@ class _AppointmentPageState extends State<AppointmentPage> {
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
+                style: TextButton.styleFrom(
+                  primary: const Color(0xFF050404).withOpacity(0.7),
+                ),
                 child: const Text('Cancel'),
               ),
               TextButton(
@@ -180,7 +203,13 @@ class _AppointmentPageState extends State<AppointmentPage> {
                     print('Error updating appointment: $e');
                   }
                 },
-                child: const Text('Confirm'),
+                style: TextButton.styleFrom(
+                  primary: const Color(0xFF050404).withOpacity(0.9),
+                ),
+                child: const Text(
+                  'Confirm',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
             ],
           );
@@ -221,24 +250,6 @@ class _AppointmentPageState extends State<AppointmentPage> {
     print('UserId in build method: $userId');
 
     return Scaffold(
-      // appBar: AppBar(
-      //   elevation: 0,
-      //   backgroundColor: Colors.white,
-      //   iconTheme: const IconThemeData(
-      //     color: Colors.black,
-      //   ),
-      //   title: const Padding(
-      //     padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-      //     child: Text(
-      //       'Applying for Delivery Driver',
-      //       style: TextStyle(
-      //         color: Color(0xFF232937),
-      //         fontSize: 20,
-      //         fontWeight: FontWeight.bold,
-      //       ),
-      //     ),
-      //   ),
-      // ),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 1,

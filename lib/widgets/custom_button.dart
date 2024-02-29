@@ -168,7 +168,7 @@ class AppointmentButton extends StatelessWidget {
 }
 
 class CartButton extends StatelessWidget {
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final String text;
   final double height;
   final double width;
@@ -191,10 +191,19 @@ class CartButton extends StatelessWidget {
         width: width,
         child: ElevatedButton(
           onPressed: onPressed,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF050404).withOpacity(0.9),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30),
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.resolveWith<Color>(
+              (Set<MaterialState> states) {
+                if (states.contains(MaterialState.disabled)) {
+                  return const Color(0xFF050404).withOpacity(0.6);
+                }
+                return const Color(0xFF050404).withOpacity(0.9);
+              },
+            ),
+            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
             ),
           ),
           child: Container(

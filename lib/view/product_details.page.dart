@@ -15,6 +15,7 @@ class ProductDetailsPage extends StatefulWidget {
   String stock;
   String availableStock;
   String id;
+  String itemType;
 
   ProductDetailsPage({
     required this.productName,
@@ -27,6 +28,7 @@ class ProductDetailsPage extends StatefulWidget {
     required this.stock,
     required this.availableStock,
     required this.id,
+    required this.itemType,
   });
 
   @override
@@ -305,11 +307,13 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                     name: widget.productName,
                                     description: widget.description,
                                     category: widget.category,
+                                    weight: int.parse(widget.weight),
                                     customerPrice:
                                         double.parse(widget.productPrice),
                                     stock: stock,
                                     imageUrl: widget.productImageUrl,
                                     availableStock: int.parse(widget.stock),
+                                    itemType: widget.itemType,
                                   ),
                                   context: context,
                                 );

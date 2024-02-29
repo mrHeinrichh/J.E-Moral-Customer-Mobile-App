@@ -103,6 +103,7 @@ class MyApp extends StatelessWidget {
           const weight = "Placeholder Weight";
           const stock = "Placeholder Stock";
           const availableStock = "Placeholder Stock";
+          const itemType = "Placeholder Type";
 
           return ProductDetailsPage(
             id: id,
@@ -115,6 +116,7 @@ class MyApp extends StatelessWidget {
             weight: weight,
             stock: stock,
             availableStock: availableStock,
+            itemType: itemType,
           );
         },
       },

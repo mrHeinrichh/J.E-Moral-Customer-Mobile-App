@@ -7,7 +7,7 @@ class LocationService {
   final Location location = Location();
 
   Future<String> reverseGeocode(double latitude, double longitude) async {
-    final apiKey = '51dbec4c848141a991dc2a9d5020f252';
+    const apiKey = '51dbec4c848141a991dc2a9d5020f252';
     final apiUrl =
         'https://api.geoapify.com/v1/geocode/reverse?lat=$latitude&lon=$longitude&apiKey=$apiKey';
 
@@ -43,9 +43,10 @@ class LocationButtonWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
+      height: 55,
       decoration: BoxDecoration(
-        color: const Color(0xFFD9D9D9),
-        borderRadius: BorderRadius.circular(10.0),
+        color: const Color(0xFF050404).withOpacity(0.8),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: TextButton(
         onPressed: () async {
@@ -83,9 +84,16 @@ class LocationButtonWidget extends StatelessWidget {
             print('Error getting location: $e');
           }
         },
-        child: const Text(
-          "Use my current location",
-          style: TextStyle(color: Colors.black),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Use my Current Location",
+              style: TextStyle(color: Colors.white),
+            ),
+            SizedBox(width: 4),
+            Icon(Icons.location_pin, color: Colors.white),
+          ],
         ),
       ),
     );

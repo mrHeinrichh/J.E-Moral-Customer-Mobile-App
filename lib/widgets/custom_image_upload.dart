@@ -201,6 +201,7 @@ class ImageUploader extends StatelessWidget {
                 ),
               )),
         ),
+        const SizedBox(height: 5),
         const Divider(),
       ],
     );
