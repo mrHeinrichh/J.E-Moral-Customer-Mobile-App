@@ -318,14 +318,25 @@ class _FeedbackPageState extends State<FeedbackPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Error"),
-            content: Text("Please provide ratings for all categories."),
+            title: const Center(
+              child: Text(
+                'Error',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            content: const Text("Please provide ratings for all categories."),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: Text("OK"),
+                style: TextButton.styleFrom(
+                  primary: const Color(0xFF050404).withOpacity(0.8),
+                ),
+                child: const Text("OK"),
               ),
             ],
           );
@@ -349,15 +360,26 @@ class _FeedbackPageState extends State<FeedbackPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Error"),
-            content: Text(
+            title: const Center(
+              child: Text(
+                'Error',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            content: const Text(
                 "Please provide explanations for all categories and ensure each explanation is at least 5 characters long."),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: Text("OK"),
+                style: TextButton.styleFrom(
+                  primary: const Color(0xFF050404).withOpacity(0.9),
+                ),
+                child: const Text("OK"),
               ),
             ],
           );

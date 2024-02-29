@@ -89,6 +89,7 @@ class MyApp extends StatelessWidget {
             cancellationImages: 'Sample Cancellation Images',
             completionImages: 'Sample Completion Images',
             id: 'Sample ID',
+            discountIdImage: 'Sample discountIdImage',
           );
 
           return OrderDetails(transaction: sampleTransaction);

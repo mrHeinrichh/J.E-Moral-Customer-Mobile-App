@@ -100,6 +100,8 @@ class _HistoryPageState extends State<HistoryPage> {
       ),
       body: RefreshIndicator(
         onRefresh: refreshData,
+        color: const Color(0xFF050404),
+        strokeWidth: 2.5,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: ListView(
@@ -130,14 +132,14 @@ class _HistoryPageState extends State<HistoryPage> {
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(
+                                const Text(
                                   'Transaction Images',
                                   style: TextStyle(
                                     fontSize: 18.0,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                SizedBox(height: 16.0),
+                                const SizedBox(height: 16.0),
                                 // Display pickup images
                                 Row(
                                   children: [

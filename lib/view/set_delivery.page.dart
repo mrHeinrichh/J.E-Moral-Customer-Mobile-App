@@ -767,7 +767,15 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                                 context: context,
                                 builder: (BuildContext context) {
                                   return AlertDialog(
-                                    title: Text('Invalid Time'),
+                                    title: const Center(
+                                      child: Text(
+                                        'Invalid Time',
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
                                     content: Text(
                                       'Please select a time between 7 AM and 7 PM for delivery.',
                                     ),
@@ -776,6 +784,10 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                                         onPressed: () {
                                           Navigator.of(context).pop();
                                         },
+                                        style: TextButton.styleFrom(
+                                          primary: const Color(0xFF050404)
+                                              .withOpacity(0.8),
+                                        ),
                                         child: Text('OK'),
                                       ),
                                     ],
@@ -810,7 +822,15 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                             context: context,
                             builder: (context) {
                               return AlertDialog(
-                                title: const Text('Delivery Hours Notice'),
+                                title: const Center(
+                                  child: Text(
+                                    'Delivery Hours Notice',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
                                 content: const Text(
                                     'Sorry, your order cannot be delivered at the moment. Our delivery hours are from 7 AM to 7 PM daily.'),
                                 actions: [
@@ -818,6 +838,10 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                                     onPressed: () {
                                       Navigator.of(context).pop();
                                     },
+                                    style: TextButton.styleFrom(
+                                      primary: const Color(0xFF050404)
+                                          .withOpacity(0.8),
+                                    ),
                                     child: const Text('OK'),
                                   ),
                                 ],
@@ -895,7 +919,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
             child: Text(
               'Delivery Confirmation',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -1080,7 +1104,15 @@ void showAlertDialog(BuildContext context) {
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: const Text('Delivery Hours Notice'),
+        title: const Center(
+          child: Text(
+            'Delivery Hours Notice',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
         content: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -1104,6 +1136,9 @@ void showAlertDialog(BuildContext context) {
             onPressed: () {
               Navigator.of(context).pop();
             },
+            style: TextButton.styleFrom(
+              primary: const Color(0xFF050404).withOpacity(0.8),
+            ),
             child: const Text('Ok, I Understand'),
           ),
         ],

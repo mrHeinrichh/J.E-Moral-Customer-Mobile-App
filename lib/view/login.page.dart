@@ -124,10 +124,14 @@ class _LoginPageState extends State<LoginPage> {
                                 context: context,
                                 builder: (context) {
                                   return AlertDialog(
-                                    title: Text(
-                                      'Login Failed',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
+                                    title: const Center(
+                                      child: Text(
+                                        'Login Failed',
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                     ),
                                     content: Text(loginResult['error']),
                                     actions: [

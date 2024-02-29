@@ -89,6 +89,8 @@ class _FaqPageState extends State<FaqPage> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: RefreshIndicator(
+                color: const Color(0xFF050404),
+                strokeWidth: 2.5,
                 onRefresh: refreshData,
                 child: ListView.builder(
                   itemCount: faqs.length,

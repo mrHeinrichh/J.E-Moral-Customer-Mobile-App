@@ -34,17 +34,14 @@ class _PrivacyPolicyDialogState extends State<PrivacyPolicyDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Column(
-        children: [
-          Text(
-            "Terms and Conditions",
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-            textAlign: TextAlign.center,
+      title: const Center(
+        child: Text(
+          "Terms and Conditions",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
           ),
-        ],
+        ),
       ),
       content: SizedBox(
         child: SingleChildScrollView(

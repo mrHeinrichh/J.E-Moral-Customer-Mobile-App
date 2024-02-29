@@ -1,6 +1,5 @@
-//my_orders.page.dart
-
 import 'package:customer_app/widgets/custom_button.dart';
+import 'package:customer_app/widgets/fullscreen_image.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -8,7 +7,6 @@ import 'dart:convert';
 import 'package:provider/provider.dart';
 import 'user_provider.dart';
 import 'package:customer_app/routes/app_routes.dart';
-import 'package:photo_view/photo_view.dart';
 
 class Transaction {
   final String deliveryLocation;
@@ -30,6 +28,7 @@ class Transaction {
   final String pickupImages;
   final String cancellationImages;
   final String completionImages;
+  final String discountIdImage;
 
   final List<Map<String, dynamic>> items;
 
@@ -54,33 +53,8 @@ class Transaction {
     required this.hasFeedback,
     required this.cancellationImages,
     required this.completionImages,
+    required this.discountIdImage,
   });
-}
-
-class ZoomableImage extends StatelessWidget {
-  final String imageUrl;
-
-  ZoomableImage({required this.imageUrl});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Image Proof',
-          style: TextStyle(color: Colors.black),
-        ),
-        backgroundColor: Colors.white,
-        iconTheme: const IconThemeData(color: Colors.black),
-      ),
-      body: Container(
-        color: Colors.white,
-        child: PhotoView(
-          imageProvider: NetworkImage(imageUrl),
-        ),
-      ),
-    );
-  }
 }
 
 class MyOrderPage extends StatefulWidget {
@@ -116,11 +90,9 @@ class _MyOrderPageState extends State<MyOrderPage> {
     final apiUrl = 'https://lpg-api-06n8.onrender.com/api/v1/transactions';
 
     final filterQuery =
-        '{"to": "$userId", "__t": "Delivery", "hasFeedback": false}';
+        '{"to": "$userId", "__t": "Delivery", "hasFeedback": false, "deleted": false}';
 
-    // Add a limit parameter to the search URL
-    final searchUrl =
-        '$apiUrl/?filter=$filterQuery&limit=300'; // Adjust the limit value as needed
+    final searchUrl = '$apiUrl/?filter=$filterQuery&limit=300';
 
     final response = await http.get(Uri.parse(searchUrl));
 
@@ -131,7 +103,6 @@ class _MyOrderPageState extends State<MyOrderPage> {
         final List<dynamic> transactionsData = data['data'] ?? [];
 
         transactionsData.sort((a, b) {
-          // Convert updatedAt strings to DateTime and compare
           DateTime dateTimeA = DateTime.parse(a['updatedAt']);
           DateTime dateTimeB = DateTime.parse(b['updatedAt']);
           return dateTimeB.compareTo(dateTimeA);
@@ -151,7 +122,7 @@ class _MyOrderPageState extends State<MyOrderPage> {
                     deliveryLocation: transactionData['deliveryLocation'],
                     customerPrice: transactionData['customerPrice'] != null
                         ? transactionData['customerPrice'].toString()
-                        : 'N/A',
+                        : '',
                     isApproved: transactionData['isApproved'],
                     id: transactionData['_id'],
                     name: transactionData['name'],
@@ -164,10 +135,13 @@ class _MyOrderPageState extends State<MyOrderPage> {
                     status: transactionData['status'],
                     cancelReason: transactionData['cancelReason'] != null
                         ? transactionData['cancelReason'].toString()
-                        : 'N/A',
+                        : '',
                     deliveryDate: transactionData['deliveryDate'] != null
                         ? transactionData['deliveryDate'].toString()
-                        : 'N/A',
+                        : '',
+                    discountIdImage: transactionData['discountIdImage'] != null
+                        ? transactionData['discountIdImage'].toString()
+                        : '',
                     total: transactionData['total'].toDouble(),
                     createdAt: transactionData['createdAt'],
                     items: (transactionData['items'] as List<dynamic>?)
@@ -194,8 +168,7 @@ class _MyOrderPageState extends State<MyOrderPage> {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: jsonEncode(
-          {'status': "Archived", '__t': 'Delivery', 'deleted': true}),
+      body: jsonEncode({'status': "Cancelled", '__t': 'Delivery'}),
     );
 
     if (response.statusCode == 200) {
@@ -212,31 +185,27 @@ class _MyOrderPageState extends State<MyOrderPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
         backgroundColor: Colors.white,
+        elevation: 1,
         title: Text(
           'My Orders',
-          // style: TextStyle(color: Color(0xFF232937), fontSize: 24),
           style: TextStyle(
             color: const Color(0xFF050404).withOpacity(0.9),
             fontSize: 22,
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.refresh),
-            onPressed: () {
-              final userProvider =
-                  Provider.of<UserProvider>(context, listen: false);
-              final userId = userProvider.userId;
-
-              if (userId != null) {
-                fetchTransactions(userId);
-              }
-            },
+        centerTitle: true,
+        iconTheme: IconThemeData(
+          color: const Color(0xFF050404).withOpacity(0.8),
+        ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(
+            color: Colors.black,
+            height: 0.2,
           ),
-        ],
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -244,25 +213,38 @@ class _MyOrderPageState extends State<MyOrderPage> {
           },
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: ListView(
-          children: [
-            for (int i = 0; i < visibleTransactions.length; i++)
-              GestureDetector(
-                onTap: () {},
-                child: TransactionCard(
-                  transaction: visibleTransactions[i],
-                  onDeleteTransaction: () {
-                    deleteTransaction(visibleTransactions[i].id);
-                    reloadTransactions(); // Call the reloadTransactions callback
-                  },
-                  reloadTransactions:
-                      reloadTransactions, // Pass the reloadTransactions callback
-                  orderNumber: visibleTransactions.length - i,
+      backgroundColor: Colors.white,
+      body: RefreshIndicator(
+        color: const Color(0xFF050404),
+        strokeWidth: 2.5,
+        onRefresh: () async {
+          final userProvider =
+              Provider.of<UserProvider>(context, listen: false);
+          final userId = userProvider.userId;
+
+          if (userId != null) {
+            await fetchTransactions(userId);
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: ListView(
+            children: [
+              for (int i = 0; i < visibleTransactions.length; i++)
+                GestureDetector(
+                  onTap: () {},
+                  child: TransactionCard(
+                    transaction: visibleTransactions[i],
+                    onDeleteTransaction: () {
+                      deleteTransaction(visibleTransactions[i].id);
+                      reloadTransactions();
+                    },
+                    reloadTransactions: reloadTransactions,
+                    orderNumber: visibleTransactions.length - i,
+                  ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -292,16 +274,17 @@ class _TransactionCardState extends State<TransactionCard> {
   Color getTrackOrderButtonColor() {
     return widget.transaction.status.toString() == "On Going" ||
             widget.transaction.status.toString() == "Completed"
-        ? const Color(0xFF232937)
-        : const Color(0xFFAFB7C9);
+        ? const Color(0xFF050404).withOpacity(0.9)
+        : const Color(0xFF050404).withOpacity(0.1);
   }
 
   Color getCancelOrderButtonColor() {
     return widget.transaction.status.toString() == "On Going" ||
             widget.transaction.status.toString() == "Approved" ||
-            widget.transaction.status.toString() == "Completed"
-        ? const Color(0xFFAFB7C9)
-        : const Color(0xFF232937);
+            widget.transaction.status.toString() == "Completed" ||
+            widget.transaction.status.toString() == "Cancelled"
+        ? const Color(0xFF050404).withOpacity(0.1)
+        : const Color(0xFF050404).withOpacity(0.9);
   }
 
   String getTrackOrderButtonText() {
@@ -319,23 +302,22 @@ class _TransactionCardState extends State<TransactionCard> {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(30),
-      child: SizedBox(
-        height: 250,
-        child: GestureDetector(
-          onTap: () {
-            _showTransactionDetailsModal(widget.transaction);
-          },
-          child: Card(
-            elevation: 2,
+    return GestureDetector(
+      onTap: () {
+        _showTransactionDetailsModal(widget.transaction);
+      },
+      child: Column(
+        children: [
+          Card(
+            elevation: 4,
             child: Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         'Order #${widget.orderNumber}',
@@ -344,115 +326,200 @@ class _TransactionCardState extends State<TransactionCard> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const Spacer(),
-                      Text(
-                        "₱${NumberFormat.decimalPattern().format(widget.transaction.total)}",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                      if (widget.transaction.status != "Cancelled")
+                        Text(
+                          "₱${widget.transaction.total % 1 == 0 ? NumberFormat('#,##0').format(widget.transaction.total.toInt()) : NumberFormat('#,##0.00').format(widget.transaction.total).replaceAll(RegExp(r"([.]*0)(?!.*\d)"), "")}",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF050404).withOpacity(0.9),
+                          ),
                         ),
-                      ),
+                      if (widget.transaction.status == "Cancelled")
+                        IconButton(
+                          icon: Icon(
+                            Icons.close,
+                            color: const Color(0xFF050404).withOpacity(0.9),
+                          ),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Center(
+                                    child: Text(
+                                      "Confirmation",
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  content: const Text(
+                                      "Are you sure you want to Remove this Transaction?"),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      style: TextButton.styleFrom(
+                                        primary: const Color(0xFF050404)
+                                            .withOpacity(0.8),
+                                      ),
+                                      child: const Text("Cancel"),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        removeTransaction(
+                                            widget.transaction.id);
+                                        Navigator.of(context).pop();
+                                      },
+                                      style: TextButton.styleFrom(
+                                        primary: const Color(0xFFd41111)
+                                            .withOpacity(0.9),
+                                      ),
+                                      child: const Text("Remove"),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        ),
                     ],
                   ),
-                  RichText(
-                    text: TextSpan(
-                      style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.black), // Default text style
+                  const Divider(),
+                  Text.rich(
+                    TextSpan(
                       children: [
-                        TextSpan(
+                        const TextSpan(
                           text: "Status: ",
                           style: TextStyle(
-                              fontWeight: FontWeight.bold), // Bold style
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         TextSpan(
-                          text: "${widget.transaction.status}", // Regular style
+                          text: widget.transaction.status,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: const Color(0xFF050404).withOpacity(0.9),
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  Visibility(
-                    visible: widget.transaction.cancelReason != null &&
-                        widget.transaction.cancelReason.isNotEmpty,
-                    child: RichText(
-                      text: TextSpan(
-                        style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black), // Default text style
+                  if (widget.transaction.cancelReason != null &&
+                      widget.transaction.cancelReason.isNotEmpty)
+                    Text.rich(
+                      TextSpan(
                         children: [
-                          TextSpan(
-                            text: "Cancel Reason: ",
+                          const TextSpan(
+                            text: "Reason/s: ",
                             style: TextStyle(
-                                fontWeight: FontWeight.bold), // Bold style
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           TextSpan(
-                            text:
-                                "${widget.transaction.cancelReason}", // Regular style
+                            text: widget.transaction.cancelReason,
+                            style: const TextStyle(
+                              fontSize: 16,
+                            ),
                           ),
                         ],
                       ),
                     ),
-                  ),
+                  const SizedBox(height: 15),
                   CustomButton(
                     backgroundColor: getTrackOrderButtonColor(),
-                    onPressed:
-                        getTrackOrderButtonColor() == const Color(0xFFAFB7C9)
-                            ? () {}
-                            : () {
-                                Navigator.pushNamed(
-                                  context,
-                                  authenticationPage,
-                                  arguments: widget.transaction,
-                                );
-                              },
+                    onPressed: getTrackOrderButtonColor() ==
+                            const Color(0xFF050404).withOpacity(0.1)
+                        ? () {}
+                        : () {
+                            Navigator.pushNamed(
+                              context,
+                              authenticationPage,
+                              arguments: widget.transaction,
+                            );
+                          },
                     text: getTrackOrderButtonText(),
                   ),
+                  const SizedBox(height: 5),
                   CustomButton(
                     backgroundColor: getCancelOrderButtonColor(),
-                    onPressed:
-                        getCancelOrderButtonColor() == const Color(0xFFAFB7C9)
-                            ? () {}
-                            : () {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: Text("Confirmation"),
-                                      content: Text(
-                                          "Are you sure you want to cancel this order? Action cannot be undone."),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.of(context)
-                                                .pop(); // Close the dialog
-                                          },
-                                          child: Text("No"),
-                                        ),
-                                        TextButton(
-                                          onPressed: () {
-                                            // Call the onDeleteTransaction callback to archive the order
-                                            widget.onDeleteTransaction();
-                                            Navigator.of(context)
-                                                .pop(); // Close the dialog
-                                            widget
-                                                .reloadTransactions(); // Reload transactions
-                                          },
-                                          child: Text("Cancel Order"),
-                                        ),
-                                      ],
-                                    );
-                                  },
+                    onPressed: (widget.transaction.status == 'Approved' ||
+                            widget.transaction.status == 'Cancelled')
+                        ? () {}
+                        : () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Center(
+                                    child: Text(
+                                      "Confirmation",
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  content: const Text(
+                                      "Are you sure you want to Cancel this Order?"),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      style: TextButton.styleFrom(
+                                        primary: const Color(0xFF050404)
+                                            .withOpacity(0.8),
+                                      ),
+                                      child: const Text("No"),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        widget.onDeleteTransaction();
+                                        Navigator.of(context).pop();
+                                        widget.reloadTransactions();
+                                      },
+                                      style: TextButton.styleFrom(
+                                        primary: const Color(0xFFd41111)
+                                            .withOpacity(0.9),
+                                      ),
+                                      child: const Text("Cancel Order"),
+                                    ),
+                                  ],
                                 );
                               },
-                    text: 'Cancel Order',
+                            );
+                          },
+                    text: "Cancel Order",
                   ),
                 ],
               ),
             ),
           ),
-        ),
+          const SizedBox(height: 5),
+        ],
       ),
     );
+  }
+
+  Future<void> removeTransaction(String id) async {
+    final response = await http.patch(
+      Uri.parse('https://lpg-api-06n8.onrender.com/api/v1/transactions/$id'),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({'deleted': true, '__t': 'Delivery'}),
+    );
+
+    if (response.statusCode == 200) {
+      print(response.body);
+      setState(() {});
+    }
   }
 }
 
@@ -470,7 +537,7 @@ class TransactionDetailsModal extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const Text(
-              'Transaction Number',
+              'Transaction Number:',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -489,15 +556,40 @@ class TransactionDetailsModal extends StatelessWidget {
             Row(
               children: [
                 const Text(
-                  'Transaction Status',
+                  'Transaction Status: ',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                Text(' : ${transaction.status}'),
+                Text(transaction.status),
               ],
             ),
+            if (transaction.cancelReason.isNotEmpty)
+              Column(
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text.rich(
+                        TextSpan(
+                          children: [
+                            const TextSpan(
+                              text: 'Reason: ',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            TextSpan(
+                              text: transaction.cancelReason,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Divider(),
+                ],
+              ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const SizedBox(height: 2),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -505,7 +597,7 @@ class TransactionDetailsModal extends StatelessWidget {
                       child: Text.rich(
                         TextSpan(
                           children: [
-                            WidgetSpan(
+                            const WidgetSpan(
                               child: const Icon(Icons.perm_identity_outlined),
                             ),
                             TextSpan(
@@ -518,6 +610,7 @@ class TransactionDetailsModal extends StatelessWidget {
                     ),
                   ],
                 ),
+                const SizedBox(height: 2),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -525,7 +618,7 @@ class TransactionDetailsModal extends StatelessWidget {
                       child: Text.rich(
                         TextSpan(
                           children: [
-                            WidgetSpan(
+                            const WidgetSpan(
                               child: const Icon(Icons.phone_rounded),
                             ),
                             TextSpan(
@@ -538,6 +631,7 @@ class TransactionDetailsModal extends StatelessWidget {
                     ),
                   ],
                 ),
+                const SizedBox(height: 2),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -545,8 +639,8 @@ class TransactionDetailsModal extends StatelessWidget {
                       child: Text.rich(
                         TextSpan(
                           children: [
-                            WidgetSpan(
-                              child: const Icon(Icons.location_on_outlined),
+                            const WidgetSpan(
+                              child: Icon(Icons.location_on_outlined),
                             ),
                             TextSpan(
                               text: ' : ${transaction.deliveryLocation}',
@@ -558,6 +652,7 @@ class TransactionDetailsModal extends StatelessWidget {
                     ),
                   ],
                 ),
+                const SizedBox(height: 2),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -565,8 +660,8 @@ class TransactionDetailsModal extends StatelessWidget {
                       child: Text.rich(
                         TextSpan(
                           children: [
-                            WidgetSpan(
-                              child: const Icon(Icons.house_outlined),
+                            const WidgetSpan(
+                              child: Icon(Icons.house_outlined),
                             ),
                             TextSpan(
                               text: ' : ${transaction.houseLotBlk}',
@@ -578,12 +673,14 @@ class TransactionDetailsModal extends StatelessWidget {
                     ),
                   ],
                 ),
+                const SizedBox(height: 2),
                 Row(
                   children: [
                     const Icon(Icons.payment_outlined),
                     Text(' : ${transaction.paymentMethod}'),
                   ],
                 ),
+                const SizedBox(height: 2),
                 Row(
                   children: [
                     const Text(
@@ -597,11 +694,59 @@ class TransactionDetailsModal extends StatelessWidget {
                 ),
                 Row(
                   children: [
+                    const Text(
+                      'Applying for Discount: ',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      transaction.discountIdImage.isNotEmpty ? 'Yes' : 'No',
+                    ),
+                  ],
+                ),
+                if (transaction.discountIdImage.isNotEmpty)
+                  Column(
+                    children: [
+                      const SizedBox(height: 5),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => FullScreenImageView(
+                                imageUrl: transaction.discountIdImage!,
+                                onClose: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          height: 150,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: const Color(0xFF050404).withOpacity(0.9),
+                              width: 1,
+                            ),
+                            image: DecorationImage(
+                              image: NetworkImage(transaction.discountIdImage),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                    ],
+                  ),
+                Row(
+                  children: [
                     Expanded(
                       child: Text.rich(
                         TextSpan(
                           children: [
-                            TextSpan(
+                            const TextSpan(
                               text: 'Items: ',
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
@@ -628,7 +773,7 @@ class TransactionDetailsModal extends StatelessWidget {
                         style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 15)),
                     Text(
-                      '₱${NumberFormat.decimalPattern().format(transaction.total)}',
+                      "₱${transaction.total % 1 == 0 ? NumberFormat('#,##0').format(transaction.total.toInt()) : NumberFormat('#,##0.00').format(transaction.total).replaceAll(RegExp(r"([.]*0)(?!.*\d)"), "")}",
                     ),
                   ],
                 ),
@@ -638,107 +783,139 @@ class TransactionDetailsModal extends StatelessWidget {
                       'Delivery Date/Time: ',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    Text(DateFormat('MMM d, y - h:mm a ')
-                        .format(DateTime.parse(transaction.deliveryDate))),
+                    Text(
+                      transaction.deliveryDate != ""
+                          ? DateFormat('MMM d, y - h:mm a ').format(
+                              DateTime.parse(transaction.deliveryDate!),
+                            )
+                          : "Not Picked the Date/Time",
+                    ),
                   ],
                 ),
-                const Divider(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      children: [
-                        const Text(
-                          'Pick-up Image',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        if (transaction.pickupImages != "")
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ZoomableImage(
-                                    imageUrl: transaction.pickupImages!,
-                                  ),
-                                ),
-                              );
-                            },
-                            child: ClipOval(
-                              child: Image.network(
-                                transaction.pickupImages!,
-                                width: 100,
-                                height: 100,
-                                fit: BoxFit.fitHeight,
-                              ),
-                            ),
-                          )
-                        else
-                          const Text(''),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        const Text(
-                          'Drop-off Image',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        if (transaction.completionImages != "")
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ZoomableImage(
-                                    imageUrl: transaction.completionImages!,
-                                  ),
-                                ),
-                              );
-                            },
-                            child: ClipOval(
-                              child: Image.network(
-                                transaction.completionImages!,
-                                width: 100,
-                                height: 100,
-                                fit: BoxFit.fitHeight,
-                              ),
-                            ),
-                          )
-                        else
-                          const Text(''),
-                      ],
-                    ),
-                    if (transaction.cancellationImages != "")
-                      Column(
+                if (transaction.pickupImages != "" ||
+                    transaction.cancellationImages != "" ||
+                    transaction.completionImages != "")
+                  Column(
+                    children: [
+                      const Divider(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          const Text(
-                            'Cancellation Image',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ZoomableImage(
-                                    imageUrl: transaction.cancellationImages!,
-                                  ),
-                                ),
-                              );
-                            },
-                            child: ClipOval(
-                              child: Image.network(
-                                transaction.cancellationImages!,
-                                width: 100,
-                                height: 100,
-                                fit: BoxFit.fitHeight,
+                          Column(
+                            children: [
+                              const Text(
+                                'Pick-up Image',
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
+                              const SizedBox(height: 5),
+                              if (transaction.pickupImages != "")
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            FullScreenImageView(
+                                          imageUrl: transaction.pickupImages!,
+                                          onClose: () {
+                                            Navigator.pop(context);
+                                          },
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.network(
+                                      transaction.pickupImages!,
+                                      width: 100,
+                                      height: 100,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                )
+                              else
+                                const Text(''),
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              const Text(
+                                'Drop-off Image',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 5),
+                              if (transaction.completionImages != "")
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            FullScreenImageView(
+                                          imageUrl:
+                                              transaction.completionImages!,
+                                          onClose: () {
+                                            Navigator.pop(context);
+                                          },
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.network(
+                                      transaction.completionImages!,
+                                      width: 100,
+                                      height: 100,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                )
+                              else
+                                const Text(''),
+                            ],
+                          ),
+                          if (transaction.cancellationImages != "")
+                            Column(
+                              children: [
+                                const Text(
+                                  'Cancellation Image',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 5),
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            FullScreenImageView(
+                                          imageUrl:
+                                              transaction.cancellationImages!,
+                                          onClose: () {
+                                            Navigator.pop(context);
+                                          },
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.network(
+                                      transaction.cancellationImages!,
+                                      width: 100,
+                                      height: 100,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                )
+                              ],
                             ),
-                          )
                         ],
                       ),
-                  ],
-                ),
+                    ],
+                  )
               ],
             ),
           ],

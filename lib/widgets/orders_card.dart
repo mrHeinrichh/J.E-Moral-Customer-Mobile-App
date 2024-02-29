@@ -60,15 +60,13 @@ class _TransactionCardState extends State<TransactionCard> {
                 Text("Status: ${widget.transaction.status}"),
                 CustomButton(
                   backgroundColor: getTrackOrderButtonColor(),
-                  onPressed: () {
-                    // Navigate to track order page
-                  },
+                  onPressed: () {},
                   text: 'Track Order',
                 ),
                 CustomButton(
                   backgroundColor: getCancelOrderButtonColor(),
                   onPressed: getCancelOrderButtonColor() == Color(0xFFAFB7C9)
-                      ? () {} // This is an empty function, effectively disabling the button
+                      ? () {}
                       : widget.onCancelTransaction,
                   text: 'Cancel Order',
                 ),

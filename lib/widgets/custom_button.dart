@@ -75,7 +75,7 @@ class CustomizedButton extends StatelessWidget {
   final double height;
   final double width;
   final double fontz;
-  final bool enabled; // Add the 'enabled' parameter
+  final bool enabled;
 
   CustomizedButton({
     required this.onPressed,
@@ -97,7 +97,7 @@ class CustomizedButton extends StatelessWidget {
           onPressed: enabled ? onPressed : null,
           style: ElevatedButton.styleFrom(
             backgroundColor: enabled
-                ? const Color(0xFF050404).withOpacity(0.8)
+                ? const Color(0xFF050404).withOpacity(0.9)
                 : const Color(0xFF050404).withOpacity(0.4),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(30),

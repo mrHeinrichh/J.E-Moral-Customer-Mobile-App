@@ -99,7 +99,15 @@ class _AppointmentPageState extends State<AppointmentPage> {
             context: context,
             builder: (context) {
               return AlertDialog(
-                title: Text('Invalid Time'),
+                title: const Center(
+                  child: Text(
+                    'Invalid Time',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
                 content: Text(
                     'Please select a time between store hours 7:00 AM and 7:00 PM.'),
                 actions: [
@@ -107,6 +115,9 @@ class _AppointmentPageState extends State<AppointmentPage> {
                     onPressed: () {
                       Navigator.pop(context);
                     },
+                    style: TextButton.styleFrom(
+                      primary: const Color(0xFF050404).withOpacity(0.8),
+                    ),
                     child: Text('OK'),
                   ),
                 ],
@@ -141,7 +152,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
               child: Text(
                 'Confirm Appointment',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -220,7 +231,15 @@ class _AppointmentPageState extends State<AppointmentPage> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: const Text('Invalid Time'),
+            title: const Center(
+              child: Text(
+                'Invalid Time',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
             content: const Text(
                 'Please select a time between store hours 7:00 AM and 7:00 PM.'),
             actions: [
@@ -228,6 +247,9 @@ class _AppointmentPageState extends State<AppointmentPage> {
                 onPressed: () {
                   Navigator.pop(context);
                 },
+                style: TextButton.styleFrom(
+                  primary: const Color(0xFF050404).withOpacity(0.9),
+                ),
                 child: const Text('OK'),
               ),
             ],
@@ -341,7 +363,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
                 const SizedBox(height: 10),
                 SizedBox(
                   width: double.infinity,
-                  child: CustomizedButton(
+                  child: AppointmentButton(
                     onPressed: () => _updateAppointment(context),
                     text: 'Book an Appointment',
                     height: 60,
