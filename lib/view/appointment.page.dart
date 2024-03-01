@@ -116,7 +116,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
                       Navigator.pop(context);
                     },
                     style: TextButton.styleFrom(
-                      backgroundColor: const Color(0xFF050404).withOpacity(0.8),
+                      foregroundColor: const Color(0xFF050404).withOpacity(0.8),
                     ),
                     child: Text('OK'),
                   ),
@@ -181,7 +181,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
                   Navigator.of(context).pop();
                 },
                 style: TextButton.styleFrom(
-                  backgroundColor: const Color(0xFF050404).withOpacity(0.7),
+                  foregroundColor: const Color(0xFF050404).withOpacity(0.7),
                 ),
                 child: const Text('Cancel'),
               ),
@@ -215,7 +215,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
                   }
                 },
                 style: TextButton.styleFrom(
-                  backgroundColor: const Color(0xFF050404).withOpacity(0.9),
+                  foregroundColor: const Color(0xFF050404).withOpacity(0.9),
                 ),
                 child: const Text(
                   'Confirm',
@@ -248,7 +248,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
                   Navigator.pop(context);
                 },
                 style: TextButton.styleFrom(
-                  backgroundColor: const Color(0xFF050404).withOpacity(0.9),
+                  foregroundColor: const Color(0xFF050404).withOpacity(0.9),
                 ),
                 child: const Text('OK'),
               ),
