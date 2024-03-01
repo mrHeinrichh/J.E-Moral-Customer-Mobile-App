@@ -658,7 +658,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                   Navigator.of(context).pop();
                                                 },
                                                 style: TextButton.styleFrom(
-                                                  primary:
+                                                  backgroundColor:
                                                       const Color(0xFF050404)
                                                           .withOpacity(0.7),
                                                 ),
@@ -688,7 +688,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                   }
                                                 },
                                                 style: TextButton.styleFrom(
-                                                  primary:
+                                                  backgroundColor:
                                                       const Color(0xFF050404)
                                                           .withOpacity(0.9),
                                                 ),
@@ -762,7 +762,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                   Navigator.of(context).pop();
                                                 },
                                                 style: TextButton.styleFrom(
-                                                  primary:
+                                                  backgroundColor:
                                                       const Color(0xFF050404)
                                                           .withOpacity(0.7),
                                                 ),
@@ -780,7 +780,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                   }
                                                 },
                                                 style: TextButton.styleFrom(
-                                                  primary:
+                                                  backgroundColor:
                                                       const Color(0xFF050404)
                                                           .withOpacity(0.9),
                                                 ),
@@ -852,7 +852,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 Navigator.of(context).pop();
               },
               style: TextButton.styleFrom(
-                primary: const Color(0xFF050404).withOpacity(0.7),
+                backgroundColor: const Color(0xFF050404).withOpacity(0.7),
               ),
               child: const Text('Cancel'),
             ),
@@ -862,7 +862,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 Navigator.pushNamed(context, '/login');
               },
               style: TextButton.styleFrom(
-                primary: const Color(0xFFd41111).withOpacity(0.8),
+                backgroundColor: const Color(0xFFd41111).withOpacity(0.8),
               ),
               child: const Text('Logout'),
             ),

@@ -785,8 +785,9 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                                           Navigator.of(context).pop();
                                         },
                                         style: TextButton.styleFrom(
-                                          primary: const Color(0xFF050404)
-                                              .withOpacity(0.8),
+                                          backgroundColor:
+                                              const Color(0xFF050404)
+                                                  .withOpacity(0.8),
                                         ),
                                         child: Text('OK'),
                                       ),
@@ -839,7 +840,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                                       Navigator.of(context).pop();
                                     },
                                     style: TextButton.styleFrom(
-                                      primary: const Color(0xFF050404)
+                                      backgroundColor: const Color(0xFF050404)
                                           .withOpacity(0.8),
                                     ),
                                     child: const Text('OK'),
@@ -1072,7 +1073,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                 Navigator.of(context).pop();
               },
               style: TextButton.styleFrom(
-                primary: const Color(0xFF050404).withOpacity(0.7),
+                backgroundColor: const Color(0xFF050404).withOpacity(0.7),
               ),
               child: const Text('Cancel'),
             ),
@@ -1085,7 +1086,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                 Navigator.pushNamed(currentContext, myOrdersPage);
               },
               style: TextButton.styleFrom(
-                primary: const Color(0xFF050404).withOpacity(0.9),
+                backgroundColor: const Color(0xFF050404).withOpacity(0.9),
               ),
               child: const Text(
                 'Confirm',
@@ -1137,7 +1138,7 @@ void showAlertDialog(BuildContext context) {
               Navigator.of(context).pop();
             },
             style: TextButton.styleFrom(
-              primary: const Color(0xFF050404).withOpacity(0.8),
+              backgroundColor: const Color(0xFF050404).withOpacity(0.8),
             ),
             child: const Text('Ok, I Understand'),
           ),

@@ -205,7 +205,7 @@ class ProfileButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        primary: text == 'Logout'
+        backgroundColor: text == 'Logout'
             ? const Color(0xFFd41111).withOpacity(0.8)
             : const Color(0xFF050404).withOpacity(0.9),
         elevation: 4,
@@ -243,7 +243,7 @@ class StatusButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        primary: text == ' View Appointment '
+        backgroundColor: text == ' View Appointment '
             ? const Color(0xFF050404).withOpacity(0.5)
             : const Color(0xFF050404).withOpacity(0.9),
         elevation: 4,
@@ -281,7 +281,7 @@ class OkButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        primary: Colors.white,
+        backgroundColor: Colors.white,
         elevation: 4,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),

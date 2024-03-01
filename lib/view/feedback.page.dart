@@ -381,7 +381,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
                                     Navigator.of(context).pop();
                                   },
                                   style: TextButton.styleFrom(
-                                    primary: const Color(0xFF050404)
+                                    backgroundColor: const Color(0xFF050404)
                                         .withOpacity(0.8),
                                   ),
                                   child: const Text("OK"),

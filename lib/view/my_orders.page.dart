@@ -359,7 +359,7 @@ class _TransactionCardState extends State<TransactionCard> {
                                         Navigator.of(context).pop();
                                       },
                                       style: TextButton.styleFrom(
-                                        primary: const Color(0xFF050404)
+                                        backgroundColor: const Color(0xFF050404)
                                             .withOpacity(0.8),
                                       ),
                                       child: const Text("Cancel"),
@@ -370,7 +370,7 @@ class _TransactionCardState extends State<TransactionCard> {
                                             widget.transaction.id);
                                       },
                                       style: TextButton.styleFrom(
-                                        primary: const Color(0xFFd41111)
+                                        backgroundColor: const Color(0xFFd41111)
                                             .withOpacity(0.9),
                                       ),
                                       child: const Text("Remove"),
@@ -468,7 +468,7 @@ class _TransactionCardState extends State<TransactionCard> {
                                         Navigator.of(context).pop();
                                       },
                                       style: TextButton.styleFrom(
-                                        primary: const Color(0xFF050404)
+                                        backgroundColor: const Color(0xFF050404)
                                             .withOpacity(0.8),
                                       ),
                                       child: const Text("No"),
@@ -480,7 +480,7 @@ class _TransactionCardState extends State<TransactionCard> {
                                         widget.reloadTransactions();
                                       },
                                       style: TextButton.styleFrom(
-                                        primary: const Color(0xFFd41111)
+                                        backgroundColor: const Color(0xFFd41111)
                                             .withOpacity(0.9),
                                       ),
                                       child: const Text("Cancel Order"),
