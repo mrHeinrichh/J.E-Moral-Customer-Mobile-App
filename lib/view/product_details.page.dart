@@ -286,8 +286,15 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       ),
                       Text(
                         totalPrice % 1 == 0
-                            ? '₱${totalPrice.toInt().toString()}'
-                            : '₱${totalPrice.toStringAsFixed(2).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match match) => '${match[1]},')}',
+                            ? '₱${totalPrice.toInt().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match match) => '${match[1]},')}'
+                            : totalPrice.toStringAsFixed(
+                                        totalPrice.truncateToDouble() ==
+                                                totalPrice
+                                            ? 0
+                                            : 2) ==
+                                    totalPrice.toStringAsFixed(0)
+                                ? '₱${totalPrice.toInt().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match match) => '${match[1]},')}'
+                                : '₱${totalPrice.toStringAsFixed(2).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match match) => '${match[1]},')}',
                         style: TextStyle(
                           fontSize: 18,
                           color: const Color(0xFFd41111).withOpacity(0.8),
