@@ -31,7 +31,7 @@ class _HistoryPageState extends State<HistoryPage> {
     }
 
     final apiUrl = 'https://lpg-api-06n8.onrender.com/api/v1/transactions';
-    final filterUrl = '$apiUrl/?filter={"to":"$userId", "__t" : "Delivery"}';
+    final filterUrl = '$apiUrl/?filter={"to":"$userId", "__t" : "Delivery"} ';
 
     final response = await http.get(Uri.parse(filterUrl));
     if (!mounted) {

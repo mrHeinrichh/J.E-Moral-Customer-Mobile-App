@@ -54,7 +54,7 @@ class _HomePageState extends State<HomePage> {
   void searchItems() async {
     final searchTerm = searchController.text;
     final url = Uri.parse(
-        'https://lpg-api-06n8.onrender.com/api/v1/items/search?search=$searchTerm');
+        'https://lpg-api-06n8.onrender.com/api/v1/items/search?search=$searchTerm&limit=300');
     final response = await http.get(url);
     if (!mounted) {
       return;

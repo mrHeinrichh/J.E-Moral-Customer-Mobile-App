@@ -147,11 +147,58 @@ class _SignupPageState extends State<SignupPage> {
 
       if (userResponse.statusCode == 200) {
         print("User created successfully.");
+
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => LoginPage(),
           ),
+        );
+
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text(
+                'Account Created Successfully',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              content: const SingleChildScrollView(
+                child: Column(
+                  children: [
+                    SizedBox(height: 10),
+                    Text(
+                      "Once your account is already verified and good to login, an email will be sent to your account.",
+                      style: TextStyle(
+                        fontSize: 14,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFF050404).withOpacity(0.9),
+                  ),
+                  child: const Text(
+                    'OK',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
         );
       } else {
         print("Response: ${userResponse.body}");
