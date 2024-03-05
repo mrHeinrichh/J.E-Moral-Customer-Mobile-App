@@ -3,7 +3,6 @@ import 'package:customer_app/routes/app_routes.dart';
 import 'package:customer_app/view/product_details.page.dart';
 import 'package:customer_app/widgets/fullscreen_image.dart';
 import 'package:customer_app/widgets/home_page_card.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -77,9 +76,9 @@ class _HomePageState extends State<HomePage> {
                 double.parse((item['customerPrice'] ?? 0).toStringAsFixed(2))),
             'imageUrl': item['image'] ?? 'Image URL Not Available',
             'description': item['description'] ?? 'Description Not Available',
+            'type': item['type'] ?? 'Type Not Available',
             'weight': (item['weight'] ?? 0).toString(),
             'stock': (item['stock'] ?? 0).toString(),
-            'availableStock': (item['stock'] ?? 0).toString(),
           };
 
           if (groupedData.containsKey(category)) {
@@ -124,9 +123,9 @@ class _HomePageState extends State<HomePage> {
                 double.parse((item['customerPrice'] ?? 0).toStringAsFixed(2))),
             'imageUrl': item['image'] ?? 'Image URL Not Available',
             'description': item['description'] ?? 'Description Not Available',
+            'type': item['type'] ?? 'Type Not Available',
             'weight': (item['weight'] ?? 0).toString(),
             'stock': (item['stock'] ?? 0).toString(),
-            'availableStock': (item['stock'] ?? 0).toString(),
           };
 
           if (groupedData.containsKey(category)) {
@@ -238,19 +237,16 @@ class _HomePageState extends State<HomePage> {
                                 borderRadius: BorderRadius.circular(10.0),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(10.0),
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(right: 4),
-                                    child: IconButton(
-                                      icon: Icon(
-                                        FontAwesomeIcons.cartShopping,
-                                        color: const Color(0xFF050404)
-                                            .withOpacity(0.8),
-                                        size: 23,
-                                      ),
-                                      onPressed: () {
-                                        Navigator.pushNamed(context, cartRoute);
-                                      },
+                                  child: IconButton(
+                                    icon: Icon(
+                                      Icons.shopping_cart_rounded,
+                                      color: const Color(0xFF050404)
+                                          .withOpacity(0.8),
+                                      size: 23,
                                     ),
+                                    onPressed: () {
+                                      Navigator.pushNamed(context, cartRoute);
+                                    },
                                   ),
                                 ),
                               ),
@@ -375,9 +371,7 @@ class _HomePageState extends State<HomePage> {
                                                       'Weight Not Available',
                                                   stock: product['stock'] ??
                                                       'Stock Not Available',
-                                                  availableStock: product[
-                                                          'availableStock'] ??
-                                                      'Stock Not Available',
+                                                  quantity: 0,
                                                   id: product['_id'] ??
                                                       'ID Not Available',
                                                 ),

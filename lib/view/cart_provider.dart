@@ -13,18 +13,18 @@ class CartProvider extends ChangeNotifier {
     int existingIndex = _cartItems.indexWhere((item) => item.id == cartItem.id);
 
     if (existingIndex != -1) {
-      int totalStock = _cartItems[existingIndex].stock + cartItem.stock;
+      int totalStock = _cartItems[existingIndex].quantity + cartItem.quantity;
 
-      if (totalStock <= cartItem.availableStock) {
-        _cartItems[existingIndex].stock = totalStock;
+      if (totalStock <= cartItem.stock) {
+        _cartItems[existingIndex].quantity = totalStock;
       } else {
         showCustomOverlay(
           context,
           'Stock Limit Exceeded',
           'The Quantity you are trying to Add exceeds the Available Stock. Please Adjust the Quantity.',
-          cartItem.availableStock,
-          _cartItems[existingIndex].stock,
           cartItem.stock,
+          _cartItems[existingIndex].quantity,
+          cartItem.quantity,
         );
 
         return;
@@ -47,9 +47,9 @@ class CartProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void incrementStock(CartItem item) {
-    if (item.stock < item.availableStock) {
-      item.stock++;
+  void incrementQuantity(CartItem item) {
+    if (item.quantity < item.stock) {
+      item.quantity++;
       notifyListeners();
     }
   }
@@ -59,10 +59,10 @@ class CartProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void decrementStock(CartItem item) {
-    if (item.stock > 0) {
-      item.stock--;
-      if (item.stock == 0) {
+  void decrementQuantity(CartItem item) {
+    if (item.quantity > 0) {
+      item.quantity--;
+      if (item.quantity == 0) {
         removeFromCart(item);
       }
     }
@@ -73,7 +73,7 @@ class CartProvider extends ChangeNotifier {
     double totalPrice = 0.0;
     for (var cartItem in _cartItems) {
       if (cartItem.isSelected) {
-        totalPrice += cartItem.customerPrice * cartItem.stock;
+        totalPrice += cartItem.customerPrice * cartItem.quantity;
       }
     }
     return totalPrice;
@@ -90,7 +90,7 @@ class CartItem {
   String imageUrl;
   bool isSelected;
   int stock;
-  int availableStock;
+  int quantity;
   String itemType;
 
   CartItem({
@@ -103,7 +103,7 @@ class CartItem {
     required this.imageUrl,
     this.isSelected = true,
     this.stock = 1,
-    required this.availableStock,
+    this.quantity = 1,
     required this.itemType,
   });
 }

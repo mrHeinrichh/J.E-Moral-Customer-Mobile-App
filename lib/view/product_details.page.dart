@@ -13,7 +13,7 @@ class ProductDetailsPage extends StatefulWidget {
   String description;
   String weight;
   String stock;
-  String availableStock;
+  int quantity;
   String id;
   String itemType;
 
@@ -26,7 +26,7 @@ class ProductDetailsPage extends StatefulWidget {
     required this.description,
     required this.weight,
     required this.stock,
-    required this.availableStock,
+    required this.quantity,
     required this.id,
     required this.itemType,
   });
@@ -36,15 +36,15 @@ class ProductDetailsPage extends StatefulWidget {
 }
 
 class _ProductDetailsPageState extends State<ProductDetailsPage> {
-  int stock = 0;
+  int quantity = 0;
 
   @override
   void initState() {
     super.initState();
     if (int.parse(widget.stock) <= 0) {
-      stock = 0;
+      quantity = 0;
     } else {
-      stock = 1;
+      quantity = 1;
     }
   }
 
@@ -54,7 +54,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
     final titleText = widget.category;
 
-    final totalPrice = double.parse(widget.productPrice) * stock;
+    final totalPrice = double.parse(widget.productPrice) * quantity;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -228,8 +228,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                               icon: const Icon(Icons.remove, size: 15),
                               onPressed: () {
                                 setState(() {
-                                  if (stock > 1) {
-                                    stock--;
+                                  if (quantity > 1) {
+                                    quantity--;
                                   }
                                 });
                               },
@@ -238,7 +238,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           ),
                           const SizedBox(width: 10),
                           Text(
-                            "$stock",
+                            "$quantity",
                             style: TextStyle(
                               fontSize: 18,
                               color: const Color(0xFF050404).withOpacity(0.8),
@@ -260,8 +260,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                               icon: const Icon(Icons.add, size: 15),
                               onPressed: () {
                                 setState(() {
-                                  if (stock < int.parse(widget.stock)) {
-                                    stock++;
+                                  if (quantity < int.parse(widget.stock)) {
+                                    quantity++;
                                   }
                                 });
                               },
@@ -305,9 +305,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   ),
                   Center(
                     child: CartButton(
-                      onPressed: stock > 0
+                      onPressed: quantity > 0
                           ? () {
-                              if (stock > 0) {
+                              if (quantity > 0) {
                                 cartProvider.addToCart(
                                   cartItem: CartItem(
                                     id: widget.id,
@@ -317,9 +317,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                     weight: int.parse(widget.weight),
                                     customerPrice:
                                         double.parse(widget.productPrice),
-                                    stock: stock,
+                                    quantity: quantity,
                                     imageUrl: widget.productImageUrl,
-                                    availableStock: int.parse(widget.stock),
+                                    stock: int.parse(widget.stock),
                                     itemType: widget.itemType,
                                   ),
                                   context: context,

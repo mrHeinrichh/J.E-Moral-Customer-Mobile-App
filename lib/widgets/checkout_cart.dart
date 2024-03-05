@@ -33,7 +33,7 @@ class CartItemWidget extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      "${cartItem.availableStock}",
+                      "${cartItem.stock}",
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -142,9 +142,9 @@ class CartItemWidget extends StatelessWidget {
                       children: [
                         Flexible(
                           child: Text(
-                            cartItem.customerPrice * cartItem.stock % 1 == 0
-                                ? '₱${(cartItem.customerPrice * cartItem.stock).toInt().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match match) => '${match[1]},')}'
-                                : '₱${(cartItem.customerPrice * cartItem.stock).toStringAsFixed(2).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match match) => '${match[1]},')}',
+                            cartItem.customerPrice * cartItem.quantity % 1 == 0
+                                ? '₱${(cartItem.customerPrice * cartItem.quantity).toInt().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match match) => '${match[1]},')}'
+                                : '₱${(cartItem.customerPrice * cartItem.quantity).toStringAsFixed(2).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match match) => '${match[1]},')}',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 18,
@@ -160,11 +160,11 @@ class CartItemWidget extends StatelessWidget {
                               onPressed: () {
                                 Provider.of<CartProvider>(context,
                                         listen: false)
-                                    .decrementStock(cartItem);
+                                    .decrementQuantity(cartItem);
                               },
                             ),
                             Text(
-                              '${cartItem.stock}',
+                              '${cartItem.quantity}',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -176,7 +176,7 @@ class CartItemWidget extends StatelessWidget {
                               onPressed: () {
                                 Provider.of<CartProvider>(context,
                                         listen: false)
-                                    .incrementStock(cartItem);
+                                    .incrementQuantity(cartItem);
                               },
                             ),
                           ],

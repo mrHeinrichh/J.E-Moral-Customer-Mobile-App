@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:customer_app/widgets/custom_button.dart';
-import 'package:customer_app/widgets/custom_timepicker.dart';
 import 'package:customer_app/widgets/location_button.dart';
 import 'package:customer_app/widgets/location_search.dart';
 import 'package:customer_app/widgets/text_field.dart';
@@ -187,14 +186,13 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
           "category": cartItem.category,
           "description": cartItem.description,
           "weight": cartItem.weight,
-          "stock": cartItem.availableStock,
+          "stock": cartItem.stock,
           "customerPrice": cartItem.customerPrice,
           // "retailerPrice": cartItem.retailerPrice,
           "image": cartItem.imageUrl,
           "type": cartItem.itemType,
-          "quantity": cartItem.stock,
-          //
-          "totalPrice": cartItem.customerPrice * cartItem.stock,
+          "quantity": cartItem.quantity,
+          // "totalPrice": cartItem.customerPrice * cartItem.stock,
         });
       }
     }
@@ -265,6 +263,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
             ? discountedUploadResponse["url"]
             : "",
         "type": "Delivery",
+        //
         "priceType": "Customer",
       };
 
@@ -763,6 +762,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                                 confirmDialog();
                               });
                             } else {
+                              // NONSENSE
                               showDialog(
                                 context: context,
                                 builder: (BuildContext context) {
@@ -789,7 +789,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                                               const Color(0xFF050404)
                                                   .withOpacity(0.8),
                                         ),
-                                        child: Text('OK'),
+                                        child: const Text('OK'),
                                       ),
                                     ],
                                   );
@@ -819,6 +819,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                           selectedDateTime = DateTime.now();
                           confirmDialog();
                         } else {
+                          // NONSENSE
                           showDialog(
                             context: context,
                             builder: (context) {
@@ -963,7 +964,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                 TextSpan(
                   children: [
                     const TextSpan(
-                      text: 'Receiver Contact Number: ',
+                      text: 'Receiver Mobile Number: ',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                       ),

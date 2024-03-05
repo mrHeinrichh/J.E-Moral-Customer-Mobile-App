@@ -67,6 +67,14 @@ class _CartPageState extends State<CartPage> {
             height: 0.2,
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add_shopping_cart_rounded),
+            onPressed: () {
+              Navigator.pushReplacementNamed(context, dashboardRoute);
+            },
+          ),
+        ],
       ),
       backgroundColor: Colors.white,
       body: Consumer2<CartProvider, UserProvider>(
@@ -79,7 +87,7 @@ class _CartPageState extends State<CartPage> {
             double totalPrice = 0.0;
             for (var cartItem in cartItems) {
               if (cartItem.isSelected) {
-                totalPrice += cartItem.customerPrice * cartItem.stock;
+                totalPrice += cartItem.customerPrice * cartItem.quantity;
               }
             }
             return totalPrice;

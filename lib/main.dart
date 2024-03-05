@@ -28,8 +28,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(
             create: (context) => CartProviderView.CartProvider()),
-        ChangeNotifierProvider(
-            create: (context) => UserProvider()),
+        ChangeNotifierProvider(create: (context) => UserProvider()),
         ChangeNotifierProvider(create: (context) => MessageProvider()),
       ],
       child: MyApp(),
@@ -101,7 +100,7 @@ class MyApp extends StatelessWidget {
           const description = "Placeholder Description";
           const weight = "Placeholder Weight";
           const stock = "Placeholder Stock";
-          const availableStock = "Placeholder Stock";
+          const quantity = 0;
           const itemType = "Placeholder Type";
 
           return ProductDetailsPage(
@@ -114,7 +113,7 @@ class MyApp extends StatelessWidget {
             description: description,
             weight: weight,
             stock: stock,
-            availableStock: availableStock,
+            quantity: quantity,
             itemType: itemType,
           );
         },
