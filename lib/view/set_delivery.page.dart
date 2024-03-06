@@ -535,7 +535,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                                   ),
                                   RadioListTile<String>(
                                     title: const Text('Gcash Payment'),
-                                    value: 'GCash',
+                                    value: 'GCASH',
                                     groupValue: selectedPaymentMethod,
                                     onChanged: (String? value) {
                                       setState(() {
