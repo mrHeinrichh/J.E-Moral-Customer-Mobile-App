@@ -371,6 +371,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Card(
+                              color: Colors.white,
                               elevation: 5,
                               child: Padding(
                                 padding: const EdgeInsets.all(12.0),
@@ -417,6 +418,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     ),
                                   if (isCardVisible)
                                     Card(
+                                      color: Colors.white,
                                       elevation: 5,
                                       child: Padding(
                                         padding: const EdgeInsets.all(12.0),
@@ -495,6 +497,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                           emailController.text =
                                               userData['email'] ?? '';
                                           return AlertDialog(
+                                            backgroundColor: Colors.white,
                                             title: const Center(
                                               child: Text(
                                                 'Edit Personal Information',
@@ -714,6 +717,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         builder: (BuildContext context) {
                                           passwordController.clear();
                                           return AlertDialog(
+                                            backgroundColor: Colors.white,
                                             title: const Center(
                                               child: Text(
                                                 'Change Password',
@@ -827,6 +831,7 @@ class _ProfilePageState extends State<ProfilePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Colors.white,
           title: const Center(
             child: Text(
               "Logout Account",

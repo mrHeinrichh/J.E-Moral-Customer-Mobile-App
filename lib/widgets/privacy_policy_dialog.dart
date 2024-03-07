@@ -34,6 +34,7 @@ class _PrivacyPolicyDialogState extends State<PrivacyPolicyDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      backgroundColor: Colors.white,
       title: const Center(
         child: Text(
           "Terms and Conditions",

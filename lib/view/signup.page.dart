@@ -159,6 +159,7 @@ class _SignupPageState extends State<SignupPage> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
+              backgroundColor: Colors.white,
               title: const Text(
                 'Account Created Successfully',
                 style: TextStyle(

@@ -99,6 +99,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
             context: context,
             builder: (context) {
               return AlertDialog(
+                backgroundColor: Colors.white,
                 title: const Center(
                   child: Text(
                     'Invalid Time',
@@ -108,8 +109,10 @@ class _AppointmentPageState extends State<AppointmentPage> {
                     ),
                   ),
                 ),
-                content: Text(
-                    'Please select a time between store hours 7:00 AM and 7:00 PM.'),
+                content: const Text(
+                  'Please select a time between store hours 7:00 AM and 7:00 PM.',
+                  textAlign: TextAlign.center,
+                ),
                 actions: [
                   TextButton(
                     onPressed: () {
@@ -118,7 +121,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
                     style: TextButton.styleFrom(
                       foregroundColor: const Color(0xFF050404).withOpacity(0.8),
                     ),
-                    child: Text('OK'),
+                    child: const Text('OK'),
                   ),
                 ],
               );
@@ -148,6 +151,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
+            backgroundColor: Colors.white,
             title: const Center(
               child: Text(
                 'Confirm Appointment',
@@ -231,6 +235,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
         context: context,
         builder: (context) {
           return AlertDialog(
+            backgroundColor: Colors.white,
             title: const Center(
               child: Text(
                 'Invalid Time',
@@ -241,7 +246,9 @@ class _AppointmentPageState extends State<AppointmentPage> {
               ),
             ),
             content: const Text(
-                'Please select a time between store hours 7:00 AM and 7:00 PM.'),
+              'Please select a time between store hours 7:00 AM and 7:00 PM.',
+              textAlign: TextAlign.center,
+            ),
             actions: [
               TextButton(
                 onPressed: () {

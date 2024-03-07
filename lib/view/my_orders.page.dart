@@ -1,4 +1,5 @@
 import 'package:customer_app/widgets/custom_button.dart';
+import 'package:customer_app/widgets/custom_text.dart';
 import 'package:customer_app/widgets/fullscreen_image.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -18,9 +19,10 @@ class Transaction {
   final String name;
   final String contactNumber;
   final String houseLotBlk;
+  final String barangay;
   final String paymentMethod;
   final String status;
-  final String assembly;
+  final bool assembly;
   final String deliveryDate;
   final double total;
   final String cancelReason;
@@ -40,6 +42,7 @@ class Transaction {
     required this.name,
     required this.contactNumber,
     required this.houseLotBlk,
+    required this.barangay,
     required this.paymentMethod,
     required this.assembly,
     required this.status,
@@ -128,10 +131,9 @@ class _MyOrderPageState extends State<MyOrderPage> {
                     name: transactionData['name'],
                     contactNumber: transactionData['contactNumber'],
                     houseLotBlk: transactionData['houseLotBlk'],
+                    barangay: transactionData['barangay'],
                     paymentMethod: transactionData['paymentMethod'],
-                    assembly: transactionData['assembly'] is bool
-                        ? transactionData['assembly'].toString()
-                        : transactionData['assembly'],
+                    assembly: transactionData['assembly'],
                     status: transactionData['status'],
                     cancelReason: transactionData['cancelReason'] != null
                         ? transactionData['cancelReason'].toString()
@@ -222,24 +224,28 @@ class _MyOrderPageState extends State<MyOrderPage> {
             await fetchTransactions(userId);
           }
         },
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: ListView(
-            children: [
-              for (int i = 0; i < visibleTransactions.length; i++)
-                GestureDetector(
-                  onTap: () {},
-                  child: TransactionCard(
-                    transaction: visibleTransactions[i],
-                    onDeleteTransaction: () {
-                      cancelTransaction(visibleTransactions[i].id);
-                      reloadTransactions();
-                    },
-                    reloadTransactions: reloadTransactions,
-                    orderNumber: visibleTransactions.length - i,
+        child: Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: ListView(
+              children: [
+                const SizedBox(height: 20),
+                for (int i = 0; i < visibleTransactions.length; i++)
+                  GestureDetector(
+                    onTap: () {},
+                    child: TransactionCard(
+                      transaction: visibleTransactions[i],
+                      onDeleteTransaction: () {
+                        cancelTransaction(visibleTransactions[i].id);
+                        reloadTransactions();
+                      },
+                      reloadTransactions: reloadTransactions,
+                      orderNumber: visibleTransactions.length - i,
+                    ),
                   ),
-                ),
-            ],
+                const SizedBox(height: 10),
+              ],
+            ),
           ),
         ),
       ),
@@ -305,6 +311,7 @@ class _TransactionCardState extends State<TransactionCard> {
       child: Column(
         children: [
           Card(
+            color: Colors.white,
             elevation: 4,
             child: Padding(
               padding: const EdgeInsets.all(20),
@@ -342,6 +349,7 @@ class _TransactionCardState extends State<TransactionCard> {
                               context: context,
                               builder: (BuildContext context) {
                                 return AlertDialog(
+                                  backgroundColor: Colors.white,
                                   title: const Center(
                                     child: Text(
                                       "Confirmation",
@@ -352,7 +360,9 @@ class _TransactionCardState extends State<TransactionCard> {
                                     ),
                                   ),
                                   content: const Text(
-                                      "Are you sure you want to Remove this Transaction?"),
+                                    "Are you sure you want to Remove this Transaction?",
+                                    textAlign: TextAlign.center,
+                                  ),
                                   actions: <Widget>[
                                     TextButton(
                                       onPressed: () {
@@ -451,6 +461,7 @@ class _TransactionCardState extends State<TransactionCard> {
                               context: context,
                               builder: (BuildContext context) {
                                 return AlertDialog(
+                                  backgroundColor: Colors.white,
                                   title: const Center(
                                     child: Text(
                                       "Confirmation",
@@ -461,7 +472,9 @@ class _TransactionCardState extends State<TransactionCard> {
                                     ),
                                   ),
                                   content: const Text(
-                                      "Are you sure you want to Cancel this Order?"),
+                                    "Are you sure you want to Cancel this Order?",
+                                    textAlign: TextAlign.center,
+                                  ),
                                   actions: [
                                     TextButton(
                                       onPressed: () {
@@ -534,171 +547,88 @@ class TransactionDetailsModal extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const Text(
-              'Transaction Number:',
+              'Transaction ID:',
               style: TextStyle(
-                fontSize: 20,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
             ),
             Text(
               transaction.id,
               style: const TextStyle(
-                fontSize: 20,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 5),
             const Divider(),
-            const SizedBox(height: 5),
-            Row(
-              children: [
-                const Text(
-                  'Transaction Status: ',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                Text(transaction.status),
-              ],
-            ),
-            if (transaction.cancelReason.isNotEmpty)
-              Column(
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text.rich(
-                        TextSpan(
-                          children: [
-                            const TextSpan(
-                              text: 'Reason: ',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            TextSpan(
-                              text: transaction.cancelReason,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Divider(),
-                ],
-              ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 2),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Text.rich(
-                        TextSpan(
-                          children: [
-                            const WidgetSpan(
-                              child: const Icon(Icons.perm_identity_outlined),
-                            ),
+                BodyMediumText(
+                  text: 'Status: ${transaction.status}',
+                ),
+                if (transaction.cancelReason.isNotEmpty)
+                  Column(
+                    children: [
+                      const SizedBox(height: 5),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text.rich(
                             TextSpan(
-                              text: ' : ${transaction.name}',
+                              children: [
+                                const TextSpan(
+                                  text: 'Reason: ',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                TextSpan(
+                                  text: transaction.cancelReason,
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                        textAlign: TextAlign.start,
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
+                const Divider(),
+                const Center(
+                  child: BodyMedium(
+                    text: 'Receiver Information:',
+                  ),
                 ),
-                const SizedBox(height: 2),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Text.rich(
-                        TextSpan(
-                          children: [
-                            const WidgetSpan(
-                              child: const Icon(Icons.phone_rounded),
-                            ),
-                            TextSpan(
-                              text: ' : ${transaction.contactNumber}',
-                            ),
-                          ],
-                        ),
-                        textAlign: TextAlign.start,
-                      ),
-                    ),
-                  ],
+                BodyMediumText(
+                  text: 'Name: ${transaction.name}',
                 ),
-                const SizedBox(height: 2),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Text.rich(
-                        TextSpan(
-                          children: [
-                            const WidgetSpan(
-                              child: Icon(Icons.location_on_outlined),
-                            ),
-                            TextSpan(
-                              text: ' : ${transaction.deliveryLocation}',
-                            ),
-                          ],
-                        ),
-                        textAlign: TextAlign.start,
-                      ),
-                    ),
-                  ],
+                BodyMediumText(
+                  text: 'Mobile Number: ${transaction.contactNumber}',
                 ),
-                const SizedBox(height: 2),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Text.rich(
-                        TextSpan(
-                          children: [
-                            const WidgetSpan(
-                              child: Icon(Icons.house_outlined),
-                            ),
-                            TextSpan(
-                              text: ' : ${transaction.houseLotBlk}',
-                            ),
-                          ],
-                        ),
-                        textAlign: TextAlign.start,
-                      ),
-                    ),
-                  ],
+                BodyMediumOver(
+                  text: 'House Number: ${transaction.houseLotBlk}',
                 ),
-                const SizedBox(height: 2),
-                Row(
-                  children: [
-                    const Icon(Icons.payment_outlined),
-                    Text(' : ${transaction.paymentMethod}'),
-                  ],
+                BodyMediumText(
+                  text: 'Barangay: ${transaction.barangay}',
                 ),
-                const SizedBox(height: 2),
-                Row(
-                  children: [
-                    const Text(
-                      'Assemble Option: ',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      transaction.paymentMethod.isNotEmpty ? 'Yes' : 'No',
-                    ),
-                  ],
+                BodyMediumOver(
+                  text: 'Delivery Location: ${transaction.deliveryLocation}',
                 ),
-                Row(
-                  children: [
-                    const Text(
-                      'Applying for Discount: ',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      transaction.discountIdImage.isNotEmpty ? 'Yes' : 'No',
-                    ),
-                  ],
+                const Divider(),
+                BodyMediumText(
+                  text: 'Payment Method: ${transaction.paymentMethod}',
+                ),
+                BodyMediumOver(
+                    text:
+                        'Delivery Date and Time: ${DateFormat('MMMM d, y - h:mm a ').format(
+                  DateTime.parse(transaction.deliveryDate),
+                )} '),
+                BodyMediumText(
+                  text:
+                      'Assemble Option: ${transaction.assembly ? 'Yes' : 'No'}',
+                ),
+                BodyMediumText(
+                  text:
+                      'Applying for Discount: ${transaction.discountIdImage.isNotEmpty ? 'Yes' : 'No'}',
                 ),
                 if (transaction.discountIdImage.isNotEmpty)
                   Column(
@@ -737,57 +667,26 @@ class TransactionDetailsModal extends StatelessWidget {
                       const SizedBox(height: 5),
                     ],
                   ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text.rich(
-                        TextSpan(
-                          children: [
-                            const TextSpan(
-                              text: 'Items: ',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            if (transaction.items != null)
-                              TextSpan(
-                                text: transaction.items!.map((item) {
-                                  if (item is Map<String, dynamic> &&
-                                      item.containsKey('name') &&
-                                      item.containsKey('quantity')) {
-                                    return '${item['name']} (${item['quantity']})';
-                                  }
-                                  return '';
-                                }).join(', '),
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 10),
+                BodyMediumOver(
+                  text: 'Items: ${transaction.items!.map((item) {
+                    if (item is Map<String, dynamic> &&
+                        item.containsKey('name') &&
+                        item.containsKey('quantity') &&
+                        item.containsKey('customerPrice')) {
+                      final itemName = item['name'];
+                      final quantity = item['quantity'];
+                      final price = NumberFormat.decimalPattern().format(
+                          double.parse(
+                              (item['customerPrice']).toStringAsFixed(2)));
+
+                      return '$itemName (₱$price x $quantity)';
+                    }
+                  }).join(', ')}',
                 ),
-                Row(
-                  children: [
-                    const Text('Total Price: ',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15)),
-                    Text(
-                      "₱${transaction.total % 1 == 0 ? NumberFormat('#,##0').format(transaction.total.toInt()) : NumberFormat('#,##0.00').format(transaction.total).replaceAll(RegExp(r"([.]*0)(?!.*\d)"), "")}",
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    const Text(
-                      'Delivery Date/Time: ',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      transaction.deliveryDate != ""
-                          ? DateFormat('MMM d, y - h:mm a ').format(
-                              DateTime.parse(transaction.deliveryDate!),
-                            )
-                          : "Not Picked the Date/Time",
-                    ),
-                  ],
+                BodyMediumText(
+                  text:
+                      'Total Price: ₱${transaction.total % 1 == 0 ? NumberFormat('#,##0').format(transaction.total.toInt()) : NumberFormat('#,##0.00').format(transaction.total).replaceAll(RegExp(r"([.]*0)(?!.*\d)"), "")}',
                 ),
                 if (transaction.pickupImages != "" ||
                     transaction.cancellationImages != "" ||

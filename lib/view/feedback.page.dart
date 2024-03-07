@@ -363,6 +363,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
                           context: context,
                           builder: (BuildContext context) {
                             return AlertDialog(
+                              backgroundColor: Colors.white,
                               title: const Center(
                                 child: Text(
                                   'Rating Error',
@@ -374,6 +375,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
                               ),
                               content: const Text(
                                 "Please ensure that you have selected and provided ratings for all categories.",
+                                textAlign: TextAlign.center,
                               ),
                               actions: [
                                 TextButton(

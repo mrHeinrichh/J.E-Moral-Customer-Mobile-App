@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:intl/intl.dart';
 
 class ForecastPage extends StatefulWidget {
   @override
@@ -22,6 +21,7 @@ class ResponseCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
       child: Card(
+        color: Colors.white,
         margin: const EdgeInsets.symmetric(vertical: 5),
         child: ListTile(
           // title: Text(priceData.item),
@@ -284,192 +284,199 @@ class _ForecastPageState extends State<ForecastPage> {
                 )
                 .toList();
 
-            if (startDate != null && endDate != null) {
-              dropdownItems.add(
-                DropdownMenuItem<Item>(
-                  value: Item(id: 'custom_date', name: 'Custom Date'),
-                  child: Text(
-                    'Start: ${startDate?.toLocal()} - End: ${endDate?.toLocal()}',
-                  ),
-                ),
-              );
-            }
-            return SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 50,
-                      vertical: 30,
-                    ),
-                    child: Column(
-                      children: [
-                        Text(
-                          'Select the Date:',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: const Color(0xFF050404).withOpacity(0.8),
-                          ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            ElevatedButton(
-                              onPressed: () => _selectStartDate(context),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: startDate != null
-                                    ? Colors.white
-                                    : const Color(0xFF050404).withOpacity(0.8),
-                                elevation: 4,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                ),
-                              ),
-                              child: Container(
-                                width: 70,
-                                alignment: Alignment.center,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 10),
-                                child: Text(
-                                  'Start Date',
-                                  style: TextStyle(
-                                    color: startDate != null
-                                        ? const Color(0xFF050404)
-                                        : Colors.white,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            ElevatedButton(
-                              onPressed: () => _selectEndDate(context),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: endDate != null
-                                    ? Colors.white
-                                    : const Color(0xFF050404).withOpacity(0.8),
-                                elevation: 4,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                ),
-                              ),
-                              child: Container(
-                                width: 70,
-                                alignment: Alignment.center,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 10),
-                                child: Text(
-                                  'End Date',
-                                  style: TextStyle(
-                                    color: endDate != null
-                                        ? const Color(0xFF050404)
-                                        : Colors.white,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text(
-                              "Start Date: ",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              startDate != null
-                                  ? DateFormat('MMMM d, y').format(startDate!)
-                                  : 'Not selected',
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text(
-                              "End Date: ",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              endDate != null
-                                  ? DateFormat('MMMM d, y').format(endDate!)
-                                  : 'Not selected',
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        Container(
-                          width: 300,
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
+            return RefreshIndicator(
+              onRefresh: () async {
+                await fetchItems();
+                await fetchData();
+              },
+              color: const Color(0xFF050404),
+              strokeWidth: 2.5,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 50,
+                        vertical: 30,
+                      ),
+                      child: Column(
+                        children: [
+                          Text(
+                            'Select the Date:',
+                            style: TextStyle(
+                              fontSize: 14,
                               color: const Color(0xFF050404).withOpacity(0.8),
-                              width: 1,
                             ),
                           ),
-                          child: GestureDetector(
-                            onTap: startDate != null && endDate != null
-                                ? null
-                                : () {
-                                    showCustomOverlay(context,
-                                        'Select the Start and End Date First!');
-                                  },
-                            child: DropdownButton<Item>(
-                              isExpanded: true,
-                              underline: const SizedBox(),
-                              icon: const Icon(Icons.arrow_drop_down),
-                              iconSize: 32,
-                              elevation: 8,
-                              alignment: Alignment.center,
-                              items: dropdownItems,
-                              onChanged: startDate != null && endDate != null
-                                  ? (selectedItem) {
-                                      setState(() {
-                                        selectedDropdownItem = selectedItem;
-                                      });
-
-                                      if (selectedItem != null &&
-                                          selectedItem.id == 'custom_date') {
-                                        _selectStartDate(context);
-                                      } else if (selectedItem != null) {
-                                        fetchData();
-                                      }
-                                    }
-                                  : null,
-                              hint: Text(
-                                selectedDropdownItem?.name ??
-                                    'Select the Product:',
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () => _selectStartDate(context),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: startDate != null
+                                      ? Colors.white
+                                      : const Color(0xFF050404)
+                                          .withOpacity(0.8),
+                                  elevation: 4,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Container(
+                                  width: 80,
+                                  alignment: Alignment.center,
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 10),
+                                  child: Text(
+                                    'Start Date',
+                                    style: TextStyle(
+                                      color: startDate != null
+                                          ? const Color(0xFF050404)
+                                          : Colors.white,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              ElevatedButton(
+                                onPressed: () => _selectEndDate(context),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: endDate != null
+                                      ? Colors.white
+                                      : const Color(0xFF050404)
+                                          .withOpacity(0.8),
+                                  elevation: 4,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: Container(
+                                  width: 80,
+                                  alignment: Alignment.center,
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 10),
+                                  child: Text(
+                                    'End Date',
+                                    style: TextStyle(
+                                      color: endDate != null
+                                          ? const Color(0xFF050404)
+                                          : Colors.white,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text(
+                                "Start Date: ",
                                 style: TextStyle(
-                                  fontSize: 16,
-                                  color:
-                                      const Color(0xFF050404).withOpacity(0.8),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                startDate != null
+                                    ? DateFormat('MMMM d, y').format(startDate!)
+                                    : 'Not selected',
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text(
+                                "End Date: ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                endDate != null
+                                    ? DateFormat('MMMM d, y').format(endDate!)
+                                    : 'Not selected',
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          Container(
+                            width: 300,
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: const Color(0xFF050404).withOpacity(0.8),
+                                width: 1,
+                              ),
+                            ),
+                            child: GestureDetector(
+                              onTap: startDate != null && endDate != null
+                                  ? null
+                                  : () {
+                                      showCustomOverlay(context,
+                                          'Select the Start and End Date First!');
+                                    },
+                              child: DropdownButton<Item>(
+                                isExpanded: true,
+                                underline: const SizedBox(),
+                                icon: const Icon(Icons.arrow_drop_down),
+                                iconSize: 32,
+                                elevation: 8,
+                                alignment: Alignment.center,
+                                items: dropdownItems,
+                                onChanged: startDate != null && endDate != null
+                                    ? (selectedItem) {
+                                        setState(() {
+                                          selectedDropdownItem = selectedItem;
+                                        });
+
+                                        if (selectedItem != null &&
+                                            selectedItem.id == 'custom_date') {
+                                          _selectStartDate(context);
+                                        } else if (selectedItem != null) {
+                                          fetchData();
+                                        }
+                                      }
+                                    : null,
+                                hint: Text(
+                                  selectedDropdownItem?.name ??
+                                      'Select the Product:',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: const Color(0xFF050404)
+                                        .withOpacity(0.8),
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  if (priceData.isNotEmpty)
-                    SizedBox(
-                      height: 300,
-                      child: buildLineChart(priceData, startDate!, endDate!),
-                    )
-                  else
-                    const Text('No data available.'),
-                  ...priceData
-                      .map((data) => ResponseCard(priceData: data))
-                      .toList(),
-                ],
+                    if (priceData.isNotEmpty)
+                      Column(
+                        children: [
+                          SizedBox(
+                            height: 300,
+                            child:
+                                buildLineChart(priceData, startDate!, endDate!),
+                          ),
+                          const SizedBox(height: 20),
+                        ],
+                      )
+                    else
+                      const Text('No data available.'),
+                    ...priceData
+                        .map((data) => ResponseCard(priceData: data))
+                        .toList(),
+                    const SizedBox(height: 20),
+                  ],
+                ),
               ),
             );
           }
@@ -522,7 +529,7 @@ class PriceData {
     return PriceData(
       id: json['_id'],
       item: json['item'],
-      reason: json['reason'],
+      reason: json['reason'] ?? "",
       price: json['price'].toDouble(),
       type: json['type'],
       deleted: json['deleted'],

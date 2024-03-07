@@ -1,7 +1,10 @@
+import 'package:customer_app/widgets/fullscreen_image.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
+
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class FaqPage extends StatefulWidget {
   @override
@@ -12,10 +15,12 @@ class _FaqPageState extends State<FaqPage> {
   List<Map<String, dynamic>> faqs = [];
 
   bool _mounted = true;
+  bool loadingData = false;
 
   @override
   void initState() {
     super.initState();
+    loadingData = true;
     fetchFAQs();
   }
 
@@ -41,6 +46,7 @@ class _FaqPageState extends State<FaqPage> {
 
             setState(() {
               faqs = List<Map<String, dynamic>>.from(faqData);
+              loadingData = false;
             });
           } else {}
         } else {
@@ -52,10 +58,6 @@ class _FaqPageState extends State<FaqPage> {
         print("Error: $e");
       }
     }
-  }
-
-  Future<void> refreshData() async {
-    await fetchFAQs();
   }
 
   @override
@@ -83,56 +85,69 @@ class _FaqPageState extends State<FaqPage> {
         ),
       ),
       backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: RefreshIndicator(
-                color: const Color(0xFF050404),
-                strokeWidth: 2.5,
-                onRefresh: refreshData,
-                child: ListView.builder(
-                  itemCount: faqs.length,
-                  itemBuilder: (context, index) {
-                    final faq = faqs[index];
-                    return Column(
-                      children: [
-                        const SizedBox(height: 5),
-                        GestureDetector(
-                          onTap: () {
-                            _showCustomerDetailsModal(faq);
-                          },
-                          child: Card(
-                            elevation: 3,
-                            child: Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text("${faq['question']}",
+      body: loadingData
+          ? Center(
+              child: LoadingAnimationWidget.flickr(
+                leftDotColor: const Color(0xFF050404).withOpacity(0.8),
+                rightDotColor: const Color(0xFFd41111).withOpacity(0.8),
+                size: 40,
+              ),
+            )
+          : Column(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 10),
+                          RefreshIndicator(
+                            color: const Color(0xFF050404),
+                            strokeWidth: 2.5,
+                            onRefresh: () async {
+                              await fetchFAQs();
+                            },
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: faqs.length,
+                              itemBuilder: (context, index) {
+                                final faq = faqs[index];
+                                return GestureDetector(
+                                  onTap: () {
+                                    _showCustomerDetailsModal(faq);
+                                  },
+                                  child: Card(
+                                    color: Colors.white,
+                                    elevation: 2,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(20.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "${faq['question']}",
                                             style: const TextStyle(
-                                                fontWeight: FontWeight.bold)),
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ],
                                       ),
-                                    ],
+                                    ),
                                   ),
-                                ],
-                              ),
+                                );
+                              },
                             ),
                           ),
-                        ),
-                      ],
-                    );
-                  },
+                          const SizedBox(height: 10),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -141,36 +156,59 @@ class _FaqPageState extends State<FaqPage> {
       context: context,
       builder: (BuildContext context) {
         return SingleChildScrollView(
-          child: Container(
-            padding: const EdgeInsets.all(30.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const SizedBox(height: 10),
-                Text(
-                  '${faq['question']}',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+          child: ClipRRect(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(20.0),
+              topRight: Radius.circular(20.0),
+            ),
+            child: Container(
+              color: Colors.white,
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 10),
+                  Text(
+                    '${faq['question']}',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  '${faq['answer']}',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w500,
+                  const SizedBox(height: 10),
+                  Text(
+                    '${faq['answer']}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 15),
-                if (faq['image'] != "")
-                  Image.network(
-                    faq['image'],
-                    width: 300,
-                    height: 300,
-                    fit: BoxFit.cover,
-                  )
-              ],
+                  const SizedBox(height: 15),
+                  if (faq['image'] != "")
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => FullScreenImageView(
+                              imageUrl: faq['image'],
+                              onClose: () {
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                      child: Image.network(
+                        faq['image'],
+                        width: 300,
+                        height: 300,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
         );

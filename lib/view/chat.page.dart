@@ -35,21 +35,45 @@ class _ChatPageState extends State<ChatPage> {
   final TextEditingController _textController = TextEditingController();
   late IO.Socket socket;
   final ScrollController _scrollController = ScrollController();
-  final bool _isLoading = false;
+  bool loadingData = false;
   final int _currentPage = 1;
   final int _totalMessagesLoaded = 0;
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   loadingData = true;
+  //   initializeSocketIO();
+  //   print('initState: Socket.IO initialized');
+
+  //   String? userId = Provider.of<UserProvider>(context, listen: false).userId;
+
+  //   String customerId = "65c73688e4f434d230d289e8";
+
+  //   fetchAndAddMessages(userId, customerId).then((_) {
+  //     setState(() {
+  //       loadingData = false;
+  //     });
+  //   });
+  // }
 
   @override
   void initState() {
     super.initState();
+    loadingData = true; // Set loadingData to true initially
     initializeSocketIO();
     print('initState: Socket.IO initialized');
 
-    String? userId = Provider.of<UserProvider>(context, listen: false).userId;
+    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+      String? userId = Provider.of<UserProvider>(context, listen: false).userId;
+      String customerId = "65c73688e4f434d230d289e8";
 
-    String customerId = "65c73688e4f434d230d289e8";
+      await fetchAndAddMessages(userId, customerId);
 
-    fetchAndAddMessages(userId, customerId);
+      setState(() {
+        loadingData = false;
+      });
+    });
   }
 
   Future<void> fetchAndAddMessages(
@@ -176,119 +200,137 @@ class _ChatPageState extends State<ChatPage> {
           ),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          children: [
-            NotificationListener(
-              onNotification: (ScrollNotification scrollInfo) {
-                if (!_isLoading &&
-                    scrollInfo.metrics.pixels == 0 &&
-                    scrollInfo is ScrollEndNotification &&
-                    _totalMessagesLoaded >
-                        Provider.of<MessageProvider>(context, listen: false)
-                            .messages
-                            .length) {}
-                return false;
-              },
-              child: Expanded(
-                child: Consumer<MessageProvider>(
-                  builder: (context, messageProvider, _) {
-                    final List<Map<String, dynamic>> messageList =
-                        messageProvider.messages;
-                    print("Number of messages: ${messageList.length}");
-
-                    return ListView.builder(
-                      key: UniqueKey(),
-                      controller: _scrollController,
-                      reverse: true,
-                      itemCount: messageList.length,
-                      itemBuilder: (context, index) {
-                        final message = messageList[index];
-                        final userId =
-                            Provider.of<UserProvider>(context, listen: false)
-                                .userId;
-                        final isCurrentUser = message['from'] == userId;
-                        return Container(
-                          margin: const EdgeInsets.symmetric(vertical: 8),
-                          child: Row(
-                            mainAxisAlignment: isCurrentUser
-                                ? MainAxisAlignment.end
-                                : MainAxisAlignment.start,
-                            children: [
-                              Card(
-                                color:
-                                    isCurrentUser ? Colors.blue : Colors.grey,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8),
-                                  child: Text(
-                                    message["content"] ?? "",
-                                    style: TextStyle(
-                                      color: isCurrentUser
-                                          ? Colors.white
-                                          : Colors.black,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
+      body: loadingData
+          ? Center(
+              child: LoadingAnimationWidget.flickr(
+                leftDotColor: const Color(0xFF050404).withOpacity(0.8),
+                rightDotColor: const Color(0xFFd41111).withOpacity(0.8),
+                size: 40,
               ),
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(20.0),
-            topRight: Radius.circular(20.0),
-          ),
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 5,
-              spreadRadius: 5,
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Row(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  child: TextField(
-                    controller: _textController,
-                    decoration: const InputDecoration(
-                      hintText: 'Type your message...',
+            )
+          : Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                children: [
+                  NotificationListener(
+                    onNotification: (ScrollNotification scrollInfo) {
+                      if (!loadingData &&
+                          scrollInfo.metrics.pixels == 0 &&
+                          scrollInfo is ScrollEndNotification &&
+                          _totalMessagesLoaded >
+                              Provider.of<MessageProvider>(context,
+                                      listen: false)
+                                  .messages
+                                  .length) {}
+                      return false;
+                    },
+                    child: Expanded(
+                      child: Consumer<MessageProvider>(
+                        builder: (context, messageProvider, _) {
+                          final List<Map<String, dynamic>> messageList =
+                              messageProvider.messages;
+                          print("Number of messages: ${messageList.length}");
+
+                          return ListView.builder(
+                            key: UniqueKey(),
+                            controller: _scrollController,
+                            reverse: true,
+                            itemCount: messageList.length,
+                            itemBuilder: (context, index) {
+                              final message = messageList[index];
+                              final userId = Provider.of<UserProvider>(context,
+                                      listen: false)
+                                  .userId;
+                              final isCurrentUser = message['from'] == userId;
+                              return Container(
+                                margin: const EdgeInsets.symmetric(vertical: 8),
+                                child: Row(
+                                  mainAxisAlignment: isCurrentUser
+                                      ? MainAxisAlignment.end
+                                      : MainAxisAlignment.start,
+                                  children: [
+                                    Card(
+                                      color: isCurrentUser
+                                          ? Colors.blue
+                                          : Colors.grey,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8),
+                                        child: Text(
+                                          message["content"] ?? "",
+                                          style: TextStyle(
+                                            color: isCurrentUser
+                                                ? Colors.white
+                                                : Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
                     ),
                   ),
+                ],
+              ),
+            ),
+      bottomNavigationBar: loadingData
+          ? Center(
+              child: LoadingAnimationWidget.flickr(
+                leftDotColor: const Color(0xFF050404).withOpacity(0.8),
+                rightDotColor: const Color(0xFFd41111).withOpacity(0.8),
+                size: 40,
+              ),
+            )
+          : Container(
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(20.0),
+                  topRight: Radius.circular(20.0),
+                ),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 5,
+                    spreadRadius: 5,
+                  ),
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
+                        child: TextField(
+                          controller: _textController,
+                          decoration: const InputDecoration(
+                            hintText: 'Type your message...',
+                          ),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.send),
+                      onPressed: () {
+                        String messageContent = _textController.text;
+                        print('Message content: $messageContent');
+                        if (messageContent.isNotEmpty) {
+                          sendMessage(messageContent);
+                          _textController.clear();
+                        }
+                      },
+                    )
+                  ],
                 ),
               ),
-              IconButton(
-                icon: const Icon(Icons.send),
-                onPressed: () {
-                  String messageContent = _textController.text;
-                  print('Message content: $messageContent');
-                  if (messageContent.isNotEmpty) {
-                    sendMessage(messageContent);
-                    _textController.clear();
-                  }
-                },
-              )
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 

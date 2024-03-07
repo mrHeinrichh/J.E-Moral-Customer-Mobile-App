@@ -244,7 +244,7 @@ class StatusButton extends StatelessWidget {
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: text == ' View Appointment '
-            ? const Color(0xFF050404).withOpacity(0.5)
+            ? const Color(0xFF050404).withOpacity(0.6)
             : const Color(0xFF050404).withOpacity(0.9),
         elevation: 4,
         shape: RoundedRectangleBorder(

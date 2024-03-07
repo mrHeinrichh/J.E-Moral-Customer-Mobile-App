@@ -257,7 +257,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
         "name": nameController.text,
         "contactNumber": contactNumberController.text,
         "items": itemsList,
-        // "discounted": "false",
+        "discounted": discountedUploadResponse != null ? true : false,
         "completed": "false",
         "discountIdImage": discountedUploadResponse != null
             ? discountedUploadResponse["url"]
@@ -767,6 +767,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                                 context: context,
                                 builder: (BuildContext context) {
                                   return AlertDialog(
+                                    backgroundColor: Colors.white,
                                     title: const Center(
                                       child: Text(
                                         'Invalid Time',
@@ -776,8 +777,9 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                                         ),
                                       ),
                                     ),
-                                    content: Text(
+                                    content: const Text(
                                       'Please select a time between 7 AM and 7 PM for delivery.',
+                                      textAlign: TextAlign.center,
                                     ),
                                     actions: [
                                       TextButton(
@@ -802,7 +804,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                     },
                     text: 'Scheduled',
                     height: 50,
-                    width: 160,
+                    width: 170,
                     fontz: 20,
                   ),
                   CustomizedButton(
@@ -824,6 +826,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                             context: context,
                             builder: (context) {
                               return AlertDialog(
+                                backgroundColor: Colors.white,
                                 title: const Center(
                                   child: Text(
                                     'Delivery Hours Notice',
@@ -834,7 +837,9 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                                   ),
                                 ),
                                 content: const Text(
-                                    'Sorry, your order cannot be delivered at the moment. Our delivery hours are from 7 AM to 7 PM daily.'),
+                                  'Sorry, your order cannot be delivered at the moment. Our delivery hours are from 7 AM to 7 PM daily.',
+                                  textAlign: TextAlign.center,
+                                ),
                                 actions: [
                                   TextButton(
                                     onPressed: () {
@@ -855,7 +860,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                     },
                     text: 'Deliver Now',
                     height: 50,
-                    width: 160,
+                    width: 170,
                     fontz: 20,
                     enabled: true,
                   ),
@@ -917,6 +922,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
+          backgroundColor: Colors.white,
           title: const Center(
             child: Text(
               'Delivery Confirmation',
@@ -1106,6 +1112,7 @@ void showAlertDialog(BuildContext context) {
     context: context,
     builder: (context) {
       return AlertDialog(
+        backgroundColor: Colors.white,
         title: const Center(
           child: Text(
             'Delivery Hours Notice',
