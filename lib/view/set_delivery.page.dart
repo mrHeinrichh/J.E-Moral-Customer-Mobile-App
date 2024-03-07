@@ -262,7 +262,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
         "discountIdImage": discountedUploadResponse != null
             ? discountedUploadResponse["url"]
             : "",
-        "type": "Delivery",
+        "__t": "Delivery",
         //
         "priceType": "Customer",
       };
