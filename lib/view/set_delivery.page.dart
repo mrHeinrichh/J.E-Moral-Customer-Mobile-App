@@ -866,6 +866,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                   ),
                 ],
               ),
+              const SizedBox(height: 10),
             ],
           ),
         ),
@@ -1090,7 +1091,9 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                 await sendTransactionData();
                 Provider.of<CartProvider>(currentContext, listen: false)
                     .clearCart();
-                Navigator.pushNamed(currentContext, myOrdersPage);
+
+                Navigator.pushNamed(currentContext, dashboardRoute,
+                    arguments: 1);
               },
               style: TextButton.styleFrom(
                 foregroundColor: const Color(0xFF050404).withOpacity(0.9),

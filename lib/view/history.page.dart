@@ -82,7 +82,6 @@ class _HistoryPageState extends State<HistoryPage> {
 
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         elevation: 1,
         title: Text(
@@ -104,6 +103,12 @@ class _HistoryPageState extends State<HistoryPage> {
             height: 0.2,
           ),
         ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushNamed(context, dashboardRoute, arguments: 1);
+          },
+        ),
       ),
       backgroundColor: Colors.white,
       body: loadingData
@@ -122,14 +127,6 @@ class _HistoryPageState extends State<HistoryPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: ListView(
                   children: [
-                    const SizedBox(height: 10),
-                    CustomButton(
-                      backgroundColor: const Color(0xFF050404).withOpacity(0.9),
-                      onPressed: () {
-                        Navigator.pushNamed(context, myOrdersPage);
-                      },
-                      text: 'View Pending Orders',
-                    ),
                     const SizedBox(height: 10),
                     for (int i = 0; i < completedTransactions.length; i++)
                       GestureDetector(

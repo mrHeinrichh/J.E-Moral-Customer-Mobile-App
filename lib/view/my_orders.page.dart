@@ -90,14 +90,10 @@ class _MyOrderPageState extends State<MyOrderPage> {
   }
 
   Future<void> fetchTransactions(String userId) async {
-    final apiUrl = 'https://lpg-api-06n8.onrender.com/api/v1/transactions';
+    final apiUrl =
+        'https://lpg-api-06n8.onrender.com/api/v1/transactions/?filter={"to":"$userId","__t":"Delivery","hasFeedback":false,"deleted":false}&limit=300';
 
-    final filterQuery =
-        '{"to": "$userId", "__t": "Delivery", "hasFeedback": false, "deleted": false}';
-
-    final searchUrl = '$apiUrl/?filter=$filterQuery&limit=300';
-
-    final response = await http.get(Uri.parse(searchUrl));
+    final response = await http.get(Uri.parse(apiUrl));
 
     if (response.statusCode == 200) {
       final Map<String, dynamic>? data = jsonDecode(response.body);
@@ -115,6 +111,7 @@ class _MyOrderPageState extends State<MyOrderPage> {
           visibleTransactions = transactionsData
               .where((transactionData) =>
                   transactionData['status'] == 'Pending' ||
+                  transactionData['status'] == 'Declined' ||
                   transactionData['status'] == 'Approved' ||
                   transactionData['status'] == 'On Going' ||
                   transactionData['status'] == 'Cancelled' ||
@@ -183,6 +180,7 @@ class _MyOrderPageState extends State<MyOrderPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         elevation: 1,
         title: Text(
@@ -204,12 +202,14 @@ class _MyOrderPageState extends State<MyOrderPage> {
             height: 0.2,
           ),
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, dashboardRoute);
-          },
-        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.receipt_long_outlined),
+            onPressed: () {
+              Navigator.pushReplacementNamed(context, historyRoute);
+            },
+          ),
+        ],
       ),
       backgroundColor: Colors.white,
       body: RefreshIndicator(
@@ -224,29 +224,33 @@ class _MyOrderPageState extends State<MyOrderPage> {
             await fetchTransactions(userId);
           }
         },
-        child: Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: ListView(
-              children: [
-                const SizedBox(height: 20),
-                for (int i = 0; i < visibleTransactions.length; i++)
-                  GestureDetector(
-                    onTap: () {},
-                    child: TransactionCard(
-                      transaction: visibleTransactions[i],
-                      onDeleteTransaction: () {
-                        cancelTransaction(visibleTransactions[i].id);
-                        reloadTransactions();
-                      },
-                      reloadTransactions: reloadTransactions,
-                      orderNumber: visibleTransactions.length - i,
-                    ),
-                  ),
-                const SizedBox(height: 10),
-              ],
+        child: Column(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: ListView(
+                  children: [
+                    const SizedBox(height: 20),
+                    for (int i = 0; i < visibleTransactions.length; i++)
+                      GestureDetector(
+                        onTap: () {},
+                        child: TransactionCard(
+                          transaction: visibleTransactions[i],
+                          onDeleteTransaction: () {
+                            cancelTransaction(visibleTransactions[i].id);
+                            reloadTransactions();
+                          },
+                          reloadTransactions: reloadTransactions,
+                          orderNumber: visibleTransactions.length - i,
+                        ),
+                      ),
+                    const SizedBox(height: 10),
+                  ],
+                ),
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -256,15 +260,14 @@ class _MyOrderPageState extends State<MyOrderPage> {
 class TransactionCard extends StatefulWidget {
   final Transaction transaction;
   final VoidCallback onDeleteTransaction;
-  final VoidCallback reloadTransactions; // Add this line
+  final VoidCallback reloadTransactions;
 
   final int orderNumber;
 
   TransactionCard({
     required this.transaction,
     required this.onDeleteTransaction,
-    required this.reloadTransactions, // Add this line
-
+    required this.reloadTransactions,
     required this.orderNumber,
   });
 
@@ -283,6 +286,7 @@ class _TransactionCardState extends State<TransactionCard> {
   Color getCancelOrderButtonColor() {
     return widget.transaction.status.toString() == "On Going" ||
             widget.transaction.status.toString() == "Approved" ||
+            widget.transaction.status.toString() == "Declined" ||
             widget.transaction.status.toString() == "Completed" ||
             widget.transaction.status.toString() == "Cancelled"
         ? const Color(0xFF050404).withOpacity(0.1)
@@ -329,7 +333,8 @@ class _TransactionCardState extends State<TransactionCard> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      if (widget.transaction.status != "Cancelled")
+                      if (widget.transaction.status != "Cancelled" &&
+                          widget.transaction.status != "Declined")
                         Text(
                           "₱${widget.transaction.total % 1 == 0 ? NumberFormat('#,##0').format(widget.transaction.total.toInt()) : NumberFormat('#,##0.00').format(widget.transaction.total).replaceAll(RegExp(r"([.]*0)(?!.*\d)"), "")}",
                           style: TextStyle(
@@ -338,7 +343,8 @@ class _TransactionCardState extends State<TransactionCard> {
                             color: const Color(0xFF050404).withOpacity(0.9),
                           ),
                         ),
-                      if (widget.transaction.status == "Cancelled")
+                      if (widget.transaction.status == "Declined" ||
+                          widget.transaction.status == "Cancelled")
                         IconButton(
                           icon: Icon(
                             Icons.close,

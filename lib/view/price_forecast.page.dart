@@ -297,7 +297,7 @@ class _ForecastPageState extends State<ForecastPage> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 50,
+                        horizontal: 30,
                         vertical: 30,
                       ),
                       child: Column(

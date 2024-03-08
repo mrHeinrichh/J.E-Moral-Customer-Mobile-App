@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:customer_app/routes/app_routes.dart';
-import 'package:customer_app/view/profile.page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:customer_app/widgets/custom_button.dart';
@@ -206,10 +205,9 @@ class _AppointmentPageState extends State<AppointmentPage> {
                       print('Appointment updated successfully');
 
                       dateController.clear();
-
-                      showCustomOverlay(context, 'Appointment confirmed!');
-
-                      Navigator.pushNamed(context, dashboardRoute);
+ 
+                      Navigator.pushNamed(context, dashboardRoute,
+                          arguments: 3);
                     } else {
                       print(
                           'Failed to update appointment. Status code: ${response.statusCode}');
@@ -385,46 +383,4 @@ class _AppointmentPageState extends State<AppointmentPage> {
       ),
     );
   }
-}
-
-void showCustomOverlay(BuildContext context, String message) {
-  final overlay = OverlayEntry(
-    builder: (context) => Positioned(
-      top: MediaQuery.of(context).size.height * 0.5,
-      left: 20,
-      right: 20,
-      child: Material(
-        color: Colors.transparent,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-          decoration: BoxDecoration(
-            color: Colors.grey.shade300,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF050404).withOpacity(0.5),
-                blurRadius: 6,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
-          child: Text(
-            message,
-            style: const TextStyle(
-              color: Colors.black,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ),
-    ),
-  );
-
-  Overlay.of(context)!.insert(overlay);
-
-  Future.delayed(const Duration(seconds: 2), () {
-    overlay.remove();
-  });
 }
