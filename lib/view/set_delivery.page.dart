@@ -3,6 +3,7 @@ import 'package:customer_app/routes/app_routes.dart';
 import 'package:customer_app/view/cart_provider.dart';
 import 'package:customer_app/view/user_provider.dart';
 import 'package:customer_app/widgets/custom_image_upload.dart';
+import 'package:customer_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -937,141 +938,39 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text.rich(
-                TextSpan(
-                  children: [
-                    const TextSpan(
-                      text: 'Delivery Location: ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextSpan(
-                      text: locationController.text,
-                    ),
-                  ],
-                ),
+              const Center(
+                child: BodyMedium(text: "Receiver Information:"),
               ),
-              Text.rich(
-                TextSpan(
-                  children: [
-                    const TextSpan(
-                      text: 'Receiver Name: ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextSpan(
-                      text: nameController.text,
-                    ),
-                  ],
-                ),
+              BodyMediumText(
+                text: 'Name: ${nameController.text}',
               ),
-              Text.rich(
-                TextSpan(
-                  children: [
-                    const TextSpan(
-                      text: 'Receiver Mobile Number: ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextSpan(
-                      text: contactNumberController.text,
-                    ),
-                  ],
-                ),
+              BodyMediumText(
+                text: 'Mobile Number: ${contactNumberController.text}',
               ),
-              Text.rich(
-                TextSpan(
-                  children: [
-                    const TextSpan(
-                      text: 'Receiver House #/Lot/Blk: ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextSpan(
-                      text: houseNumberController.text,
-                    ),
-                  ],
-                ),
+              BodyMediumOver(
+                text: 'House Number: ${houseNumberController.text}',
               ),
-              Text.rich(
-                TextSpan(
-                  children: [
-                    const TextSpan(
-                      text: 'Barangay: ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextSpan(
-                      text: selectedBarangay,
-                    ),
-                  ],
-                ),
+              BodyMediumText(
+                text: 'Barangay: $selectedBarangay',
               ),
-              Text.rich(
-                TextSpan(
-                  children: [
-                    const TextSpan(
-                      text: "Scheduled Date and Time: ",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextSpan(
-                      text: DateFormat('MMMM d, y, h:mm a')
-                          .format(selectedDateTime!),
-                    ),
-                  ],
-                ),
+              BodyMediumOver(
+                text: 'Delivery Location: ${locationController.text}',
               ),
-              Text.rich(
-                TextSpan(
-                  children: [
-                    const TextSpan(
-                      text: 'Payment Method: ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextSpan(
-                      text: selectedPaymentMethod,
-                    ),
-                  ],
-                ),
+              const Divider(),
+              BodyMediumOver(
+                  text:
+                      'Delivery Date and Time: ${DateFormat('MMMM d, y - h:mm a ').format(
+                selectedDateTime!,
+              )} '),
+              BodyMediumText(
+                text:
+                    'Assemble Option: ${selectedAssemblyOption! ? 'Yes' : 'No'}',
               ),
-              Text.rich(
-                TextSpan(
-                  children: [
-                    const TextSpan(
-                      text: 'Need to be Assembled: ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextSpan(
-                      text: selectedAssemblyOption! ? 'Yes' : 'No',
-                    ),
-                  ],
-                ),
+              BodyMediumText(
+                text: 'Payment Method: $selectedPaymentMethod',
               ),
-              Text.rich(
-                TextSpan(
-                  children: [
-                    const TextSpan(
-                      text: 'Applying for Discount: ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextSpan(
-                      text: _image != null ? 'Yes' : 'No',
-                    ),
-                  ],
-                ),
+              BodyMediumText(
+                text: 'Applying for Discount: ${_image != null ? 'Yes' : 'No'}',
               ),
             ],
           ),
