@@ -46,7 +46,6 @@ class _FaqPageState extends State<FaqPage> {
 
             setState(() {
               faqs = List<Map<String, dynamic>>.from(faqData);
-              loadingData = false;
             });
           } else {}
         } else {
@@ -57,6 +56,8 @@ class _FaqPageState extends State<FaqPage> {
       if (_mounted) {
         print("Error: $e");
       }
+    } finally {
+      loadingData = false;
     }
   }
 

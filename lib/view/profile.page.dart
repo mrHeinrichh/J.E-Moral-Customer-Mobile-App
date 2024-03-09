@@ -31,6 +31,49 @@ class _ProfilePageState extends State<ProfilePage> {
   final formKey = GlobalKey<FormState>();
   File? _image;
   final imageStreamController = StreamController<File?>.broadcast();
+  bool _mounted = true;
+
+  @override
+  void dispose() {
+    _mounted = false;
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    String? userId = Provider.of<UserProvider>(context, listen: false).userId;
+    if (_mounted) {
+      _userDetailsFuture = fetchUserDetails(userId!);
+    }
+  }
+
+  Future<Map<String, dynamic>> fetchUserDetails(String userId) async {
+    try {
+      final response = await http.get(
+        Uri.parse('https://lpg-api-06n8.onrender.com/api/v1/users/$userId'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (_mounted) {
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> userDetails = jsonDecode(response.body);
+          print(response.body);
+          return userDetails;
+        } else {
+          throw Exception('Failed to load user details');
+        }
+      }
+    } catch (error) {
+      if (_mounted) {
+        print('Error fetching user details: $error');
+        throw Exception('Failed to load user details');
+      }
+    }
+    throw Exception('Failed to load user details');
+  }
 
   Future<void> _takeImage() async {
     final pickedFile =
@@ -173,29 +216,6 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  Future<Map<String, dynamic>> fetchUserDetails(String userId) async {
-    try {
-      final response = await http.get(
-        Uri.parse('https://lpg-api-06n8.onrender.com/api/v1/users/$userId'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> userDetails = jsonDecode(response.body);
-        print(response.body);
-        return userDetails;
-      } else {
-        throw Exception('Failed to load user details');
-      }
-    } catch (error) {
-      print('Error fetching user details: $error');
-      throw Exception('Failed to load user details');
-    }
-  }
-
-  // Di gumagana Change Password
   Future<void> changePassword(String userId, String newPassword) async {
     try {
       final response = await Dio().patch(
@@ -219,16 +239,11 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _handleRefresh() async {
     String? userId = Provider.of<UserProvider>(context, listen: false).userId;
-    setState(() {
-      _userDetailsFuture = fetchUserDetails(userId!);
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    String? userId = Provider.of<UserProvider>(context, listen: false).userId;
-    _userDetailsFuture = fetchUserDetails(userId!);
+    if (_mounted) {
+      setState(() {
+        _userDetailsFuture = fetchUserDetails(userId!);
+      });
+    }
   }
 
   bool isViewAppointmentVisible = true;
@@ -246,6 +261,64 @@ class _ProfilePageState extends State<ProfilePage> {
       isViewAppointmentVisible = true;
       isCardVisible = false;
     });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    String? userId = Provider.of<UserProvider>(context).userId;
+    if (userId != null) {
+      return FutureBuilder<Map<String, dynamic>>(
+        future: _userDetailsFuture,
+        builder: (context, snapshot) {
+          print('Connection State: ${snapshot.connectionState}');
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            print('Waiting for data...');
+            return Scaffold(
+              appBar: AppBar(
+                automaticallyImplyLeading: false,
+                backgroundColor: Colors.white,
+                elevation: 1,
+                title: Text(
+                  'Profile',
+                  style: TextStyle(
+                    color: const Color(0xFF050404).withOpacity(0.9),
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                centerTitle: true,
+                iconTheme: IconThemeData(
+                  color: const Color(0xFF050404).withOpacity(0.8),
+                ),
+                bottom: PreferredSize(
+                  preferredSize: const Size.fromHeight(1),
+                  child: Container(
+                    color: Colors.black,
+                    height: 0.2,
+                  ),
+                ),
+              ),
+              body: Center(
+                child: LoadingAnimationWidget.flickr(
+                  leftDotColor: const Color(0xFF050404).withOpacity(0.8),
+                  rightDotColor: const Color(0xFFd41111).withOpacity(0.8),
+                  size: 40,
+                ),
+              ),
+            );
+          } else if (snapshot.hasError || snapshot.data == null) {
+            print('Error loading user details: ${snapshot.error}');
+            return const Text('Error loading user details');
+          } else {
+            Map<String, dynamic> userDetails = snapshot.data!;
+            print('User details loaded successfully: $userDetails');
+            return buildProfileWidget(userDetails, userId);
+          }
+        },
+      );
+    } else {
+      return const Text('User ID not available');
+    }
   }
 
   Widget buildProfileWidget(Map<String, dynamic> userDetails, String? userId) {
@@ -277,10 +350,8 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       ),
       body: RefreshIndicator(
-        onRefresh: () {
-          String? userId =
-              Provider.of<UserProvider>(context, listen: false).userId;
-          return fetchUserDetails(userId!);
+        onRefresh: () async {
+          await _handleRefresh();
         },
         color: const Color(0xFF050404),
         strokeWidth: 2.5,
@@ -293,7 +364,7 @@ class _ProfilePageState extends State<ProfilePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 30),
-                SizedBox(
+                Container(
                   height: 150,
                   child: Stack(
                     children: [
@@ -930,37 +1001,5 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       ],
     );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    String? userId = Provider.of<UserProvider>(context).userId;
-    if (userId != null) {
-      return FutureBuilder<Map<String, dynamic>>(
-        future: _userDetailsFuture,
-        builder: (context, snapshot) {
-          print('Connection State: ${snapshot.connectionState}');
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            print('Waiting for data...');
-            return Center(
-              child: LoadingAnimationWidget.flickr(
-                leftDotColor: const Color(0xFF050404).withOpacity(0.8),
-                rightDotColor: const Color(0xFFd41111).withOpacity(0.8),
-                size: 40,
-              ),
-            );
-          } else if (snapshot.hasError || snapshot.data == null) {
-            print('Error loading user details: ${snapshot.error}');
-            return const Text('Error loading user details');
-          } else {
-            Map<String, dynamic> userDetails = snapshot.data!;
-            print('User details loaded successfully: $userDetails');
-            return buildProfileWidget(userDetails, userId);
-          }
-        },
-      );
-    } else {
-      return const Text('User ID not available');
-    }
   }
 }

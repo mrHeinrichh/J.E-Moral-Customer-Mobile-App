@@ -124,6 +124,7 @@ class _LoginPageState extends State<LoginPage> {
                                 context: context,
                                 builder: (context) {
                                   return AlertDialog(
+                                    backgroundColor: Colors.white,
                                     title: const Center(
                                       child: Text(
                                         'Login Failed',
@@ -139,7 +140,7 @@ class _LoginPageState extends State<LoginPage> {
                                         onPressed: () {
                                           Navigator.of(context).pop();
                                         },
-                                        child: Text(
+                                        child: const Text(
                                           'OK',
                                           style: TextStyle(
                                             color: Color(0xFF050404),

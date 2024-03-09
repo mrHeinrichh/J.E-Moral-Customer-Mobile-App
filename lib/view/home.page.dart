@@ -532,9 +532,11 @@ class _HomePageState extends State<HomePage> {
                                                 ListTile(
                                                   title: Text(
                                                     product['name'],
-                                                    style: const TextStyle(
+                                                    style: TextStyle(
                                                       fontSize: 13,
-                                                      color: Color(0xFF232937),
+                                                      color: const Color(
+                                                              0xFF050404)
+                                                          .withOpacity(0.9),
                                                     ),
                                                     overflow:
                                                         TextOverflow.ellipsis,

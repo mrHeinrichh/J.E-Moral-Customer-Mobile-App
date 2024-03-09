@@ -4,6 +4,7 @@ import 'package:customer_app/widgets/fullscreen_image.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'dart:convert';
 import 'package:provider/provider.dart';
 import 'user_provider.dart';
@@ -68,96 +69,118 @@ class MyOrderPage extends StatefulWidget {
 class _MyOrderPageState extends State<MyOrderPage> {
   List<Transaction> visibleTransactions = [];
 
+  bool _mounted = true;
+  bool loadingData = false;
+
+  @override
+  void dispose() {
+    _mounted = false;
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
 
+    loadingData = true;
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final userId = userProvider.userId;
 
-    if (userId != null) {
-      fetchTransactions(userId);
+    if (_mounted) {
+      if (userId != null) {
+        fetchTransactions(userId);
+      }
     }
   }
 
   void reloadTransactions() {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final userId = userProvider.userId;
-
-    if (userId != null) {
-      fetchTransactions(userId);
+    if (_mounted) {
+      if (userId != null) {
+        fetchTransactions(userId);
+      }
     }
   }
 
   Future<void> fetchTransactions(String userId) async {
-    final apiUrl =
-        'https://lpg-api-06n8.onrender.com/api/v1/transactions/?filter={"to":"$userId","__t":"Delivery","hasFeedback":false,"deleted":false}&limit=300';
+    try {
+      final apiUrl =
+          'https://lpg-api-06n8.onrender.com/api/v1/transactions/?filter={"to":"$userId","__t":"Delivery","hasFeedback":false,"deleted":false}&limit=300';
 
-    final response = await http.get(Uri.parse(apiUrl));
+      final response = await http.get(Uri.parse(apiUrl));
 
-    if (response.statusCode == 200) {
-      final Map<String, dynamic>? data = jsonDecode(response.body);
-      print(response.body);
-      if (data != null && data['status'] == 'success') {
-        final List<dynamic> transactionsData = data['data'] ?? [];
+      if (response.statusCode == 200) {
+        final Map<String, dynamic>? data = jsonDecode(response.body);
+        print(response.body);
+        if (data != null && data['status'] == 'success') {
+          final List<dynamic> transactionsData = data['data'] ?? [];
 
-        transactionsData.sort((a, b) {
-          DateTime dateTimeA = DateTime.parse(a['updatedAt']);
-          DateTime dateTimeB = DateTime.parse(b['updatedAt']);
-          return dateTimeB.compareTo(dateTimeA);
-        });
+          transactionsData.sort((a, b) {
+            DateTime dateTimeA = DateTime.parse(a['updatedAt']);
+            DateTime dateTimeB = DateTime.parse(b['updatedAt']);
+            return dateTimeB.compareTo(dateTimeA);
+          });
 
-        setState(() {
-          visibleTransactions = transactionsData
-              .where((transactionData) =>
-                  transactionData['status'] == 'Pending' ||
-                  transactionData['status'] == 'Declined' ||
-                  transactionData['status'] == 'Approved' ||
-                  transactionData['status'] == 'On Going' ||
-                  transactionData['status'] == 'Cancelled' ||
-                  transactionData['status'] == 'Completed' &&
-                      transactionData['hasFeedback'] == false &&
-                      transactionData['deleted'] == false)
-              .map((transactionData) => Transaction(
-                    deliveryLocation: transactionData['deliveryLocation'],
-                    customerPrice: transactionData['customerPrice'] != null
-                        ? transactionData['customerPrice'].toString()
-                        : '',
-                    isApproved: transactionData['isApproved'],
-                    id: transactionData['_id'],
-                    name: transactionData['name'],
-                    contactNumber: transactionData['contactNumber'],
-                    houseLotBlk: transactionData['houseLotBlk'],
-                    barangay: transactionData['barangay'],
-                    paymentMethod: transactionData['paymentMethod'],
-                    assembly: transactionData['assembly'],
-                    status: transactionData['status'],
-                    cancelReason: transactionData['cancelReason'] != null
-                        ? transactionData['cancelReason'].toString()
-                        : '',
-                    deliveryDate: transactionData['deliveryDate'] != null
-                        ? transactionData['deliveryDate'].toString()
-                        : '',
-                    discountIdImage: transactionData['discountIdImage'] != null
-                        ? transactionData['discountIdImage'].toString()
-                        : '',
-                    total: transactionData['total'].toDouble(),
-                    createdAt: transactionData['createdAt'],
-                    items: (transactionData['items'] as List<dynamic>?)
-                            ?.map<Map<String, dynamic>>((item) =>
-                                item is Map<String, dynamic> ? item : {})
-                            .toList() ??
-                        [],
-                    completed: transactionData['completed'],
-                    pickupImages: transactionData['pickupImages'],
-                    hasFeedback: transactionData['hasFeedback'],
-                    cancellationImages: transactionData['cancellationImages'],
-                    completionImages: transactionData['completionImages'],
-                  ))
-              .toList();
-        });
+          setState(() {
+            visibleTransactions = transactionsData
+                .where((transactionData) =>
+                    transactionData['status'] == 'Pending' ||
+                    transactionData['status'] == 'Declined' ||
+                    transactionData['status'] == 'Approved' ||
+                    transactionData['status'] == 'On Going' ||
+                    transactionData['status'] == 'Cancelled' ||
+                    transactionData['status'] == 'Completed' &&
+                        transactionData['hasFeedback'] == false &&
+                        transactionData['deleted'] == false)
+                .map((transactionData) => Transaction(
+                      deliveryLocation: transactionData['deliveryLocation'],
+                      customerPrice: transactionData['customerPrice'] != null
+                          ? transactionData['customerPrice'].toString()
+                          : '',
+                      isApproved: transactionData['isApproved'],
+                      id: transactionData['_id'],
+                      name: transactionData['name'],
+                      contactNumber: transactionData['contactNumber'],
+                      houseLotBlk: transactionData['houseLotBlk'],
+                      barangay: transactionData['barangay'],
+                      paymentMethod: transactionData['paymentMethod'],
+                      assembly: transactionData['assembly'],
+                      status: transactionData['status'],
+                      cancelReason: transactionData['cancelReason'] != null
+                          ? transactionData['cancelReason'].toString()
+                          : '',
+                      deliveryDate: transactionData['deliveryDate'] != null
+                          ? transactionData['deliveryDate'].toString()
+                          : '',
+                      discountIdImage:
+                          transactionData['discountIdImage'] != null
+                              ? transactionData['discountIdImage'].toString()
+                              : '',
+                      total: transactionData['total'].toDouble(),
+                      createdAt: transactionData['createdAt'],
+                      items: (transactionData['items'] as List<dynamic>?)
+                              ?.map<Map<String, dynamic>>((item) =>
+                                  item is Map<String, dynamic> ? item : {})
+                              .toList() ??
+                          [],
+                      completed: transactionData['completed'],
+                      pickupImages: transactionData['pickupImages'],
+                      hasFeedback: transactionData['hasFeedback'],
+                      cancellationImages: transactionData['cancellationImages'],
+                      completionImages: transactionData['completionImages'],
+                    ))
+                .toList();
+          });
+        } else {}
       } else {}
-    } else {}
+    } catch (e) {
+      if (_mounted) {
+        print("Error: $e");
+      }
+    } finally {
+      loadingData = false;
+    }
   }
 
   Future<void> cancelTransaction(String transactionId) async {
@@ -212,47 +235,55 @@ class _MyOrderPageState extends State<MyOrderPage> {
         ],
       ),
       backgroundColor: Colors.white,
-      body: RefreshIndicator(
-        color: const Color(0xFF050404),
-        strokeWidth: 2.5,
-        onRefresh: () async {
-          final userProvider =
-              Provider.of<UserProvider>(context, listen: false);
-          final userId = userProvider.userId;
+      body: loadingData
+          ? Center(
+              child: LoadingAnimationWidget.flickr(
+                leftDotColor: const Color(0xFF050404).withOpacity(0.8),
+                rightDotColor: const Color(0xFFd41111).withOpacity(0.8),
+                size: 40,
+              ),
+            )
+          : RefreshIndicator(
+              color: const Color(0xFF050404),
+              strokeWidth: 2.5,
+              onRefresh: () async {
+                final userProvider =
+                    Provider.of<UserProvider>(context, listen: false);
+                final userId = userProvider.userId;
 
-          if (userId != null) {
-            await fetchTransactions(userId);
-          }
-        },
-        child: Column(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: ListView(
-                  children: [
-                    const SizedBox(height: 20),
-                    for (int i = 0; i < visibleTransactions.length; i++)
-                      GestureDetector(
-                        onTap: () {},
-                        child: TransactionCard(
-                          transaction: visibleTransactions[i],
-                          onDeleteTransaction: () {
-                            cancelTransaction(visibleTransactions[i].id);
-                            reloadTransactions();
-                          },
-                          reloadTransactions: reloadTransactions,
-                          orderNumber: visibleTransactions.length - i,
-                        ),
+                if (userId != null) {
+                  await fetchTransactions(userId);
+                }
+              },
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: ListView(
+                        children: [
+                          const SizedBox(height: 20),
+                          for (int i = 0; i < visibleTransactions.length; i++)
+                            GestureDetector(
+                              onTap: () {},
+                              child: TransactionCard(
+                                transaction: visibleTransactions[i],
+                                onDeleteTransaction: () {
+                                  cancelTransaction(visibleTransactions[i].id);
+                                  reloadTransactions();
+                                },
+                                reloadTransactions: reloadTransactions,
+                                orderNumber: visibleTransactions.length - i,
+                              ),
+                            ),
+                          const SizedBox(height: 10),
+                        ],
                       ),
-                    const SizedBox(height: 10),
-                  ],
-                ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 }
