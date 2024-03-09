@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:customer_app/view/user_provider.dart';
+import 'package:customer_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -38,29 +39,21 @@ class _ChatPageState extends State<ChatPage> {
   bool loadingData = false;
   final int _currentPage = 1;
   final int _totalMessagesLoaded = 0;
+  final FocusNode _focusNode = FocusNode();
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   loadingData = true;
-  //   initializeSocketIO();
-  //   print('initState: Socket.IO initialized');
-
-  //   String? userId = Provider.of<UserProvider>(context, listen: false).userId;
-
-  //   String customerId = "65c73688e4f434d230d289e8";
-
-  //   fetchAndAddMessages(userId, customerId).then((_) {
-  //     setState(() {
-  //       loadingData = false;
-  //     });
-  //   });
-  // }
+  @override
+  void dispose() {
+    _textController.dispose();
+    _focusNode.dispose();
+    _scrollController.dispose();
+    socket.disconnect();
+    super.dispose();
+  }
 
   @override
   void initState() {
     super.initState();
-    loadingData = true; // Set loadingData to true initially
+    loadingData = true;
     initializeSocketIO();
     print('initState: Socket.IO initialized');
 
@@ -68,11 +61,17 @@ class _ChatPageState extends State<ChatPage> {
       String? userId = Provider.of<UserProvider>(context, listen: false).userId;
       String customerId = "65c73688e4f434d230d289e8";
 
-      await fetchAndAddMessages(userId, customerId);
-
-      setState(() {
-        loadingData = false;
-      });
+      try {
+        await fetchAndAddMessages(userId, customerId);
+      } catch (error) {
+        print("Error fetching and adding messages: $error");
+      } finally {
+        if (mounted) {
+          setState(() {
+            loadingData = false;
+          });
+        }
+      }
     });
   }
 
@@ -200,6 +199,7 @@ class _ChatPageState extends State<ChatPage> {
           ),
         ),
       ),
+      backgroundColor: Colors.white,
       body: loadingData
           ? Center(
               child: LoadingAnimationWidget.flickr(
@@ -308,11 +308,11 @@ class _ChatPageState extends State<ChatPage> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 12, vertical: 8),
-                        child: TextField(
+                        child: ChatTextField(
+                          keyboardType: TextInputType.multiline,
+                          maxLines: null,
                           controller: _textController,
-                          decoration: const InputDecoration(
-                            hintText: 'Type your message...',
-                          ),
+                          hintText: 'Type your message...',
                         ),
                       ),
                     ),
@@ -332,15 +332,5 @@ class _ChatPageState extends State<ChatPage> {
               ),
             ),
     );
-  }
-
-  final FocusNode _focusNode = FocusNode();
-
-  @override
-  void dispose() {
-    _textController.dispose();
-    _focusNode.dispose();
-    socket.disconnect();
-    super.dispose();
   }
 }

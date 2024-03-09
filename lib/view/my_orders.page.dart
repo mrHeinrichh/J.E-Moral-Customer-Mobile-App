@@ -127,6 +127,7 @@ class _MyOrderPageState extends State<MyOrderPage> {
                 .where((transactionData) =>
                     transactionData['status'] == 'Pending' ||
                     transactionData['status'] == 'Declined' ||
+                    transactionData['status'] == 'Archived' ||
                     transactionData['status'] == 'Approved' ||
                     transactionData['status'] == 'On Going' ||
                     transactionData['status'] == 'Cancelled' ||
@@ -190,7 +191,7 @@ class _MyOrderPageState extends State<MyOrderPage> {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: jsonEncode({'status': "Cancelled", '__t': 'Delivery'}),
+      body: jsonEncode({'status': "Archived", '__t': 'Delivery'}),
     );
 
     if (response.statusCode == 200) {
@@ -318,6 +319,7 @@ class _TransactionCardState extends State<TransactionCard> {
     return widget.transaction.status.toString() == "On Going" ||
             widget.transaction.status.toString() == "Approved" ||
             widget.transaction.status.toString() == "Declined" ||
+            widget.transaction.status.toString() == "Archived" ||
             widget.transaction.status.toString() == "Completed" ||
             widget.transaction.status.toString() == "Cancelled"
         ? const Color(0xFF050404).withOpacity(0.1)
@@ -365,7 +367,8 @@ class _TransactionCardState extends State<TransactionCard> {
                         ),
                       ),
                       if (widget.transaction.status != "Cancelled" &&
-                          widget.transaction.status != "Declined")
+                          widget.transaction.status != "Declined" &&
+                          widget.transaction.status != "Archived")
                         Text(
                           "₱${widget.transaction.total % 1 == 0 ? NumberFormat('#,##0').format(widget.transaction.total.toInt()) : NumberFormat('#,##0.00').format(widget.transaction.total).replaceAll(RegExp(r"([.]*0)(?!.*\d)"), "")}",
                           style: TextStyle(
@@ -375,7 +378,8 @@ class _TransactionCardState extends State<TransactionCard> {
                           ),
                         ),
                       if (widget.transaction.status == "Declined" ||
-                          widget.transaction.status == "Cancelled")
+                          widget.transaction.status == "Cancelled" ||
+                          widget.transaction.status == "Archived")
                         IconButton(
                           icon: Icon(
                             Icons.close,
@@ -431,46 +435,21 @@ class _TransactionCardState extends State<TransactionCard> {
                     ],
                   ),
                   const Divider(),
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        const TextSpan(
-                          text: "Status: ",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        TextSpan(
-                          text: widget.transaction.status,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: const Color(0xFF050404).withOpacity(0.9),
-                          ),
-                        ),
-                      ],
-                    ),
+                  TitleMediumText(
+                    text: widget.transaction.status == 'Archived'
+                        ? 'Status: Cancelled (Me)'
+                        : widget.transaction.status == 'Cancelled' &&
+                                widget.transaction.cancelReason != null &&
+                                widget.transaction.cancelReason.isNotEmpty
+                            ? 'Status: Failed'
+                            : 'Status: ${widget.transaction.status}',
                   ),
                   if (widget.transaction.cancelReason != null &&
                       widget.transaction.cancelReason.isNotEmpty)
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          const TextSpan(
-                            text: "Reason/s: ",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          TextSpan(
-                            text: widget.transaction.cancelReason,
-                            style: const TextStyle(
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      ),
+                    TitleMediumOver(
+                      text: widget.transaction.status == 'Declined'
+                          ? 'Admin Reason/s: ${widget.transaction.cancelReason}'
+                          : 'Delivery Driver Reason/s: ${widget.transaction.cancelReason}',
                     ),
                   const SizedBox(height: 15),
                   CustomButton(
@@ -491,7 +470,8 @@ class _TransactionCardState extends State<TransactionCard> {
                   CustomButton(
                     backgroundColor: getCancelOrderButtonColor(),
                     onPressed: (widget.transaction.status == 'Approved' ||
-                            widget.transaction.status == 'Cancelled')
+                            widget.transaction.status == 'Cancelled' ||
+                            widget.transaction.status == 'Archived')
                         ? () {}
                         : () {
                             showDialog(
@@ -603,31 +583,20 @@ class TransactionDetailsModal extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 BodyMediumText(
-                  text: 'Status: ${transaction.status}',
+                  text: transaction.status == 'Archived'
+                      ? 'Status: Cancelled (Me)'
+                      : transaction.status == 'Cancelled' &&
+                              transaction.cancelReason != null &&
+                              transaction.cancelReason.isNotEmpty
+                          ? 'Status: Failed'
+                          : 'Status: ${transaction.status}',
                 ),
-                if (transaction.cancelReason.isNotEmpty)
-                  Column(
-                    children: [
-                      const SizedBox(height: 5),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text.rich(
-                            TextSpan(
-                              children: [
-                                const TextSpan(
-                                  text: 'Reason: ',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                TextSpan(
-                                  text: transaction.cancelReason,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                if (transaction.cancelReason != null &&
+                    transaction.cancelReason.isNotEmpty)
+                  BodyMediumOver(
+                    text: transaction.status == 'Declined'
+                        ? 'Admin Reason/s: ${transaction.cancelReason}'
+                        : 'Delivery Driver Reason/s: ${transaction.cancelReason}',
                   ),
                 const Divider(),
                 const Center(
@@ -717,7 +686,7 @@ class TransactionDetailsModal extends StatelessWidget {
                           double.parse(
                               (item['customerPrice']).toStringAsFixed(2)));
 
-                      return '$itemName (₱$price x $quantity)';
+                      return '$itemName ₱$price (x$quantity)';
                     }
                   }).join(', ')}',
                 ),
@@ -734,14 +703,14 @@ class TransactionDetailsModal extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          Column(
-                            children: [
-                              const Text(
-                                'Pick-up Image',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 5),
-                              if (transaction.pickupImages != "")
+                          if (transaction.pickupImages != "")
+                            Column(
+                              children: [
+                                const Text(
+                                  'Pick-up Image',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 5),
                                 GestureDetector(
                                   onTap: () {
                                     Navigator.push(
@@ -767,18 +736,16 @@ class TransactionDetailsModal extends StatelessWidget {
                                     ),
                                   ),
                                 )
-                              else
-                                const Text(''),
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              const Text(
-                                'Drop-off Image',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 5),
-                              if (transaction.completionImages != "")
+                              ],
+                            ),
+                          if (transaction.completionImages != "")
+                            Column(
+                              children: [
+                                const Text(
+                                  'Drop-off Image',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 5),
                                 GestureDetector(
                                   onTap: () {
                                     Navigator.push(
@@ -805,10 +772,8 @@ class TransactionDetailsModal extends StatelessWidget {
                                     ),
                                   ),
                                 )
-                              else
-                                const Text(''),
-                            ],
-                          ),
+                              ],
+                            ),
                           if (transaction.cancellationImages != "")
                             Column(
                               children: [

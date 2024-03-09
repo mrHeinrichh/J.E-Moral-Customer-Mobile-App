@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:customer_app/routes/app_routes.dart';
 import 'package:customer_app/view/my_orders.page.dart';
 import 'package:customer_app/widgets/text_field.dart';
@@ -452,7 +451,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
         print("Feedback submitted successfully");
         print(response.body);
         print(response.statusCode);
-        Navigator.pushNamed(context, dashboardRoute);
+        Navigator.pushNamed(context, historyRoute);
       } else {
         print("Failed to submit feedback. Status code: ${response.statusCode}");
       }

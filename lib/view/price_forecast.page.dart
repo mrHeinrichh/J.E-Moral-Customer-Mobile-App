@@ -1,3 +1,4 @@
+import 'package:customer_app/routes/app_routes.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
@@ -222,7 +223,6 @@ class _ForecastPageState extends State<ForecastPage> {
           List<PriceData> fetchedData =
               data.map((item) => PriceData.fromJson(item)).toList();
 
-          // Sort fetchedData based on updatedAt in descending order
           fetchedData.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
 
           setState(() {
@@ -257,6 +257,12 @@ class _ForecastPageState extends State<ForecastPage> {
             color: Colors.black,
             height: 0.2,
           ),
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushReplacementNamed(context, dashboardRoute);
+          },
         ),
       ),
       backgroundColor: Colors.white,

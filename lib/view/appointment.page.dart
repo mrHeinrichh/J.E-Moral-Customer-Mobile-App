@@ -205,7 +205,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
                       print('Appointment updated successfully');
 
                       dateController.clear();
- 
+
                       Navigator.pushNamed(context, dashboardRoute,
                           arguments: 3);
                     } else {
@@ -295,6 +295,12 @@ class _AppointmentPageState extends State<AppointmentPage> {
             color: Colors.black,
             height: 0.2,
           ),
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushReplacementNamed(context, dashboardRoute);
+          },
         ),
       ),
       backgroundColor: Colors.white,

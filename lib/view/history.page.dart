@@ -413,14 +413,14 @@ class _HistoryPageState extends State<HistoryPage> {
                                                   'customerPrice')) {
                                             final itemName = item['name'];
                                             final quantity = item['quantity'];
-                                            final price =
+                                            final price =  
                                                 NumberFormat.decimalPattern()
                                                     .format(double.parse(
                                                         (item['customerPrice'])
                                                             .toStringAsFixed(
                                                                 2)));
 
-                                            return '$itemName (₱$price x $quantity)';
+                                            return '$itemName ₱$price (x$quantity)';
                                           }
                                         }).join(', ')}',
                                       ),

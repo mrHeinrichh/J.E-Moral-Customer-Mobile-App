@@ -1,3 +1,4 @@
+import 'package:customer_app/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:customer_app/widgets/custom_button.dart';
 import 'package:flutter/widgets.dart';
@@ -77,6 +78,12 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             color: Colors.black,
             height: 0.2,
           ),
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushReplacementNamed(context, dashboardRoute);
+          },
         ),
       ),
       backgroundColor: Colors.white,
