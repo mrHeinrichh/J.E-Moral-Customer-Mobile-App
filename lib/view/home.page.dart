@@ -256,7 +256,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       SizedBox(
                         child: CarouselSlider.builder(
-                          itemCount: announcements.length + 1,
+                          itemCount: announcements.length + 2,
                           itemBuilder:
                               (BuildContext context, int index, int realIndex) {
                             if (index == 0) {
@@ -264,7 +264,7 @@ class _HomePageState extends State<HomePage> {
                             } else if (index == 1) {
                               return PriceForecastCard();
                             } else {
-                              final announcement = announcements[index - 1];
+                              final announcement = announcements[index - 2];
 
                               return InkWell(
                                 onTap: () {
