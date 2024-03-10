@@ -27,7 +27,7 @@ class _MapsPageState extends State<MapsPage> {
     fetchData();
 
     // Start a timer to call fetchData every 3 seconds
-    timer = Timer.periodic(Duration(seconds: 3), (Timer t) => fetchData());
+    timer = Timer.periodic(Duration(seconds: 16), (Timer t) => fetchData());
   }
 
   @override
@@ -151,14 +151,15 @@ class _MapsPageState extends State<MapsPage> {
       );
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = jsonDecode(response.body);
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
         print(response.body);
 
-        final String riderId = data['data']['rider'];
+        final Map<String, dynamic> data = responseData['data'];
+        final String riderId = data['rider'];
+        final String deliveryLocation = data['deliveryLocation'];
+        final String startLatitude = data['lat'].toString();
+        final String startLongitude = data['long'].toString();
 
-        final String deliveryLocation = data['data']['deliveryLocation'];
-        final String startLatitude = data['data']['lat'];
-        final String startLongitude = data['data']['long'];
         print(
             'START LOCATION Latitude: $startLatitude, Longitude: $startLongitude');
 
