@@ -27,7 +27,7 @@ class _MapsPageState extends State<MapsPage> {
     fetchData();
 
     // Start a timer to call fetchData every 3 seconds
-    timer = Timer.periodic(Duration(seconds: 16), (Timer t) => fetchData());
+    timer = Timer.periodic(Duration(seconds: 3), (Timer t) => fetchData());
   }
 
   @override
@@ -91,10 +91,13 @@ class _MapsPageState extends State<MapsPage> {
           zoom: zoom,
         ),
         children: [
-          TileLayer(
-            urlTemplate:
-                'https://maps.geoapify.com/v1/tile/klokantech-basic/{z}/{x}/{y}.png?apiKey=3e4c0fcabf244021845380f543236e29',
-          ),
+          isLoading
+              ? Center(child: CircularProgressIndicator())
+              : TileLayer(
+                  urlTemplate:
+                      'https://maps.geoapify.com/v1/tile/osm-bright-grey/{z}/{x}/{y}@2x.png?apiKey=YOUR_API_KEY',
+                  tileProvider: NetworkTileProvider(),
+                ),
           PolylineLayer(
             polylines: [
               Polyline(
