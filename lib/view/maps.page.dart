@@ -24,9 +24,6 @@ class _MapsPageState extends State<MapsPage> {
   @override
   void initState() {
     super.initState();
-    fetchData();
-
-    // Start a timer to call fetchData every 3 seconds
     timer = Timer.periodic(Duration(seconds: 3), (Timer t) => fetchData());
   }
 
@@ -95,7 +92,7 @@ class _MapsPageState extends State<MapsPage> {
               ? Center(child: CircularProgressIndicator())
               : TileLayer(
                   urlTemplate:
-                      'https://maps.geoapify.com/v1/tile/osm-bright-grey/{z}/{x}/{y}@2x.png?apiKey=YOUR_API_KEY',
+                      'https://maps.geoapify.com/v1/tile/osm-bright-grey/{z}/{x}/{y}@2x.png?apiKey=8d6f24ab18d648ce9062effc64d52580',
                   tileProvider: NetworkTileProvider(),
                 ),
           PolylineLayer(
@@ -141,11 +138,6 @@ class _MapsPageState extends State<MapsPage> {
   }
 
   Future<void> fetchData() async {
-    if (!isLoading) {
-      return;
-    }
-    print("test");
-
     try {
       final response = await http.get(
         Uri.parse(
@@ -297,13 +289,12 @@ class CustomMarker extends StatelessWidget {
 
 double calculateZoom(
     double minLat, double maxLat, double minLng, double maxLng) {
-  const double paddingFactor = 1.1; // Adjust this to add padding around markers
+  const double paddingFactor = 1.1;
   double latRange = (maxLat - minLat) * paddingFactor;
   double lngRange = (maxLng - minLng) * paddingFactor;
 
   double diagonal = math.sqrt(latRange * latRange + lngRange * lngRange);
 
-  // 256 is the default tile size
   double zoom =
       (math.log(360.0 / 256.0 * (EarthRadius * math.pi) / diagonal) / math.ln2)
           .floorToDouble();
