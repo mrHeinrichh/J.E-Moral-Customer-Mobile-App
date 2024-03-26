@@ -26,8 +26,6 @@ class SetDeliveryPage extends StatefulWidget {
 class _SetDeliveryPageState extends State<SetDeliveryPage> {
   final formKey = GlobalKey<FormState>();
   final imageStreamController = StreamController<File?>.broadcast();
-
-  String? selectedPaymentMethod;
   bool? selectedAssemblyOption;
 
   DateTime? selectedDateTime;
@@ -235,15 +233,13 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
       final Map<String, dynamic> requestData = {
         "deliveryLocation": locationController.text,
         "houseLotBlk": houseNumberController.text,
-        "paymentMethod": selectedPaymentMethod,
+        "paymentMethod": "COD",
         "status": "Pending",
         "assembly": selectedAssemblyOption.toString(),
         "deliveryDate": selectedDateTime.toString(),
         "barangay": selectedBarangay,
-        // "total": "",
         "to": userId,
         "feedback": "",
-        // "statuses": "",
         "rating": "0",
         "pickupImages": "",
         "completionImages": "",
@@ -490,82 +486,6 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                         }
                         return null;
                       },
-                    ),
-                    const SizedBox(height: 10),
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: const Color(0xFF050404)),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 8),
-                            child: Text(
-                              "Choose Payment Method:",
-                              style: TextStyle(
-                                color: Color(0xFF050404),
-                              ),
-                            ),
-                          ),
-                          FormField<String>(
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please Select a Payment Method';
-                              }
-                              return null;
-                            },
-                            builder: (state) {
-                              return Column(
-                                children: [
-                                  RadioListTile<String>(
-                                    title: const Text('Cash on Delivery'),
-                                    value: 'COD',
-                                    groupValue: selectedPaymentMethod,
-                                    onChanged: (String? value) {
-                                      setState(() {
-                                        selectedPaymentMethod = value!;
-                                      });
-                                      state.didChange(value);
-                                    },
-                                    controlAffinity:
-                                        ListTileControlAffinity.leading,
-                                    activeColor: const Color(0xFF050404),
-                                  ),
-                                  RadioListTile<String>(
-                                    title: const Text('Gcash Payment'),
-                                    value: 'GCASH',
-                                    groupValue: selectedPaymentMethod,
-                                    onChanged: (String? value) {
-                                      setState(() {
-                                        selectedPaymentMethod = value!;
-                                      });
-                                      state.didChange(value);
-                                    },
-                                    controlAffinity:
-                                        ListTileControlAffinity.leading,
-                                    activeColor: const Color(0xFF050404),
-                                  ),
-                                  if (state.errorText != null) ...[
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12, vertical: 8),
-                                      child: Text(
-                                        state.errorText!,
-                                        style:
-                                            const TextStyle(color: Colors.red),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 5),
-                                  ],
-                                ],
-                              );
-                            },
-                          ),
-                        ],
-                      ),
                     ),
                     const SizedBox(height: 10),
                     Container(
@@ -965,9 +885,6 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
               BodyMediumText(
                 text:
                     'Assemble Option: ${selectedAssemblyOption! ? 'Yes' : 'No'}',
-              ),
-              BodyMediumText(
-                text: 'Payment Method: $selectedPaymentMethod',
               ),
               BodyMediumText(
                 text: 'Applying for Discount: ${_image != null ? 'Yes' : 'No'}',
