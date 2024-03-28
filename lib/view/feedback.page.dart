@@ -190,15 +190,30 @@ class _FeedbackPageState extends State<FeedbackPage> {
         SizedBox(height: 5),
         Wrap(
           children: options.map((option) {
-            return Row(
-              children: [
-                Radio<String>(
-                  value: option,
-                  groupValue: selectedValue,
-                  onChanged: onChanged,
+            return GestureDetector(
+              onTap: () {
+                onChanged(option);
+              },
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: selectedValue == option ? Colors.blue : Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: selectedValue == option ? Colors.blue : Colors.grey,
+                    width: 1,
+                  ),
                 ),
-                Text(option),
-              ],
+                child: Text(
+                  option,
+                  style: TextStyle(
+                    color:
+                        selectedValue == option ? Colors.white : Colors.black,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
             );
           }).toList(),
         ),
