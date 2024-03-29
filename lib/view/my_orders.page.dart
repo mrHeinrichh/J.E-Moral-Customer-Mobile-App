@@ -557,6 +557,8 @@ class TransactionDetailsModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final savedAmount = transaction.total * 0.25;
+
     return SingleChildScrollView(
       child: Container(
         padding: const EdgeInsets.all(20),
@@ -689,6 +691,13 @@ class TransactionDetailsModal extends StatelessWidget {
                       return '$itemName ₱$price (x$quantity)';
                     }
                   }).join(', ')}',
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Saved Amount:'),
+                    Text('₱${savedAmount.toStringAsFixed(2)}'),
+                  ],
                 ),
                 BodyMediumText(
                   text:

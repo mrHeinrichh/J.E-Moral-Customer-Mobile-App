@@ -19,6 +19,12 @@ class _HistoryPageState extends State<HistoryPage> {
   List<Map<String, dynamic>> visibleTransactions = [];
   bool loadingData = false;
 
+  double calculateSavedAmount(
+      int index, List<Map<String, dynamic>> transactions) {
+    final total = transactions[index]['total'] ?? 0.0;
+    return total * 0.25;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -79,6 +85,7 @@ class _HistoryPageState extends State<HistoryPage> {
             transaction['status'] == "Completed" &&
             transaction['hasFeedback'] == true)
         .toList();
+    double savedAmount = 0.0;
 
     return Scaffold(
       appBar: AppBar(
@@ -413,7 +420,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                                   'customerPrice')) {
                                             final itemName = item['name'];
                                             final quantity = item['quantity'];
-                                            final price =  
+                                            final price =
                                                 NumberFormat.decimalPattern()
                                                     .format(double.parse(
                                                         (item['customerPrice'])
@@ -423,6 +430,12 @@ class _HistoryPageState extends State<HistoryPage> {
                                             return '$itemName ₱$price (x$quantity)';
                                           }
                                         }).join(', ')}',
+                                      ),
+                                      // Display saved amount
+
+                                      BodyMediumText(
+                                        text:
+                                            'Saved Amount: ₱${calculateSavedAmount(i, completedTransactions).toStringAsFixed(2)}',
                                       ),
                                       BodyMediumText(
                                         text:
