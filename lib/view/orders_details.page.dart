@@ -60,7 +60,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                     Text("Contact: ${widget.transaction.contactNumber}"),
                     Text("House#/Lot/Blk: ${widget.transaction.houseLotBlk}"),
                     Text("Payment Method: ${widget.transaction.paymentMethod}"),
-                    Text("Assembly: ${widget.transaction.assembly}"),
+                    Text("Installed: ${widget.transaction.installed}"),
                     Text("Delivery Time: ${widget.transaction.deliveryDate}"),
                     Text("Total Price: ${widget.transaction.total}"),
                     Text("Date: ${widget.transaction.createdAt}"),

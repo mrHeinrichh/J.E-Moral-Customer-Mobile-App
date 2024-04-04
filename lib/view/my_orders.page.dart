@@ -23,7 +23,7 @@ class Transaction {
   final String barangay;
   final String paymentMethod;
   final String status;
-  final bool assembly;
+  final bool installed;
   final String deliveryDate;
   final double total;
   final String cancelReason;
@@ -45,7 +45,7 @@ class Transaction {
     required this.houseLotBlk,
     required this.barangay,
     required this.paymentMethod,
-    required this.assembly,
+    required this.installed,
     required this.status,
     required this.deliveryDate,
     required this.total,
@@ -146,7 +146,7 @@ class _MyOrderPageState extends State<MyOrderPage> {
                       houseLotBlk: transactionData['houseLotBlk'],
                       barangay: transactionData['barangay'],
                       paymentMethod: transactionData['paymentMethod'],
-                      assembly: transactionData['assembly'],
+                      installed: transactionData['installed'],
                       status: transactionData['status'],
                       cancelReason: transactionData['cancelReason'] != null
                           ? transactionData['cancelReason'].toString()
@@ -632,7 +632,7 @@ class TransactionDetailsModal extends StatelessWidget {
                 )} '),
                 BodyMediumText(
                   text:
-                      'Assemble Option: ${transaction.assembly ? 'Yes' : 'No'}',
+                      'Assemble Option: ${transaction.installed ? 'Yes' : 'No'}',
                 ),
                 BodyMediumText(
                   text:
