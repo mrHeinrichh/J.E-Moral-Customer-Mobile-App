@@ -26,7 +26,7 @@ class SetDeliveryPage extends StatefulWidget {
 class _SetDeliveryPageState extends State<SetDeliveryPage> {
   final formKey = GlobalKey<FormState>();
   final imageStreamController = StreamController<File?>.broadcast();
-  bool? selectedAssemblyOption;
+  bool? selectedInstalledOption;
 
   DateTime? selectedDateTime;
   File? _image;
@@ -235,7 +235,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
         "houseLotBlk": houseNumberController.text,
         "paymentMethod": "COD",
         "status": "Pending",
-        "assembly": selectedAssemblyOption.toString(),
+        "installed": selectedInstalledOption.toString(),
         "deliveryDate": selectedDateTime.toString(),
         "barangay": selectedBarangay,
         "to": userId,
@@ -519,10 +519,10 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                                   ListTile(
                                     leading: Radio<bool>(
                                       value: true,
-                                      groupValue: selectedAssemblyOption,
+                                      groupValue: selectedInstalledOption,
                                       onChanged: (bool? value) {
                                         setState(() {
-                                          selectedAssemblyOption = value!;
+                                          selectedInstalledOption = value!;
                                         });
                                         state.didChange(value);
                                       },
@@ -533,10 +533,10 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                                   ListTile(
                                     leading: Radio<bool>(
                                       value: false,
-                                      groupValue: selectedAssemblyOption,
+                                      groupValue: selectedInstalledOption,
                                       onChanged: (bool? value) {
                                         setState(() {
-                                          selectedAssemblyOption = value!;
+                                          selectedInstalledOption = value!;
                                         });
                                         state.didChange(value);
                                       },
@@ -884,7 +884,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
               )} '),
               BodyMediumText(
                 text:
-                    'Assemble Option: ${selectedAssemblyOption! ? 'Yes' : 'No'}',
+                    'Assemble Option: ${selectedInstalledOption! ? 'Yes' : 'No'}',
               ),
               BodyMediumText(
                 text: 'Applying for Discount: ${_image != null ? 'Yes' : 'No'}',

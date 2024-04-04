@@ -399,7 +399,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                       ),
                                       BodyMediumText(
                                         text:
-                                            'Assemble Option: ${completedTransactions[i]['assembly'] ? 'Yes' : 'No'}',
+                                            'Assemble Option: ${completedTransactions[i]['installed'] ? 'Yes' : 'No'}',
                                       ),
                                       BodyMediumOver(
                                         text:

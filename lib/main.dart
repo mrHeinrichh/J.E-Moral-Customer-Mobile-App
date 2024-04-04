@@ -65,7 +65,7 @@ class MyApp extends StatelessWidget {
             contactNumber: 'Sample Contact Number',
             houseLotBlk: 'Sample House/Lot/Block',
             paymentMethod: 'Sample Payment Method',
-            assembly: false,
+            installed: false,
             deliveryDate: 'Sample Delivery Time',
             barangay: 'Sample Barangay',
             total: 0.0,
