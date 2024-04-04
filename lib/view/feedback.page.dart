@@ -19,6 +19,12 @@ class _FeedbackPageState extends State<FeedbackPage> {
   late String selectedOverallSatisfaction;
   late String selectedRecommendation;
 
+  bool applicationResponsivenessValid = true;
+  bool orderAcceptanceValid = true;
+  bool riderPerformanceValid = true;
+  bool overallSatisfactionValid = true;
+  bool recommendationValid = true;
+
   @override
   void initState() {
     super.initState();
@@ -60,19 +66,19 @@ class _FeedbackPageState extends State<FeedbackPage> {
       ),
       backgroundColor: Colors.white,
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const SizedBox(height: 20),
               buildRadioList(
                 'Application Responsiveness',
+                'Are you satisfied with the speed and responsiveness of our mobile/web application when browsing and making purchases?',
                 [
-                  'Very satisfied',
-                  'Satisfied',
-                  'Neutral',
-                  'Dissatisfied',
-                  'Very dissatisfied'
+                  'Absolutely Satisfied', // POSITIVE
+                  'Moderately Satisfied', // NEUTRAL
+                  'Somewhat Dissatisfied' // NEGATIVE
                 ],
                 selectedApplicationResponsiveness,
                 (String? value) {
@@ -80,15 +86,15 @@ class _FeedbackPageState extends State<FeedbackPage> {
                     selectedApplicationResponsiveness = value ?? '';
                   });
                 },
+                applicationResponsivenessValid,
               ),
               buildRadioList(
                 'Order Acceptance',
+                'How was the approval and speed of your transaction in the system?',
                 [
-                  'Very satisfied',
-                  'Satisfied',
-                  'Neutral',
-                  'Dissatisfied',
-                  'Very dissatisfied'
+                  'Fast and Hasslefree',
+                  'Experiencing Delays but Tolerable',
+                  'Complicated and Inconvenient',
                 ],
                 selectedOrderAcceptance,
                 (String? value) {
@@ -96,15 +102,15 @@ class _FeedbackPageState extends State<FeedbackPage> {
                     selectedOrderAcceptance = value ?? '';
                   });
                 },
+                orderAcceptanceValid,
               ),
               buildRadioList(
                 'Rider Performance',
+                'How was the communication skills and punctuality of the delivery rider in delivering your LPG order?',
                 [
-                  'Very satisfied',
-                  'Satisfied',
-                  'Neutral',
-                  'Dissatisfied',
-                  'Very dissatisfied'
+                  'Interactive and Arrived on time',
+                  'Average expectation',
+                  'Needs more training and arrived late',
                 ],
                 selectedRiderPerformance,
                 (String? value) {
@@ -112,15 +118,15 @@ class _FeedbackPageState extends State<FeedbackPage> {
                     selectedRiderPerformance = value ?? '';
                   });
                 },
+                riderPerformanceValid,
               ),
               buildRadioList(
                 'Overall Satisfaction',
+                'How would you describe your overall experience using our mobile/web application to purchase LPG products?',
                 [
-                  'Very satisfied',
-                  'Satisfied',
-                  'Neutral',
-                  'Dissatisfied',
-                  'Very dissatisfied'
+                  'One of a kind, will reuse the app',
+                  'Medium performance, needs improvement',
+                  'Inconvenient, will stick to conventional purchasing method.',
                 ],
                 selectedOverallSatisfaction,
                 (String? value) {
@@ -128,15 +134,15 @@ class _FeedbackPageState extends State<FeedbackPage> {
                     selectedOverallSatisfaction = value ?? '';
                   });
                 },
+                overallSatisfactionValid,
               ),
               buildRadioList(
                 'Recommendation',
+                'Overall, how likely are you to recommend our mobile/web application to others based on your experience using it for LPG purchases?',
                 [
-                  'Very likely',
-                  'Likely',
-                  'Neutral',
-                  'Unlikely',
-                  'Very unlikely'
+                  'Will highly recommend to others',
+                  'Undecided to recommend to others',
+                  'Unlikely to recommend to others',
                 ],
                 selectedRecommendation,
                 (String? value) {
@@ -144,17 +150,34 @@ class _FeedbackPageState extends State<FeedbackPage> {
                     selectedRecommendation = value ?? '';
                   });
                 },
+                recommendationValid,
               ),
-              SizedBox(height: 15),
               CustomizedButton(
                 onPressed: () {
-                  submitFeedback(transaction);
+                  setState(() {
+                    applicationResponsivenessValid =
+                        selectedApplicationResponsiveness.isNotEmpty;
+                    orderAcceptanceValid = selectedOrderAcceptance.isNotEmpty;
+                    riderPerformanceValid = selectedRiderPerformance.isNotEmpty;
+                    overallSatisfactionValid =
+                        selectedOverallSatisfaction.isNotEmpty;
+                    recommendationValid = selectedRecommendation.isNotEmpty;
+                  });
+
+                  if (applicationResponsivenessValid &&
+                      orderAcceptanceValid &&
+                      riderPerformanceValid &&
+                      overallSatisfactionValid &&
+                      recommendationValid) {
+                    submitFeedback(transaction);
+                  }
                 },
                 text: 'Submit',
                 height: 50,
                 width: 340,
                 fontz: 18,
               ),
+              const SizedBox(height: 20),
             ],
           ),
         ),
@@ -164,9 +187,11 @@ class _FeedbackPageState extends State<FeedbackPage> {
 
   Widget buildRadioList(
     String title,
+    String prompt,
     List<String> options,
     String selectedValue,
     void Function(String?) onChanged,
+    bool isValid,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,20 +199,23 @@ class _FeedbackPageState extends State<FeedbackPage> {
         Text(
           title,
           style: TextStyle(
-            color: Color(0xFF050404),
+            color: isValid
+                ? Colors.black
+                : const Color(0xFFd41111).withOpacity(0.8),
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
-        SizedBox(height: 5),
+        const Divider(),
+        const SizedBox(height: 5),
         Text(
-          'Select one:',
+          prompt,
           style: TextStyle(
-            color: Color(0xFF050404),
-            fontSize: 14,
+            color: isValid ? Colors.black : Colors.red,
+            fontSize: 16,
           ),
         ),
-        SizedBox(height: 5),
+        const SizedBox(height: 5),
         Wrap(
           children: options.map((option) {
             return GestureDetector(
@@ -195,21 +223,26 @@ class _FeedbackPageState extends State<FeedbackPage> {
                 onChanged(option);
               },
               child: Container(
-                margin: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-                padding: EdgeInsets.all(10),
+                margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: selectedValue == option ? Colors.blue : Colors.white,
+                  color: selectedValue == option
+                      ? const Color(0xFFd41111).withOpacity(0.8)
+                      : Colors.white,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: selectedValue == option ? Colors.blue : Colors.grey,
+                    color: selectedValue == option
+                        ? Colors.transparent
+                        : const Color(0xFF050404).withOpacity(0.6),
                     width: 1,
                   ),
                 ),
                 child: Text(
                   option,
                   style: TextStyle(
-                    color:
-                        selectedValue == option ? Colors.white : Colors.black,
+                    color: selectedValue == option
+                        ? Colors.white
+                        : const Color(0xFF050404),
                     fontSize: 16,
                   ),
                 ),
@@ -217,7 +250,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
             );
           }).toList(),
         ),
-        SizedBox(height: 15),
+        const SizedBox(height: 20),
       ],
     );
   }
