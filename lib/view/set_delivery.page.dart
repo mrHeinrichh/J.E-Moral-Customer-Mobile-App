@@ -500,7 +500,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
                             padding: EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 8),
                             child: Text(
-                              "Needs to be assembled:",
+                              "Needs to be Installed:",
                               style: TextStyle(
                                 color: Color(0xFF050404),
                               ),
@@ -884,7 +884,7 @@ class _SetDeliveryPageState extends State<SetDeliveryPage> {
               )} '),
               BodyMediumText(
                 text:
-                    'Assemble Option: ${selectedInstalledOption! ? 'Yes' : 'No'}',
+                    'Installed Option: ${selectedInstalledOption! ? 'Yes' : 'No'}',
               ),
               BodyMediumText(
                 text: 'Applying for Discount: ${_image != null ? 'Yes' : 'No'}',

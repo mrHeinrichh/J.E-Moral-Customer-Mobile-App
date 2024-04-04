@@ -632,7 +632,7 @@ class TransactionDetailsModal extends StatelessWidget {
                 )} '),
                 BodyMediumText(
                   text:
-                      'Assemble Option: ${transaction.installed ? 'Yes' : 'No'}',
+                      'Installed Option: ${transaction.installed ? 'Yes' : 'No'}',
                 ),
                 BodyMediumText(
                   text:
